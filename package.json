@@ -2,6 +2,7 @@
   "name": "masjid-al-ikhlas-website",
   "version": "1.0.0",
   "description": "Website resmi Masjid Al-Birru — Blog, Acara, Keuangan",
+  "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",

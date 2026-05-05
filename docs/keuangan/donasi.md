@@ -63,7 +63,7 @@ description: Informasi rekening dan program donasi Masjid Al-Birru
   </div>
 </div>
 
-Renovasi tempat wudhu meliputi penambahan kran, perbaikan saluran air, pemasangan lantai anti-slip, dan penambahan cermin. Target selesai: **Agustus 2025**.
+Renovasi tempat wudhu meliputi penambahan kran, perbaikan saluran air, pemasangan lantai anti-slip, dan penambahan cermin. Target selesai: **Agustus 2026**.
 
 **Kode donasi:** `WUDHU`
 

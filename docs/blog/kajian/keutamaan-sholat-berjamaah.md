@@ -1,7 +1,7 @@
 ---
 title: Keutamaan Sholat Berjamaah di Masjid
 description: Sholat berjamaah memiliki keutamaan 27 derajat. Artikel ini membahas tuntas dalil, hukum, dan tips konsisten berjamaah.
-date: 2025-05-01
+date: 2026-05-01
 author: Ust. Ahmad Fauzi
 category: Kajian
 tags: [sholat, berjamaah, ibadah, fiqh]
@@ -10,7 +10,7 @@ tags: [sholat, berjamaah, ibadah, fiqh]
 # Keutamaan Sholat Berjamaah di Masjid
 
 <div class="article-meta">
-  <span>📅 1 Mei 2025</span>
+  <span>📅 1 Mei 2026</span>
   <span>✍️ Ust. Ahmad Fauzi</span>
   <span class="tag">Kajian</span>
   <span>⏱️ 5 menit baca</span>

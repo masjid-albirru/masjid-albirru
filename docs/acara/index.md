@@ -21,7 +21,7 @@ Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
 ---
 
-## 📋 Acara Mendatang (Mei 2025)
+## 📋 Acara Mendatang (Mei 2026)
 
 <div class="event-card">
   <div class="event-date">
@@ -90,15 +90,15 @@ Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
 ---
 
-## 📆 Jadwal Khatib Jum'at — Mei 2025
+## 📆 Jadwal Khatib Jum'at — Mei 2026
 
 | Tanggal | Khatib | Tema Khutbah |
 |---------|--------|--------------|
-| 2 Mei 2025 | Ust. Ahmad Fauzi | Pentingnya Ilmu dalam Islam |
-| 9 Mei 2025 | Ust. Hasan Basri | Birrul Walidain |
-| 16 Mei 2025 | Ust. Dr. Ridwan | Iman dan Amal Shaleh |
-| 23 Mei 2025 | Ust. Ahmad Fauzi | Menjaga Lisan |
-| 30 Mei 2025 | Ust. Mahmud Ali | Ukhuwah Islamiyah |
+| 2 Mei 2026 | Ust. Ahmad Fauzi | Pentingnya Ilmu dalam Islam |
+| 9 Mei 2026 | Ust. Hasan Basri | Birrul Walidain |
+| 16 Mei 2026 | Ust. Dr. Ridwan | Iman dan Amal Shaleh |
+| 23 Mei 2026 | Ust. Ahmad Fauzi | Menjaga Lisan |
+| 30 Mei 2026 | Ust. Mahmud Ali | Ukhuwah Islamiyah |
 
 ---
 

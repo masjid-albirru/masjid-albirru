@@ -21,10 +21,10 @@ on:
           - november
           - desember
       tahun:
-        description: "Tahun laporan (contoh: 2025)"
+        description: "Tahun laporan (contoh: 2026)"
         required: true
         type: string
-        default: "2025"
+        default: "2026"
       saldo_awal:
         description: "Saldo awal bulan (angka saja, contoh: 29700000)"
         required: true

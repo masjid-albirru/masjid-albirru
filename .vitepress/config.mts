@@ -61,10 +61,10 @@ export default defineConfig({
           text: '📅 Acara & Kegiatan',
           items: [
             { text: 'Semua Acara', link: '/acara/' },
-            { text: 'Jadwal Sholat Jum\'at', link: '/acara/jumat' },
-            { text: 'Kajian Rutin', link: '/acara/kajian-rutin' },
-            { text: 'Ramadan', link: '/acara/ramadan' },
-            { text: 'Hari Besar Islam', link: '/acara/hari-besar' },
+            // { text: 'Jadwal Sholat Jum\'at', link: '/acara/jumat' },
+            // { text: 'Kajian Rutin', link: '/acara/kajian-rutin' },
+            // { text: 'Ramadan', link: '/acara/ramadan' },
+            // { text: 'Hari Besar Islam', link: '/acara/hari-besar' },
           ]
         }
       ],
@@ -74,11 +74,11 @@ export default defineConfig({
           items: [
             { text: 'Ringkasan', link: '/keuangan/' },
             { text: 'Laporan Bulanan', collapsed: false, items: [
-              { text: '2025', collapsed: true, items: [
-                { text: 'Januari 2025', link: '/keuangan/2025/januari' },
-                { text: 'Februari 2025', link: '/keuangan/2025/februari' },
-                { text: 'Maret 2025', link: '/keuangan/2025/maret' },
-                { text: 'April 2025', link: '/keuangan/2025/april' },
+              { text: '2026', collapsed: true, items: [
+                { text: 'Januari 2026', link: '/keuangan/2026/januari' },
+                { text: 'Februari 2026', link: '/keuangan/2026/februari' },
+                { text: 'Maret 2026', link: '/keuangan/2026/maret' },
+                { text: 'April 2026', link: '/keuangan/2026/april' },
               ]}
             ]},
             { text: 'Laporan Tahunan', link: '/keuangan/tahunan' },
@@ -91,10 +91,7 @@ export default defineConfig({
           text: '🕌 Tentang Masjid',
           items: [
             { text: 'Profil Masjid', link: '/tentang/' },
-            { text: 'Sejarah', link: '/tentang/sejarah' },
-            { text: 'Visi & Misi', link: '/tentang/visi-misi' },
             { text: 'Struktur Pengurus', link: '/tentang/pengurus' },
-            { text: 'Fasilitas', link: '/tentang/fasilitas' },
             { text: 'Kontak & Lokasi', link: '/tentang/kontak' },
           ]
         }

@@ -159,7 +159,7 @@ masjid-al-ikhlas/
 │   │   ├── index.md               # Ringkasan keuangan
 │   │   ├── donasi.md              # Program donasi
 │   │   ├── tahunan.md             # Laporan tahunan
-│   │   └── 2025/
+│   │   └── 2026/
 │   │       ├── januari.md
 │   │       ├── februari.md
 │   │       └── ...
@@ -198,7 +198,7 @@ Edit `.vitepress/theme/custom.css` untuk mengubah:
 ---
 title: Judul Artikel
 description: Deskripsi singkat untuk SEO
-date: 2025-05-01
+date: 2026-05-01
 author: Nama Penulis
 category: kajian
 tags: [sholat, ibadah, fiqh]

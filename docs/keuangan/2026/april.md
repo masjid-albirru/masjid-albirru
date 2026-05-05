@@ -1,14 +1,14 @@
 ---
-title: Laporan Keuangan April 2025
-description: Laporan keuangan resmi Masjid Al-Birru bulan April 2025
-date: 2025-05-01
+title: Laporan Keuangan April 2026
+description: Laporan keuangan resmi Masjid Al-Birru bulan April 2026
+date: 2026-05-01
 ---
 
-# 💰 Laporan Keuangan April 2025
+# 💰 Laporan Keuangan April 2026
 
 <div class="article-meta">
-  <span>📅 Periode: 1 – 30 April 2025</span>
-  <span>✍️ Bendahara: Bpk. Sulaiman</span>
+  <span>📅 Periode: 1 – 30 April 2026</span>
+  <span>✍️ Bendahara: Bpk. Iis Munandar</span>
   <span class="tag">Keuangan</span>
 </div>
 
@@ -35,7 +35,7 @@ date: 2025-05-01
   </div>
 </div>
 
-> **Saldo awal bulan (1 April 2025): Rp 29.700.000**
+> **Saldo awal bulan (1 April 2026): Rp 29.700.000**
 
 ---
 
@@ -85,10 +85,10 @@ date: 2025-05-01
 
 | Keterangan | Jumlah |
 |------------|--------|
-| Saldo Awal (1 April 2025) | Rp 29.700.000 |
+| Saldo Awal (1 April 2026) | Rp 29.700.000 |
 | + Total Pemasukan | Rp 28.450.000 |
 | − Total Pengeluaran | Rp 15.720.000 |
-| **= Saldo Akhir (30 April 2025)** | **Rp 42.430.000** |
+| **= Saldo Akhir (30 April 2026)** | **Rp 42.430.000** |
 {.total}
 
 ---
@@ -122,8 +122,8 @@ Alhamdulillah, bulan April menunjukkan surplus yang sehat. Dana renovasi tempat 
 | Bendahara | Sulaiman | *(tanda tangan)* |
 | Saksi | Ahmad Yusuf | *(tanda tangan)* |
 
-*Laporan diterbitkan: 1 Mei 2025*
+*Laporan diterbitkan: 1 Mei 2026*
 
 ---
 
-← [Laporan Maret 2025](/keuangan/2025/maret) | [Kembali ke Ringkasan Keuangan](/keuangan/) | [Laporan Mei 2025](/keuangan/) →
+← [Laporan Maret 2026](/keuangan/2026/maret) | [Kembali ke Ringkasan Keuangan](/keuangan/) | [Laporan Mei 2026](/keuangan/) →

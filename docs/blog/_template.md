@@ -1,7 +1,7 @@
 ---
 title: Judul Artikel
 description: Deskripsi singkat artikel ini untuk SEO dan preview
-date: 2025-01-01
+date: 2026-01-01
 author: Nama Penulis
 category: kajian
 tags: [tag1, tag2, tag3]
@@ -10,7 +10,7 @@ tags: [tag1, tag2, tag3]
 # Judul Artikel
 
 <div class="article-meta">
-  <span>📅 1 Januari 2025</span>
+  <span>📅 1 Januari 2026</span>
   <span>✍️ Nama Penulis</span>
   <span class="tag">Kajian</span>
   <span>⏱️ 5 menit baca</span>

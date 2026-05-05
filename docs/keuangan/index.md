@@ -9,7 +9,7 @@ Masjid Al-Birru berkomitmen pada **transparansi penuh** dalam pengelolaan keuang
 
 ---
 
-## 📊 Ringkasan Keuangan Tahun 2025
+## 📊 Ringkasan Keuangan Tahun 2026
 
 <div class="financial-summary">
   <div class="financial-card pemasukan">
@@ -21,29 +21,28 @@ Masjid Al-Birru berkomitmen pada **transparansi penuh** dalam pengelolaan keuang
     <div class="amount">Rp 56.320.000</div>
   </div>
   <div class="financial-card saldo">
-    <div class="label">Saldo Akhir April 2025</div>
+    <div class="label">Saldo Akhir April 2026</div>
     <div class="amount">Rp 42.430.000</div>
   </div>
 </div>
 
 ---
 
-## 📅 Laporan Bulanan 2025
+## 📅 Laporan Bulanan 2026
 
 | Bulan | Pemasukan | Pengeluaran | Saldo Akhir | Status |
 |-------|-----------|-------------|-------------|--------|
-| [Januari 2025](/keuangan/2025/januari) | Rp 22.150.000 | Rp 13.200.000 | Rp 8.950.000 | ✅ Selesai |
-| [Februari 2025](/keuangan/2025/februari) | Rp 24.300.000 | Rp 14.100.000 | Rp 19.150.000 | ✅ Selesai |
-| [Maret 2025](/keuangan/2025/maret) | Rp 23.850.000 | Rp 13.300.000 | Rp 29.700.000 | ✅ Selesai |
-| [April 2025](/keuangan/2025/april) | Rp 28.450.000 | Rp 15.720.000 | Rp 42.430.000 | ✅ Selesai |
-| Mei 2025 | — | — | — | 🔄 Berjalan |
+| [Januari 2026](/keuangan/2026/januari) | Rp 22.150.000 | Rp 13.200.000 | Rp 8.950.000 | ✅ Selesai |
+| [Februari 2026](/keuangan/2026/februari) | Rp 24.300.000 | Rp 14.100.000 | Rp 19.150.000 | ✅ Selesai |
+| [Maret 2026](/keuangan/2026/maret) | Rp 23.850.000 | Rp 13.300.000 | Rp 29.700.000 | ✅ Selesai |
+| [April 2026](/keuangan/2026/april) | Rp 28.450.000 | Rp 15.720.000 | Rp 42.430.000 | ✅ Selesai |
+| Mei 2026 | — | — | — | 🔄 Berjalan |
 
 ---
 
 ## 📂 Laporan Per Tahun
 
-- [📄 Laporan Tahunan 2024](/keuangan/tahunan)
-- [📄 Laporan Tahunan 2023](/keuangan/tahunan#2023)
+- [📄 Laporan Tahunan 2025](/keuangan/tahunan)
 
 ---
 
@@ -72,5 +71,5 @@ a.n. **Masjid Al-Birru**
 ---
 
 ::: tip Pertanyaan Keuangan?
-Untuk pertanyaan terkait laporan keuangan, silakan hubungi Bendahara Masjid: **Bpk. Sulaiman** — WhatsApp **0812-9999-0000**
+Untuk pertanyaan terkait laporan keuangan, silakan hubungi Bendahara Masjid: **Bpk. Iis Munandar** — WhatsApp **0812-9999-0000**
 :::

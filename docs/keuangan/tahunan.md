@@ -7,24 +7,24 @@ description: Rekap laporan keuangan Masjid Al-Birru per tahun
 
 ---
 
-## 📊 Rekap Tahunan 2024
+## 📊 Rekap Tahunan 2025
 
 <div class="financial-summary">
   <div class="financial-card pemasukan">
-    <div class="label">Total Pemasukan 2024</div>
+    <div class="label">Total Pemasukan 2025</div>
     <div class="amount">Rp 312.500.000</div>
   </div>
   <div class="financial-card pengeluaran">
-    <div class="label">Total Pengeluaran 2024</div>
+    <div class="label">Total Pengeluaran 2025</div>
     <div class="amount">Rp 283.200.000</div>
   </div>
   <div class="financial-card saldo">
-    <div class="label">Saldo Akhir 2024</div>
+    <div class="label">Saldo Akhir 2025</div>
     <div class="amount">Rp 29.300.000</div>
   </div>
 </div>
 
-### Rekap Per Bulan 2024
+### Rekap Per Bulan 2025
 
 | Bulan | Pemasukan | Pengeluaran | Saldo Akhir |
 |-------|-----------|-------------|-------------|
@@ -42,7 +42,7 @@ description: Rekap laporan keuangan Masjid Al-Birru per tahun
 | Desember | Rp 22.000.000 | Rp 22.000.000 | Rp 29.300.000 |
 | **Total** | **Rp 312.500.000** | **Rp 283.200.000** | **Rp 29.300.000** |
 
-### Program Dana Terealisasi 2024
+### Program Dana Terealisasi 2025
 
 | Program | Anggaran | Realisasi | Status |
 |---------|----------|-----------|--------|
@@ -56,9 +56,9 @@ description: Rekap laporan keuangan Masjid Al-Birru per tahun
 
 ---
 
-## 📅 Laporan Per Bulan (2025)
+## 📅 Laporan Per Bulan (2026)
 
-Untuk laporan bulan per bulan tahun 2025, lihat di [halaman laporan keuangan](/keuangan/).
+Untuk laporan bulan per bulan tahun 2026, lihat di [halaman laporan keuangan](/keuangan/).
 
 ---
 
