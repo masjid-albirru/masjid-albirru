@@ -49,9 +49,10 @@ export default defineConfig({
           text: '📰 Blog & Berita',
           items: [
             { text: 'Semua Artikel', link: '/blog/' },
-            { text: 'Kajian Islam', link: '/blog/kajian/' },
-            { text: 'Kegiatan Masjid', link: '/blog/kegiatan/' },
-            { text: 'Pengumuman', link: '/blog/pengumuman/' },
+            // kalau mau nanti ada kategori khusus bisa ditambahkan di sini, misalnya:
+            // { text: 'Kajian Islam', link: '/blog/kajian/' },
+            // { text: 'Kegiatan Masjid', link: '/blog/kegiatan/' },
+            // { text: 'Pengumuman', link: '/blog/pengumuman/' },
           ]
         }
       ],
