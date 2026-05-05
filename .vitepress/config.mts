@@ -177,5 +177,9 @@ export default defineConfig({
     lineNumbers: false,
   },
 
-  ignoreDeadLinks: true
+  ignoreDeadLinks: [
+    /^\/blog\//,
+    /^\/tentang\//,
+    /^\/keuangan\//
+  ],
 })
