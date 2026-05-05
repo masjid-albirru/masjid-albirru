@@ -1,0 +1,104 @@
+backend:
+  name: github
+  repo: masjid-albirru/masjid-albirru
+  branch: main
+  base_url: https://sveltia-cms-auth.masjid-albirru.workers.dev/
+
+# Simpan gambar di sini
+media_folder: docs/public/images/uploads
+public_folder: /images/uploads
+
+# Locale
+locale: id
+
+collections:
+
+  # ─── BLOG ────────────────────────────────────────────────────────────────
+  - name: blog
+    label: "📝 Blog & Artikel"
+    label_singular: "Artikel"
+    folder: docs/blog
+    create: true
+    slug: "{{slug}}"
+    path: "{{kategori}}/{{slug}}"
+    media_folder: ''
+    public_folder: ''
+    fields:
+      - { label: "Judul", name: title, widget: string }
+      - { label: "Deskripsi Singkat", name: description, widget: text }
+      - { label: "Tanggal", name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
+      - { label: "Penulis", name: author, widget: string, default: "Redaksi" }
+      - label: "Kategori"
+        name: kategori
+        widget: select
+        options:
+          - { label: "Kajian Islam", value: kajian }
+          - { label: "Kegiatan Masjid", value: kegiatan }
+          - { label: "Pengumuman", value: pengumuman }
+      - label: "Tags"
+        name: tags
+        widget: list
+        default: []
+      - { label: "Estimasi Baca (menit)", name: readTime, widget: number, default: 3, required: false }
+      - { label: "Gambar Utama", name: image, widget: image, required: false }
+      - { label: "Isi Artikel", name: body, widget: markdown }
+
+  # ─── ACARA ───────────────────────────────────────────────────────────────
+  - name: acara
+    label: "📅 Acara & Kegiatan"
+    label_singular: "Acara"
+    folder: docs/acara
+    create: true
+    slug: "{{tanggal}}-{{slug}}"
+    fields:
+      - { label: "Nama Acara", name: title, widget: string }
+      - { label: "Deskripsi", name: description, widget: text }
+      - { label: "Tanggal", name: tanggal, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
+      - { label: "Waktu Mulai", name: waktu_mulai, widget: string, default: "08:00", hint: "Format: HH:MM" }
+      - { label: "Waktu Selesai", name: waktu_selesai, widget: string, default: "10:00", hint: "Format: HH:MM" }
+      - { label: "Lokasi", name: lokasi, widget: string, default: "Masjid Al-Birru" }
+      - { label: "Pemateri / Pengisi", name: pemateri, widget: string, required: false }
+      - label: "Tipe Acara"
+        name: tipe
+        widget: select
+        options: [Kajian, Pengajian, Rapat, Lomba, Sosial, Lainnya]
+      - label: "Terbuka Untuk"
+        name: terbuka_umum
+        widget: select
+        options:
+          - { label: "Umum", value: "Ya" }
+          - { label: "Jamaah Masjid", value: "Tidak (Jamaah saja)" }
+          - { label: "Khusus Muslimah", value: "Khusus Muslimah" }
+      - { label: "Keterangan Tambahan", name: body, widget: markdown, required: false }
+
+  # ─── KEUANGAN ────────────────────────────────────────────────────────────
+  - name: keuangan
+    label: "💰 Laporan Keuangan"
+    label_singular: "Laporan"
+    folder: docs/keuangan
+    create: true
+    slug: "{{slug}}"
+    path: "{{tahun}}/{{slug}}"
+    fields:
+      - { label: "Judul Laporan", name: title, widget: string, hint: "Contoh: Laporan Keuangan April 2025" }
+      - { label: "Deskripsi", name: description, widget: text, required: false }
+      - { label: "Tahun", name: tahun, widget: number, default: 2025 }
+      - label: "Bulan"
+        name: bulan
+        widget: select
+        options:
+          - { label: "Januari", value: januari }
+          - { label: "Februari", value: februari }
+          - { label: "Maret", value: maret }
+          - { label: "April", value: april }
+          - { label: "Mei", value: mei }
+          - { label: "Juni", value: juni }
+          - { label: "Juli", value: juli }
+          - { label: "Agustus", value: agustus }
+          - { label: "September", value: september }
+          - { label: "Oktober", value: oktober }
+          - { label: "November", value: november }
+          - { label: "Desember", value: desember }
+      - { label: "Total Pemasukan (Rp)", name: total_pemasukan, widget: number, default: 0 }
+      - { label: "Total Pengeluaran (Rp)", name: total_pengeluaran, widget: number, default: 0 }
+      - { label: "Isi Laporan", name: body, widget: markdown, hint: "Tulis rincian pemasukan dan pengeluaran di sini" }
