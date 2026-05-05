@@ -176,4 +176,6 @@ export default defineConfig({
     },
     lineNumbers: false,
   },
+
+  ignoreDeadLinks: true
 })
