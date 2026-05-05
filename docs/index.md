@@ -11,10 +11,10 @@ hero:
   #   alt: Masjid Al-Birru
   actions:
     - theme: brand
-      text: 📰 Baca Berita Terbaru
+      text: Baca Berita Terbaru
       link: /blog/
     - theme: alt
-      text: 📅 Jadwal Acara
+      text: Jadwal Acara
       link: /acara/
     
 

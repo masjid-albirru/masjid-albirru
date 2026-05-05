@@ -138,10 +138,10 @@ export default defineConfig({
       }
     },
 
-    editLink: {
-      pattern: 'https://github.com/USERNAME/masjid-al-ikhlas/edit/main/docs/:path',
-      text: 'Edit halaman ini di GitHub'
-    },
+    // editLink: {
+    //   pattern: 'https://github.com/USERNAME/masjid-al-ikhlas/edit/main/docs/:path',
+    //   text: 'Edit halaman ini di GitHub'
+    // },
 
     lastUpdated: {
       text: 'Terakhir diperbarui',
