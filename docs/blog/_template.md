@@ -1,12 +1,15 @@
 ---
-title: Judul Artikel
+title: Edited Judul Artikel in sveltia cms
 description: Deskripsi singkat artikel ini untuk SEO dan preview
-date: 2026-01-01
-author: Nama Penulis
+date: 2026-05-05
+author: Fadhlan
+kategori: kajian
+tags:
+  - test
+readTime: 1
+image: cuplikan-layar-2026-03-27-114305.png
 category: kajian
-tags: [tag1, tag2, tag3]
 ---
-
 # Judul Artikel
 
 <div class="article-meta">
@@ -17,11 +20,12 @@ tags: [tag1, tag2, tag3]
 </div>
 
 <!-- Ayat/hadits pembuka (opsional) -->
+
 <div class="arabic">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</div>
 
 > *"Terjemahan ayat atau hadits pembuka di sini."* — Sumber
 
----
+- - -
 
 ## Pendahuluan
 
@@ -31,18 +35,18 @@ Tuliskan paragraf pembuka di sini. Jelaskan topik yang akan dibahas secara menar
 
 ### Sub-topik 1
 
-Isi konten...
+*TEST*
 
 ### Sub-topik 2
 
-Isi konten...
+*TEST*
 
 ## Kesimpulan
 
 Rangkuman dan penutup artikel.
 
----
+- - -
 
-*Artikel ini ditulis oleh **Nama Penulis**, [jabatan di masjid].*
+*Artikel ini ditulis oleh **Nama Penulis**, \[jabatan di masjid].*
 
 **Bagikan artikel ini** kepada saudara/saudari yang membutuhkan. 🤲
