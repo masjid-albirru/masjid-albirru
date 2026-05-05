@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/masjid-albirru/',
   title: 'Masjid Al-Birru',
   description: 'Website Resmi Masjid Al-Birru - Informasi, Berita, Acara & Laporan Keuangan',
   lang: 'id-ID',
@@ -15,7 +16,7 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: '/icons/masjid-logo.svg',
+    logo: '/public/images/albirru.jpg',
     siteTitle: 'Masjid Al-Birru',
 
     nav: [
