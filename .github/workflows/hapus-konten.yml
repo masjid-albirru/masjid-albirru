@@ -1,0 +1,65 @@
+name: 🗑️ Hapus Konten
+
+on:
+  workflow_dispatch:
+    inputs:
+      path_file:
+        description: "Path file yang akan dihapus (contoh: docs/blog/kajian/nama-artikel.md)"
+        required: true
+        type: string
+      alasan:
+        description: "Alasan penghapusan"
+        required: true
+        type: string
+      konfirmasi:
+        description: "Ketik HAPUS untuk konfirmasi"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  hapus-konten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validasi konfirmasi
+        run: |
+          if [ "${{ github.event.inputs.konfirmasi }}" != "HAPUS" ]; then
+            echo "❌ Konfirmasi tidak valid. Ketik HAPUS (huruf kapital semua)."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cek apakah file ada
+        run: |
+          if [ ! -f "${{ github.event.inputs.path_file }}" ]; then
+            echo "❌ File tidak ditemukan: ${{ github.event.inputs.path_file }}"
+            exit 1
+          fi
+          echo "✅ File ditemukan: ${{ github.event.inputs.path_file }}"
+
+      - name: Hapus file
+        run: |
+          rm "${{ github.event.inputs.path_file }}"
+          echo "🗑️ File berhasil dihapus: ${{ github.event.inputs.path_file }}"
+
+      - name: Commit & push
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "🗑️ Hapus: ${{ github.event.inputs.path_file }} — ${{ github.event.inputs.alasan }}"
+          git push
+
+      - name: Ringkasan
+        run: |
+          echo "## ✅ File Berhasil Dihapus" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Nilai |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **File** | \`${{ github.event.inputs.path_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Alasan** | ${{ github.event.inputs.alasan }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Dihapus oleh** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY

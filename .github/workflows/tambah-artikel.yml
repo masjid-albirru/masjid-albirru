@@ -1,0 +1,132 @@
+name: ✍️ Tambah Artikel Blog Baru
+
+on:
+  workflow_dispatch:
+    inputs:
+      judul:
+        description: "Judul artikel"
+        required: true
+        type: string
+      kategori:
+        description: "Kategori artikel"
+        required: true
+        type: choice
+        options:
+          - kajian
+          - kegiatan
+          - pengumuman
+      penulis:
+        description: "Nama penulis"
+        required: true
+        type: string
+      deskripsi:
+        description: "Deskripsi singkat (1-2 kalimat)"
+        required: true
+        type: string
+      tag:
+        description: "Tag (pisahkan dengan koma, contoh: sholat, ibadah, fiqh)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  buat-artikel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate slug & tanggal
+        id: meta
+        run: |
+          TANGGAL=$(date +%Y-%m-%d)
+          TAHUN=$(date +%Y)
+          BULAN=$(date +%m)
+          
+          # Buat slug dari judul (lowercase, ganti spasi dengan strip)
+          JUDUL="${{ github.event.inputs.judul }}"
+          SLUG=$(echo "$JUDUL" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/--*/-/g' | sed 's/^-\|-$//g')
+          
+          echo "tanggal=$TANGGAL" >> $GITHUB_OUTPUT
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "tahun=$TAHUN" >> $GITHUB_OUTPUT
+          echo "path=docs/blog/${{ github.event.inputs.kategori }}/${SLUG}.md" >> $GITHUB_OUTPUT
+
+      - name: Buat file artikel
+        run: |
+          KATEGORI="${{ github.event.inputs.kategori }}"
+          TAG="${{ github.event.inputs.tag }}"
+          
+          # Format tag menjadi array YAML
+          if [ -n "$TAG" ]; then
+            TAG_YAML="[$(echo "$TAG" | sed 's/, */", "/g' | sed 's/^/"/;s/$/"/' )]"
+          else
+            TAG_YAML="[]"
+          fi
+
+          mkdir -p "docs/blog/$KATEGORI"
+
+          cat > "${{ steps.meta.outputs.path }}" << 'ARTIKEL_EOF'
+          ---
+          title: "${{ github.event.inputs.judul }}"
+          description: "${{ github.event.inputs.deskripsi }}"
+          date: ${{ steps.meta.outputs.tanggal }}
+          author: ${{ github.event.inputs.penulis }}
+          category: ${{ github.event.inputs.kategori }}
+          tags: TAG_PLACEHOLDER
+          ---
+
+          # ${{ github.event.inputs.judul }}
+
+          <div class="article-meta">
+            <span>📅 ${{ steps.meta.outputs.tanggal }}</span>
+            <span>✍️ ${{ github.event.inputs.penulis }}</span>
+            <span class="tag">${{ github.event.inputs.kategori }}</span>
+          </div>
+
+          > *Tuliskan pendahuluan atau kutipan pembuka artikel di sini...*
+
+          ## Pendahuluan
+
+          Tuliskan isi artikel di sini. Hapus bagian ini dan ganti dengan konten yang sebenarnya.
+
+          ## Pembahasan
+
+          Lorem ipsum — ganti dengan konten artikel yang sebenarnya.
+
+          ## Penutup
+
+          Kesimpulan artikel.
+
+          ---
+
+          *Artikel ini ditulis oleh ${{ github.event.inputs.penulis }}.*
+          ARTIKEL_EOF
+
+          # Ganti placeholder tag
+          sed -i "s/TAG_PLACEHOLDER/$TAG_YAML/" "${{ steps.meta.outputs.path }}"
+
+      - name: Commit & push artikel baru
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add "${{ steps.meta.outputs.path }}"
+          git commit -m "✍️ Tambah artikel: ${{ github.event.inputs.judul }}"
+          git push
+
+      - name: Ringkasan
+        run: |
+          echo "## ✅ Artikel Berhasil Dibuat!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Nilai |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Judul** | ${{ github.event.inputs.judul }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Kategori** | ${{ github.event.inputs.kategori }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Penulis** | ${{ github.event.inputs.penulis }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tanggal** | ${{ steps.meta.outputs.tanggal }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **File** | \`${{ steps.meta.outputs.path }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📝 Buka file tersebut di GitHub untuk mengisi konten artikel." >> $GITHUB_STEP_SUMMARY

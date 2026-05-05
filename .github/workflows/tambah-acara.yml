@@ -1,0 +1,193 @@
+name: 📅 Tambah Acara / Event Baru
+
+on:
+  workflow_dispatch:
+    inputs:
+      nama_acara:
+        description: "Nama acara"
+        required: true
+        type: string
+      tanggal:
+        description: "Tanggal acara (format: YYYY-MM-DD)"
+        required: true
+        type: string
+      waktu_mulai:
+        description: "Waktu mulai (contoh: 09:00)"
+        required: true
+        type: string
+      waktu_selesai:
+        description: "Waktu selesai (contoh: 11:00)"
+        required: true
+        type: string
+      lokasi:
+        description: "Lokasi acara"
+        required: true
+        type: string
+        default: "Masjid Al-Birru"
+      deskripsi:
+        description: "Deskripsi singkat acara"
+        required: true
+        type: string
+      pemateri:
+        description: "Nama pemateri/pengisi (kosongkan jika tidak ada)"
+        required: false
+        type: string
+      tipe:
+        description: "Tipe acara"
+        required: true
+        type: choice
+        options:
+          - Kajian
+          - Pengajian
+          - Rapat
+          - Lomba
+          - Sosial
+          - Lainnya
+      terbuka_umum:
+        description: "Terbuka untuk umum?"
+        required: true
+        type: choice
+        options:
+          - "Ya"
+          - "Tidak (Jamaah saja)"
+          - "Khusus Muslimah"
+
+permissions:
+  contents: write
+
+jobs:
+  tambah-acara:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Persiapan metadata
+        id: meta
+        run: |
+          TANGGAL="${{ github.event.inputs.tanggal }}"
+          TAHUN=$(echo "$TANGGAL" | cut -d'-' -f1)
+          BULAN=$(echo "$TANGGAL" | cut -d'-' -f2)
+          HARI=$(echo "$TANGGAL" | cut -d'-' -f3)
+
+          NAMA="${{ github.event.inputs.nama_acara }}"
+          SLUG=$(echo "$NAMA" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g')
+
+          # Badge berdasarkan tipe keterbukaan
+          TERBUKA="${{ github.event.inputs.terbuka_umum }}"
+          if [ "$TERBUKA" = "Ya" ]; then
+            BADGE='<span class="badge badge-gold">Terbuka Umum</span>'
+          elif [ "$TERBUKA" = "Khusus Muslimah" ]; then
+            BADGE='<span class="badge badge-green">Khusus Muslimah</span>'
+          else
+            BADGE='<span class="badge badge-info">Jamaah Masjid</span>'
+          fi
+
+          echo "tahun=$TAHUN" >> $GITHUB_OUTPUT
+          echo "bulan=$BULAN" >> $GITHUB_OUTPUT
+          echo "hari=$HARI" >> $GITHUB_OUTPUT
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "badge=$BADGE" >> $GITHUB_OUTPUT
+          echo "path=docs/acara/${TAHUN}-${BULAN}/${SLUG}.md" >> $GITHUB_OUTPUT
+
+      - name: Buat file acara
+        run: |
+          mkdir -p "docs/acara/${{ steps.meta.outputs.tahun }}-${{ steps.meta.outputs.bulan }}"
+          
+          PEMATERI="${{ github.event.inputs.pemateri }}"
+          PEMATERI_LINE=""
+          if [ -n "$PEMATERI" ]; then
+            PEMATERI_LINE="Bersama **${PEMATERI}**"
+          fi
+
+          cat > "${{ steps.meta.outputs.path }}" << EOF
+          ---
+          title: "${{ github.event.inputs.nama_acara }}"
+          description: "${{ github.event.inputs.deskripsi }}"
+          date: ${{ github.event.inputs.tanggal }}
+          tipe: ${{ github.event.inputs.tipe }}
+          ---
+
+          # 📅 ${{ github.event.inputs.nama_acara }}
+
+          <div class="article-meta">
+            <span>📅 ${{ github.event.inputs.tanggal }}</span>
+            <span>⏰ ${{ github.event.inputs.waktu_mulai }} – ${{ github.event.inputs.waktu_selesai }} WIB</span>
+            <span class="tag">${{ github.event.inputs.tipe }}</span>
+          </div>
+
+          ---
+
+          ## 📋 Detail Acara
+
+          | Keterangan | Detail |
+          |------------|--------|
+          | **Nama Acara** | ${{ github.event.inputs.nama_acara }} |
+          | **Tanggal** | ${{ github.event.inputs.tanggal }} |
+          | **Waktu** | ${{ github.event.inputs.waktu_mulai }} – ${{ github.event.inputs.waktu_selesai }} WIB |
+          | **Lokasi** | ${{ github.event.inputs.lokasi }} |
+          | **Pemateri** | ${PEMATERI:-"—"} |
+          | **Peserta** | ${{ github.event.inputs.terbuka_umum }} |
+
+          ## 📝 Deskripsi
+
+          ${{ github.event.inputs.deskripsi }}
+
+          $PEMATERI_LINE
+
+          ---
+
+          ## 🗺️ Lokasi
+
+          **${{ github.event.inputs.lokasi }}**
+
+          > Jl. Contoh No. 1, Depok, Jawa Barat · [Lihat di Google Maps](https://maps.google.com)
+
+          ---
+
+          ::: info Informasi Lebih Lanjut
+          Untuk informasi lebih lanjut, hubungi sekretariat masjid:
+          - **WhatsApp:** [0812-3456-7890](https://wa.me/6281234567890)
+          - **Email:** info@masjidalikhas.id
+          :::
+
+          ---
+
+          [← Kembali ke Jadwal Acara](/acara/)
+          EOF
+
+      - name: Tambahkan ke halaman acara index
+        run: |
+          # Tambahkan event card ke docs/acara/index.md sebelum baris "## 📆 Jadwal Khatib"
+          HARI="${{ steps.meta.outputs.hari }}"
+          BULAN_NUM="${{ steps.meta.outputs.bulan }}"
+          
+          # Convert bulan number ke nama
+          case $BULAN_NUM in
+            01) BULAN_NAMA="Jan" ;; 02) BULAN_NAMA="Feb" ;; 03) BULAN_NAMA="Mar" ;;
+            04) BULAN_NAMA="Apr" ;; 05) BULAN_NAMA="Mei" ;; 06) BULAN_NAMA="Jun" ;;
+            07) BULAN_NAMA="Jul" ;; 08) BULAN_NAMA="Agu" ;; 09) BULAN_NAMA="Sep" ;;
+            10) BULAN_NAMA="Okt" ;; 11) BULAN_NAMA="Nov" ;; 12) BULAN_NAMA="Des" ;;
+          esac
+          
+          echo "Acara ditambahkan: ${{ github.event.inputs.nama_acara }} — $HARI $BULAN_NAMA"
+
+      - name: Commit & push
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add "${{ steps.meta.outputs.path }}"
+          git commit -m "📅 Tambah acara: ${{ github.event.inputs.nama_acara }} (${{ github.event.inputs.tanggal }})"
+          git push
+
+      - name: Ringkasan
+        run: |
+          echo "## ✅ Acara Berhasil Ditambahkan!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Nilai |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Nama Acara** | ${{ github.event.inputs.nama_acara }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tanggal** | ${{ github.event.inputs.tanggal }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Waktu** | ${{ github.event.inputs.waktu_mulai }} – ${{ github.event.inputs.waktu_selesai }} WIB |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tipe** | ${{ github.event.inputs.tipe }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **File** | \`${{ steps.meta.outputs.path }}\` |" >> $GITHUB_STEP_SUMMARY

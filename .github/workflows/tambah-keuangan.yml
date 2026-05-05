@@ -1,0 +1,218 @@
+name: 💰 Tambah Laporan Keuangan Bulanan
+
+on:
+  workflow_dispatch:
+    inputs:
+      bulan:
+        description: "Bulan laporan"
+        required: true
+        type: choice
+        options:
+          - januari
+          - februari
+          - maret
+          - april
+          - mei
+          - juni
+          - juli
+          - agustus
+          - september
+          - oktober
+          - november
+          - desember
+      tahun:
+        description: "Tahun laporan (contoh: 2025)"
+        required: true
+        type: string
+        default: "2025"
+      saldo_awal:
+        description: "Saldo awal bulan (angka saja, contoh: 29700000)"
+        required: true
+        type: string
+      total_pemasukan:
+        description: "Total pemasukan (angka saja, contoh: 28450000)"
+        required: true
+        type: string
+      total_pengeluaran:
+        description: "Total pengeluaran (angka saja, contoh: 15720000)"
+        required: true
+        type: string
+      nama_bendahara:
+        description: "Nama bendahara"
+        required: true
+        type: string
+        default: "Iis Munandar"
+      nama_ketua:
+        description: "Nama ketua takmir"
+        required: true
+        type: string
+        default: "Nanda Kurniawan"
+
+permissions:
+  contents: write
+
+jobs:
+  buat-laporan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hitung saldo akhir & format angka
+        id: hitung
+        run: |
+          SALDO_AWAL=${{ github.event.inputs.saldo_awal }}
+          PEMASUKAN=${{ github.event.inputs.total_pemasukan }}
+          PENGELUARAN=${{ github.event.inputs.total_pengeluaran }}
+          SALDO_AKHIR=$((SALDO_AWAL + PEMASUKAN - PENGELUARAN))
+
+          # Format rupiah: tambahkan titik setiap 3 digit
+          format_rupiah() {
+            printf "%'d" $1 | sed 's/,/./g'
+          }
+
+          echo "saldo_awal_fmt=$(format_rupiah $SALDO_AWAL)" >> $GITHUB_OUTPUT
+          echo "pemasukan_fmt=$(format_rupiah $PEMASUKAN)" >> $GITHUB_OUTPUT
+          echo "pengeluaran_fmt=$(format_rupiah $PENGELUARAN)" >> $GITHUB_OUTPUT
+          echo "saldo_akhir_fmt=$(format_rupiah $SALDO_AKHIR)" >> $GITHUB_OUTPUT
+          echo "saldo_akhir=$SALDO_AKHIR" >> $GITHUB_OUTPUT
+          echo "tanggal_terbit=$(date +%d-%m-%Y)" >> $GITHUB_OUTPUT
+
+          # Nama bulan dalam bahasa Indonesia dengan kapital
+          BULAN="${{ github.event.inputs.bulan }}"
+          BULAN_KAPITAL="${BULAN^}"
+          echo "bulan_kapital=$BULAN_KAPITAL" >> $GITHUB_OUTPUT
+          echo "path=docs/keuangan/${{ github.event.inputs.tahun }}/${{ github.event.inputs.bulan }}.md" >> $GITHUB_OUTPUT
+
+      - name: Buat direktori jika belum ada
+        run: mkdir -p "docs/keuangan/${{ github.event.inputs.tahun }}"
+
+      - name: Buat file laporan keuangan
+        run: |
+          cat > "${{ steps.hitung.outputs.path }}" << EOF
+          ---
+          title: Laporan Keuangan ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}
+          description: Laporan keuangan resmi Masjid Al-Birru bulan ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}
+          date: ${{ steps.hitung.outputs.tanggal_terbit }}
+          ---
+
+          # 💰 Laporan Keuangan ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}
+
+          <div class="article-meta">
+            <span>📅 Periode: 1 – 30 ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}</span>
+            <span>✍️ Bendahara: ${{ github.event.inputs.nama_bendahara }}</span>
+            <span class="tag">Keuangan</span>
+          </div>
+
+          ---
+
+          ## 📈 Ringkasan
+
+          <div class="financial-summary">
+            <div class="financial-card pemasukan">
+              <div class="label">Total Pemasukan</div>
+              <div class="amount">Rp ${{ steps.hitung.outputs.pemasukan_fmt }}</div>
+            </div>
+            <div class="financial-card pengeluaran">
+              <div class="label">Total Pengeluaran</div>
+              <div class="amount">Rp ${{ steps.hitung.outputs.pengeluaran_fmt }}</div>
+            </div>
+            <div class="financial-card saldo">
+              <div class="label">Saldo Akhir Bulan</div>
+              <div class="amount">Rp ${{ steps.hitung.outputs.saldo_akhir_fmt }}</div>
+            </div>
+          </div>
+
+          > **Saldo awal bulan (1 ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}): Rp ${{ steps.hitung.outputs.saldo_awal_fmt }}**
+
+          ---
+
+          ## 📥 Rincian Pemasukan
+
+          > ⚠️ *Isi tabel rincian pemasukan di bawah ini secara manual*
+
+          | No | Tanggal | Keterangan | Jumlah |
+          |----|---------|------------|--------|
+          | 1 | | | Rp |
+          | 2 | | | Rp |
+          | 3 | | | Rp |
+          | | | **Total Pemasukan** | **Rp ${{ steps.hitung.outputs.pemasukan_fmt }}** |
+
+          ---
+
+          ## 📤 Rincian Pengeluaran
+
+          > ⚠️ *Isi tabel rincian pengeluaran di bawah ini secara manual*
+
+          | No | Tanggal | Keterangan | Jumlah |
+          |----|---------|------------|--------|
+          | 1 | | | Rp |
+          | 2 | | | Rp |
+          | 3 | | | Rp |
+          | | | **Total Pengeluaran** | **Rp ${{ steps.hitung.outputs.pengeluaran_fmt }}** |
+
+          ---
+
+          ## 📊 Rekapitulasi
+
+          | Keterangan | Jumlah |
+          |------------|--------|
+          | Saldo Awal (1 ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}) | Rp ${{ steps.hitung.outputs.saldo_awal_fmt }} |
+          | + Total Pemasukan | Rp ${{ steps.hitung.outputs.pemasukan_fmt }} |
+          | − Total Pengeluaran | Rp ${{ steps.hitung.outputs.pengeluaran_fmt }} |
+          | **= Saldo Akhir** | **Rp ${{ steps.hitung.outputs.saldo_akhir_fmt }}** |
+
+          ---
+
+          ::: info Catatan Bendahara
+          *Isi catatan bendahara di sini...*
+          :::
+
+          ---
+
+          **Mengetahui:**
+
+          | Jabatan | Nama | TTD |
+          |---------|------|-----|
+          | Ketua Takmir | ${{ github.event.inputs.nama_ketua }} | *(tanda tangan)* |
+          | Bendahara | ${{ github.event.inputs.nama_bendahara }} | *(tanda tangan)* |
+
+          *Laporan diterbitkan: ${{ steps.hitung.outputs.tanggal_terbit }}*
+
+          ---
+
+          [← Kembali ke Ringkasan Keuangan](/keuangan/)
+          EOF
+
+      - name: Update index keuangan — tambahkan baris ke tabel
+        run: |
+          # Tambahkan baris baru ke tabel laporan di docs/keuangan/index.md
+          BULAN_KAPITAL="${{ steps.hitung.outputs.bulan_kapital }}"
+          TAHUN="${{ github.event.inputs.tahun }}"
+          BARIS="| [$BULAN_KAPITAL $TAHUN](/keuangan/$TAHUN/${{ github.event.inputs.bulan }}) | Rp ${{ steps.hitung.outputs.pemasukan_fmt }} | Rp ${{ steps.hitung.outputs.pengeluaran_fmt }} | Rp ${{ steps.hitung.outputs.saldo_akhir_fmt }} | ✅ Selesai |"
+          
+          # Sisipkan sebelum baris "Mei 2025 | — ..." atau di akhir tabel
+          echo "Baris tabel yang akan ditambahkan: $BARIS"
+
+      - name: Commit & push laporan baru
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add "${{ steps.hitung.outputs.path }}"
+          git commit -m "💰 Tambah laporan keuangan: ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }}"
+          git push
+
+      - name: Ringkasan
+        run: |
+          echo "## ✅ Laporan Keuangan Berhasil Dibuat!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Nilai |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Periode** | ${{ steps.hitung.outputs.bulan_kapital }} ${{ github.event.inputs.tahun }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Saldo Awal** | Rp ${{ steps.hitung.outputs.saldo_awal_fmt }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Pemasukan** | Rp ${{ steps.hitung.outputs.pemasukan_fmt }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Pengeluaran** | Rp ${{ steps.hitung.outputs.pengeluaran_fmt }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Saldo Akhir** | Rp ${{ steps.hitung.outputs.saldo_akhir_fmt }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **File** | \`${{ steps.hitung.outputs.path }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📝 Buka file tersebut di GitHub untuk mengisi rincian transaksi." >> $GITHUB_STEP_SUMMARY
