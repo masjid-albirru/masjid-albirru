@@ -51,33 +51,16 @@ features:
     linkText: Lihat galeri
 ---
 
+## 🤲 Program Donasi & Infak
+<DonasiQRIS />
+::: tip Donasi Rutin
+Amal yang sedikit tapi konsisten lebih dicintai Allah daripada amal besar yang terputus.
+:::
+
 <div style="max-width: 900px; margin: 3rem auto; padding: 0 1.5rem;">
 
-<!-- ## 🕌 Jadwal Sholat Hari Ini
-
-<div class="prayer-times">
-  <div class="prayer-time-item">
-    <div class="prayer-name">Subuh</div>
-    <div class="prayer-hour">04:28</div>
-  </div>
-  <div class="prayer-time-item">
-    <div class="prayer-name">Dzuhur</div>
-    <div class="prayer-hour">11:56</div>
-  </div>
-  <div class="prayer-time-item">
-    <div class="prayer-name">Ashar</div>
-    <div class="prayer-hour">15:19</div>
-  </div>
-  <div class="prayer-time-item">
-    <div class="prayer-name">Maghrib</div>
-    <div class="prayer-hour">17:58</div>
-  </div>
-  <div class="prayer-time-item">
-    <div class="prayer-name">Isya</div>
-    <div class="prayer-hour">19:10</div>
-  </div>
-</div> -->
----
+## 🕌 Jadwal Sholat Hari Ini
+<JadwalSholat />
 
 ## 📅 Acara Mendatang
 
@@ -119,8 +102,6 @@ features:
 
 [📅 Lihat semua acara →](/acara/)
 
----
-
 ## 💰 Ringkasan Keuangan Bulan Ini
 
 <div class="financial-summary">
@@ -139,7 +120,7 @@ features:
 </div>
 
 [💰 Lihat laporan lengkap →](/keuangan/)
---- 
+
 ## 🕌 Alamat Masjid
 > 📍 **Lokasi:** Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516 · [Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
 

@@ -2,6 +2,13 @@
 title: Laporan Keuangan April 2026
 description: Laporan keuangan resmi Masjid Al-Birru bulan April 2026
 date: 2026-05-01
+bulan: 4              
+tahun: 2026           
+pemasukan: 28450000   
+pengeluaran: 15720000 
+saldo_akhir: 42430000 
+status: selesai       
+bendahara: Iis Munandar
 ---
 
 # 💰 Laporan Keuangan April 2026
