@@ -569,15 +569,28 @@ body {
 
 /* ===== TABLE FIX ===== */
 .vp-doc table {
-  border-collapse: collapse !important;
+  display: table !important;
   width: 100%;
-  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  table-layout: auto !important;
+}
+
+.vp-doc table thead {
+  display: table-header-group !important;
+}
+
+.vp-doc table tbody {
+  display: table-row-group !important;
+}
+
+.vp-doc table tr {
+  display: table-row !important;
 }
 
 .vp-doc table th,
 .vp-doc table td {
+  display: table-cell !important;
   border: 1px solid var(--warm-border) !important;
   padding: 0.75rem 1rem !important;
   vertical-align: middle !important;
-  word-wrap: break-word;
 }
