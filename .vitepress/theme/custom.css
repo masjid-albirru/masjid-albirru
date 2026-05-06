@@ -571,7 +571,7 @@ body {
 .vp-doc table {
   border-collapse: collapse !important;
   width: 100%;
-  display: table !important;
+  table-layout: fixed !important;
 }
 
 .vp-doc table th,
@@ -579,13 +579,5 @@ body {
   border: 1px solid var(--warm-border) !important;
   padding: 0.75rem 1rem !important;
   vertical-align: middle !important;
-}
-
-.vp-doc table tr {
-  border: none !important;
-  background: none !important;
-}
-
-.vp-doc table tbody tr:nth-child(even) {
-  background: var(--vp-c-bg-soft) !important;
+  word-wrap: break-word;
 }
