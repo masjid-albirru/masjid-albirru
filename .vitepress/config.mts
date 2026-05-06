@@ -41,6 +41,7 @@ export default defineConfig({
         ]
       },
       { text: '📞 Kontak', link: '/tentang/kontak' },
+      { text: '⌛ Jadwal Sholat', link: '/jadwal-sholat' },
     ],
 
     sidebar: {
