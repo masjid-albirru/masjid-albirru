@@ -1,14 +1,18 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
+import PengumumanBanner from './PengumumanBanner.vue'
 const { Layout } = DefaultTheme
 </script>
 
 <template>
   <Layout>
     <template #layout-top>
+      <!-- Banner Bismillah -->
       <div class="mosque-top-banner">
         <span class="arabic">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</span>
       </div>
+      <!-- Banner Pengumuman -->
+      <PengumumanBanner />
     </template>
   </Layout>
 </template>

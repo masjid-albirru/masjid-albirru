@@ -6,6 +6,7 @@ import BlogList from './BlogList.vue'
 import JadwalSholat from './JadwalSholat.vue'
 import KeuanganSummary from './KeuanganSummary.vue'
 import DonasiQRIS from './DonasiQRIS.vue'
+import PengumumanBanner from './PengumumanBanner.vue'
 
 export default {
   extends: DefaultTheme,
@@ -15,5 +16,6 @@ export default {
     app.component('JadwalSholat', JadwalSholat)
     app.component('KeuanganSummary', KeuanganSummary)
     app.component('DonasiQRIS', DonasiQRIS)
+    app.component('PengumumanBanner', PengumumanBanner)
   },
 }
