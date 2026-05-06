@@ -566,3 +566,26 @@ body {
   .VPHero .name           { font-size: 1.7rem !important; }
   .VPDoc .vp-doc h1       { font-size: 1.55rem; }
 }
+
+/* ===== TABLE FIX ===== */
+.vp-doc table {
+  border-collapse: collapse !important;
+  width: 100%;
+  display: table !important;
+}
+
+.vp-doc table th,
+.vp-doc table td {
+  border: 1px solid var(--warm-border) !important;
+  padding: 0.75rem 1rem !important;
+  vertical-align: middle !important;
+}
+
+.vp-doc table tr {
+  border: none !important;
+  background: none !important;
+}
+
+.vp-doc table tbody tr:nth-child(even) {
+  background: var(--vp-c-bg-soft) !important;
+}
