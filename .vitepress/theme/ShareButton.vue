@@ -8,9 +8,9 @@ const route = useRoute()
 const copied = ref(false)
 
 const pageUrl = computed(() => {
-  return site.value.base
-    ? `https://masjid-albirru.github.io${site.value.base}${route.path.replace(/^\//, '')}`
-    : `https://masjid-albirru.github.io${route.path}`
+  const base = 'https://masjid-albirru.github.io/masjid-albirru'
+  const path = route.path.replace(/\.html$/, '')
+  return base + path
 })
 
 const pageTitle = computed(() => page.value.title || 'Masjid Al-Birru')
