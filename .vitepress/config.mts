@@ -16,7 +16,7 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: '/images/albirru.jpg',
+    logo: '/images/albirru-transparent.png',
     siteTitle: 'Masjid Al-Birru',
 
     nav: [
