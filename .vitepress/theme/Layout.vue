@@ -1,7 +1,18 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
+import { useData } from 'vitepress'
 import PengumumanBanner from './PengumumanBanner.vue'
+import ShareButton from './ShareButton.vue'
+
 const { Layout } = DefaultTheme
+const { frontmatter } = useData()
+
+// Hanya tampil di halaman artikel (bukan homepage/landing)
+const showShare = computed(() => frontmatter.value.layout !== 'home')
+</script>
+
+<script>
+import { computed } from 'vue'
 </script>
 
 <template>
@@ -13,6 +24,11 @@ const { Layout } = DefaultTheme
       </div>
       <!-- Banner Pengumuman -->
       <PengumumanBanner />
+    </template>
+
+    <!-- Share button di bawah setiap artikel -->
+    <template #doc-after>
+      <ShareButton v-if="showShare" />
     </template>
   </Layout>
 </template>
