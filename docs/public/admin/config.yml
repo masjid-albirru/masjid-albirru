@@ -102,3 +102,15 @@ collections:
       - { label: "Total Pemasukan (Rp)", name: total_pemasukan, widget: number, default: 0 }
       - { label: "Total Pengeluaran (Rp)", name: total_pengeluaran, widget: number, default: 0 }
       - { label: "Isi Laporan", name: body, widget: markdown, hint: "Tulis rincian pemasukan dan pengeluaran di sini" }
+
+# ─── KHATIB JUM'AT ───────────────────────────────────────────────────────
+  - name: khatib
+    label: "🕌 Jadwal Khatib Jum'at"
+    label_singular: "Jadwal Khatib"
+    folder: docs/khatib
+    create: true
+    slug: "{{tanggal}}"
+    fields:
+      - { label: "Tanggal Jum'at", name: tanggal, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
+      - { label: "Nama Khatib", name: khatib, widget: string }
+      - { label: "Tema Khutbah", name: tema, widget: string, required: false }

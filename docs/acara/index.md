@@ -25,19 +25,9 @@ Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
 <AcaraList />
 
----
-
 ## 📆 Jadwal Khatib Jum'at — Mei 2026
 
-| Tanggal | Khatib | Tema Khutbah |
-|---------|--------|--------------|
-| 2 Mei 2026 | Ust. Ahmad Fauzi | Pentingnya Ilmu dalam Islam |
-| 9 Mei 2026 | Ust. Hasan Basri | Birrul Walidain |
-| 16 Mei 2026 | Ust. Dr. Ridwan | Iman dan Amal Shaleh |
-| 23 Mei 2026 | Ust. Ahmad Fauzi | Menjaga Lisan |
-| 30 Mei 2026 | Ust. Mahmud Ali | Ukhuwah Islamiyah |
-
----
+<JadwalKhatib />
 
 ::: info Informasi Pendaftaran
 Untuk acara yang memerlukan pendaftaran, silakan hubungi sekretariat masjid melalui WhatsApp: **0812-3456-7890** atau datang langsung ke kantor takmir masjid.

@@ -9,6 +9,7 @@ import DonasiQRIS from './DonasiQRIS.vue'
 import PengumumanBanner from './PengumumanBanner.vue'
 import ShareButton from './ShareButton.vue'
 import AcaraList from './AcaraList.vue'
+import JadwalKhatib from './JadwalKhatib.vue'
 
 export default {
   extends: DefaultTheme,
@@ -21,5 +22,6 @@ export default {
     app.component('PengumumanBanner', PengumumanBanner)
     app.component('ShareButton', ShareButton)
     app.component('AcaraList', AcaraList)
+    app.component('JadwalKhatib', JadwalKhatib)
   },
 }
