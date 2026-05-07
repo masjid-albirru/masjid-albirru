@@ -8,6 +8,7 @@ import KeuanganSummary from './KeuanganSummary.vue'
 import DonasiQRIS from './DonasiQRIS.vue'
 import PengumumanBanner from './PengumumanBanner.vue'
 import ShareButton from './ShareButton.vue'
+import AcaraList from './AcaraList.vue'
 
 export default {
   extends: DefaultTheme,
@@ -19,5 +20,6 @@ export default {
     app.component('DonasiQRIS', DonasiQRIS)
     app.component('PengumumanBanner', PengumumanBanner)
     app.component('ShareButton', ShareButton)
+    app.component('AcaraList', AcaraList)
   },
 }
