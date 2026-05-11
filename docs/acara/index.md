@@ -7,19 +7,7 @@ description: Jadwal lengkap acara dan kegiatan Masjid Al-Birru
 
 Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
----
-
-## 🗓️ Kegiatan Rutin Mingguan
-
-| Hari | Waktu | Kegiatan | Penceramah/Pengisi |
-|------|-------|----------|-------------------|
-| **Senin** | Ba'da Subuh (05:00) | Kajian Tafsir Al-Qur'an | Ust. Ahmad Fauzi |
-| **Rabu** | Ba'da Maghrib (18:15) | Kajian Fiqh Ibadah | Ust. Hasan Basri |
-| **Jum'at** | 12:00 - 13:00 | Sholat Jum'at | Khatib bergilir |
-| **Sabtu** | Ba'da Ashar (15:30) | TPA Anak-Anak | Tim Pendidik |
-| **Minggu** | 09:00 - 10:30 | Majelis Taklim Ibu-Ibu | Ustadzah Aminah |
-
----
+<KegiatanRutin />
 
 ## 📋 Acara Mendatang (Mei 2026)
 

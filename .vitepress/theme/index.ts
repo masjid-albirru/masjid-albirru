@@ -13,6 +13,7 @@ import ShareButton from './ShareButton.vue'
 import AcaraList from './AcaraList.vue'
 import JadwalKhatib from './JadwalKhatib.vue'
 import DaftarQurban from './DaftarQurban.vue'
+import KegiatanRutin from './KegiatanRutin.vue'
 
 export default {
   extends: DefaultTheme,
@@ -29,5 +30,6 @@ export default {
     app.component('AcaraList', AcaraList)
     app.component('JadwalKhatib', JadwalKhatib)
     app.component('DaftarQurban', DaftarQurban)
+    app.component('KegiatanRutin', KegiatanRutin)
   },
 }
