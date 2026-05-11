@@ -1,74 +1,11 @@
 ---
 title: Laporan Keuangan Masjid
-description: Transparansi laporan keuangan Masjid Al-Birru secara bulanan dan tahunan
+description: Laporan keuangan transparan Masjid Al-Birru
 ---
 
-# 💰 Laporan Keuangan Masjid
+# 💰 Laporan Keuangan
 
-Masjid Al-Birru berkomitmen pada **transparansi penuh** dalam pengelolaan keuangan. Seluruh pemasukan dan pengeluaran dilaporkan secara terbuka kepada jamaah setiap bulannya.
-
----
-
-## 📊 Ringkasan Keuangan Tahun 2026
-
-<div class="financial-summary">
-  <div class="financial-card pemasukan">
-    <div class="label">Total Pemasukan (Jan–Apr)</div>
-    <div class="amount">Rp 98.750.000</div>
-  </div>
-  <div class="financial-card pengeluaran">
-    <div class="label">Total Pengeluaran (Jan–Apr)</div>
-    <div class="amount">Rp 56.320.000</div>
-  </div>
-  <div class="financial-card saldo">
-    <div class="label">Saldo Akhir April 2026</div>
-    <div class="amount">Rp 42.430.000</div>
-  </div>
-</div>
-
----
-
-## 📅 Laporan Bulanan 2026
-
-| Bulan | Pemasukan | Pengeluaran | Saldo Akhir | Status |
-|-------|-----------|-------------|-------------|--------|
-| [Januari 2026](/keuangan/2026/januari) | Rp 22.150.000 | Rp 13.200.000 | Rp 8.950.000 | ✅ Selesai |
-| [Februari 2026](/keuangan/2026/februari) | Rp 24.300.000 | Rp 14.100.000 | Rp 19.150.000 | ✅ Selesai |
-| [Maret 2026](/keuangan/2026/maret) | Rp 23.850.000 | Rp 13.300.000 | Rp 29.700.000 | ✅ Selesai |
-| [April 2026](/keuangan/2026/april) | Rp 28.450.000 | Rp 15.720.000 | Rp 42.430.000 | ✅ Selesai |
-| Mei 2026 | — | — | — | 🔄 Berjalan |
-
----
-
-## 📂 Laporan Per Tahun
-
-- [📄 Laporan Tahunan 2025](/keuangan/tahunan)
-
----
-
-## 🤲 Program Donasi & Infak
-
-Masjid Al-Birru menerima donasi melalui beberapa saluran:
-
-<div class="donation-card">
-
-### Rekening Masjid Al-Birru
-
-**Bank Syariah Indonesia (BSI)**
-No. Rekening: **7123 4567 89**
-a.n. **Yayasan Masjid Al-Birru**
-
-**Bank BCA**
-No. Rekening: **0123 456 789**
-a.n. **Masjid Al-Birru**
-
-**QRIS** — tersedia di kantor takmir masjid
-
-</div>
-
-[💳 Selengkapnya tentang Program Donasi →](/keuangan/donasi)
-
----
+<KeuanganSheets />
 
 ::: tip Pertanyaan Keuangan?
 Untuk pertanyaan terkait laporan keuangan, silakan hubungi Bendahara Masjid: **Bpk. Iis Munandar** — WhatsApp **0812-9999-0000**

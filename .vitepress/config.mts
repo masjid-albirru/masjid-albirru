@@ -26,11 +26,7 @@ export default defineConfig({
       { text: '📅 Acara', link: '/acara/' },
       {
         text: '💰 Keuangan',
-        items: [
-          { text: 'Laporan Bulanan', link: '/keuangan/' },
-          { text: 'Laporan Tahunan', link: '/keuangan/tahunan' },
-          { text: 'Program Donasi', link: '/keuangan/donasi' },
-        ]
+        link: '/keuangan/'
       },
       {
         text: '🕌 Masjid',
@@ -74,16 +70,7 @@ export default defineConfig({
         {
           text: '💰 Laporan Keuangan',
           items: [
-            { text: 'Ringkasan', link: '/keuangan/' },
-            { text: 'Laporan Bulanan', collapsed: false, items: [
-              { text: '2026', collapsed: true, items: [
-                { text: 'Januari 2026', link: '/keuangan/2026/januari' },
-                { text: 'Februari 2026', link: '/keuangan/2026/februari' },
-                { text: 'Maret 2026', link: '/keuangan/2026/maret' },
-                { text: 'April 2026', link: '/keuangan/2026/april' },
-              ]}
-            ]},
-            { text: 'Laporan Tahunan', link: '/keuangan/tahunan' },
+            { text: 'Keuangan Masjid', link: '/keuangan/' },
             { text: 'Program Donasi', link: '/keuangan/donasi' },
           ]
         }

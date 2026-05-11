@@ -5,6 +5,7 @@ import Layout from './Layout.vue'
 import BlogList from './BlogList.vue'
 import JadwalSholat from './JadwalSholat.vue'
 import KeuanganSummary from './KeuanganSummary.vue'
+import KeuanganSheets from './KeuanganSheets.vue'
 import DonasiQRIS from './DonasiQRIS.vue'
 import PengumumanBanner from './PengumumanBanner.vue'
 import ShareButton from './ShareButton.vue'
@@ -19,6 +20,7 @@ export default {
     app.component('BlogList', BlogList)
     app.component('JadwalSholat', JadwalSholat)
     app.component('KeuanganSummary', KeuanganSummary)
+    app.component('KeuanganSheets', KeuanganSheets)
     app.component('DonasiQRIS', DonasiQRIS)
     app.component('PengumumanBanner', PengumumanBanner)
     app.component('ShareButton', ShareButton)
