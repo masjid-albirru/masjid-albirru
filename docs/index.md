@@ -100,26 +100,11 @@ Amal yang sedikit tapi konsisten lebih dicintai Allah daripada amal besar yang t
   </div>
 </div>
 
-[📅 Lihat semua acara →](/acara/)
+[Lihat semua acara →](/acara/)
 
-## 💰 Ringkasan Keuangan Bulan Ini
+## 💰 Ringkasan Keuangan
 
-<div class="financial-summary">
-  <div class="financial-card pemasukan">
-    <div class="label">Total Pemasukan</div>
-    <div class="amount">Rp 28.450.000</div>
-  </div>
-  <div class="financial-card pengeluaran">
-    <div class="label">Total Pengeluaran</div>
-    <div class="amount">Rp 15.720.000</div>
-  </div>
-  <div class="financial-card saldo">
-    <div class="label">Saldo Akhir</div>
-    <div class="amount">Rp 42.380.000</div>
-  </div>
-</div>
-
-[💰 Lihat laporan lengkap →](/keuangan/)
+<KeuanganRingkas />
 
 ## 🕌 Alamat Masjid
 > 📍 **Lokasi:** Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516 · [Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
