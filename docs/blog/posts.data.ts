@@ -5,9 +5,10 @@ export default createContentLoader('blog/**/*.md', {
   transform(data) {
     return data
       .filter(p =>
-        p.frontmatter.date &&         // harus punya tanggal
-        p.frontmatter.title &&        // harus punya judul
-        !p.url.endsWith('/index')     // skip file index.md
+        p.frontmatter.date &&
+        p.frontmatter.title &&
+        !p.url.endsWith('/index') &&
+        !p.url.includes('/_template')  // ← tambah ini
       )
       .sort((a, b) =>
         +new Date(b.frontmatter.date) - +new Date(a.frontmatter.date)

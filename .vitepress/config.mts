@@ -5,6 +5,7 @@ export default defineConfig({
   title: 'Masjid Al-Birru',
   description: 'Website Resmi Masjid Al-Birru - Informasi, Berita, Acara & Laporan Keuangan',
   lang: 'id-ID',
+  cleanUrls: true,
   
   head: [
     ['link', { rel: 'icon', href: '/icons/favicon.ico' }],
