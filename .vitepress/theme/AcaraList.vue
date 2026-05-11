@@ -1,39 +1,75 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { data as acara } from '../../docs/acara/acara.data.ts'
+import { ref, computed, onMounted } from 'vue'
 import { useData } from 'vitepress'
 
-const TAB_OPTIONS = ['Akan Datang', 'Sudah Lewat', 'Semua']
-const TIPE_OPTIONS = ['Semua Tipe', 'Kajian', 'Pengajian', 'Rapat', 'Lomba', 'Sosial', 'Lainnya']
+const { site } = useData()
+
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcqzrQ3Ybt3LkWQfzC7uqzG-Byn_u1SzRIkBpFJ4kC5eR7qYbry5YTHauQrH-Q4WXXFC-yMvWVamN8/pub?gid=0&single=true&output=csv'
+
+const data = ref([])
+const loading = ref(true)
+const error = ref(false)
 
 const activeTab = ref('Akan Datang')
 const activeTipe = ref('Semua Tipe')
 
-const filtered = computed(() => {
-  let list = acara
-
-  // Filter tab
-  if (activeTab.value === 'Akan Datang') list = list.filter(a => !a.sudah_lewat)
-  else if (activeTab.value === 'Sudah Lewat') list = list.filter(a => a.sudah_lewat)
-
-  // Filter tipe
-  if (activeTipe.value !== 'Semua Tipe') list = list.filter(a => a.tipe === activeTipe.value)
-
-  // Sudah lewat diurutkan terbaru dulu
-  if (activeTab.value === 'Sudah Lewat') {
-    return [...list].reverse()
+onMounted(async () => {
+  try {
+    const res = await fetch(CSV_URL)
+    const text = await res.text()
+    data.value = parseCSV(text)
+  } catch {
+    error.value = true
+  } finally {
+    loading.value = false
   }
+})
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n')
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const sekarang = new Date(); sekarang.setHours(0,0,0,0)
+
+  return lines.slice(1).map(line => {
+    const cols = []
+    let current = ''
+    let inQuote = false
+    for (const ch of line) {
+      if (ch === '"') { inQuote = !inQuote }
+      else if (ch === ',' && !inQuote) { cols.push(current.trim()); current = '' }
+      else { current += ch }
+    }
+    cols.push(current.trim())
+
+    const row = {}
+    headers.forEach((h, i) => { row[h] = (cols[i] ?? '').replace(/"/g, '') })
+
+    const tanggal = new Date(row.tanggal); tanggal.setHours(0,0,0,0)
+    row.sudah_lewat = tanggal < sekarang
+    return row
+  }).filter(r => r.tanggal && r.nama_acara)
+    .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+}
+
+const TAB_OPTIONS = ['Akan Datang', 'Sudah Lewat', 'Semua']
+
+const tipeOptions = computed(() => {
+  const set = new Set(data.value.map(r => r.tipe).filter(Boolean))
+  return ['Semua Tipe', ...Array.from(set)]
+})
+
+const mendatangCount = computed(() => data.value.filter(r => !r.sudah_lewat).length)
+
+const filtered = computed(() => {
+  let list = data.value
+
+  if (activeTab.value === 'Akan Datang') list = list.filter(r => !r.sudah_lewat)
+  else if (activeTab.value === 'Sudah Lewat') list = list.filter(r => r.sudah_lewat).reverse()
+
+  if (activeTipe.value !== 'Semua Tipe') list = list.filter(r => r.tipe === activeTipe.value)
 
   return list
 })
-
-const { site } = useData()
-
-function url(path) {
-  return site.value.base + path.replace(/^\//, '')
-}
-
-const mendatangCount = computed(() => acara.filter(a => !a.sudah_lewat).length)
 
 function formatTanggal(str) {
   const d = new Date(str)
@@ -56,112 +92,140 @@ function hariLagi(str) {
 }
 
 const tipeWarna = {
-  Kajian:   { bg: 'rgba(15,107,120,0.1)',  text: '#0f6b78' },
-  Pengajian:{ bg: 'rgba(15,107,120,0.1)',  text: '#0f6b78' },
-  Rapat:    { bg: 'rgba(100,100,100,0.1)', text: '#666' },
-  Lomba:    { bg: 'rgba(234,179,8,0.12)',  text: '#92400e' },
-  Sosial:   { bg: 'rgba(34,197,94,0.1)',   text: '#16a34a' },
-  Lainnya:  { bg: 'rgba(100,100,100,0.1)', text: '#666' },
+  Kajian:    { bg: 'rgba(15,107,120,0.1)',  text: '#0f6b78' },
+  Pengajian: { bg: 'rgba(15,107,120,0.1)',  text: '#0f6b78' },
+  Rapat:     { bg: 'rgba(100,100,100,0.1)', text: '#666' },
+  Lomba:     { bg: 'rgba(234,179,8,0.12)',  text: '#92400e' },
+  Sosial:    { bg: 'rgba(34,197,94,0.1)',   text: '#16a34a' },
+  Lainnya:   { bg: 'rgba(100,100,100,0.1)', text: '#666' },
 }
 
 const terbukaBadge = {
-  'Ya':                { label: 'Terbuka Umum',     warna: '#16a34a' },
-  'Tidak (Jamaah saja)':{ label: 'Jamaah Masjid',   warna: '#0f6b78' },
-  'Khusus Muslimah':   { label: 'Khusus Muslimah',  warna: '#9333ea' },
+  'Ya':                  { label: 'Terbuka Umum',    warna: '#16a34a' },
+  'Tidak (Jamaah saja)': { label: 'Jamaah Masjid',   warna: '#0f6b78' },
+  'Khusus Muslimah':     { label: 'Khusus Muslimah', warna: '#9333ea' },
 }
 </script>
 
 <template>
   <div class="acara-list">
 
-    <!-- Tab Akan Datang / Sudah Lewat -->
-    <div class="al-tabs">
-      <button
-        v-for="tab in TAB_OPTIONS" :key="tab"
-        class="al-tab"
-        :class="{ active: activeTab === tab }"
-        @click="activeTab = tab"
-      >
-        {{ tab }}
-        <span v-if="tab === 'Akan Datang' && mendatangCount > 0" class="al-badge">
-          {{ mendatangCount }}
-        </span>
-      </button>
-
-      <!-- Filter tipe -->
-      <select class="al-select" v-model="activeTipe">
-        <option v-for="t in TIPE_OPTIONS" :key="t">{{ t }}</option>
-      </select>
+    <div v-if="loading" class="al-loading">
+      <span class="spinner"></span> Memuat jadwal acara...
     </div>
 
-    <!-- Kosong -->
-    <div v-if="acara.length === 0" class="al-empty">
-      Belum ada acara. Tambahkan melalui Decap CMS.
+    <div v-else-if="error" class="al-error">
+      ⚠️ Gagal memuat data. Periksa koneksi internet.
     </div>
 
-    <div v-else-if="filtered.length === 0" class="al-empty">
-      Tidak ada acara {{ activeTab === 'Akan Datang' ? 'mendatang' : 'yang sudah lewat' }}
-      {{ activeTipe !== 'Semua Tipe' ? 'untuk tipe ' + activeTipe : '' }}.
-    </div>
+    <template v-else>
+      <!-- Tabs & Filter -->
+      <div class="al-tabs">
+        <button
+          v-for="tab in TAB_OPTIONS" :key="tab"
+          class="al-tab"
+          :class="{ active: activeTab === tab }"
+          @click="activeTab = tab"
+        >
+          {{ tab }}
+          <span v-if="tab === 'Akan Datang' && mendatangCount > 0" class="al-badge">
+            {{ mendatangCount }}
+          </span>
+        </button>
 
-    <!-- Daftar Acara -->
-    <div v-else class="al-grid">
-      <div
-        v-for="a in filtered" :key="a.link"
-        class="al-card"
-        :class="{ 'al-card--lewat': a.sudah_lewat }"
-      >
-        <!-- Tanggal -->
-        <div class="al-date">
-          <div class="al-date-day">{{ formatTanggal(a.tanggal).tanggal }}</div>
-          <div class="al-date-month">{{ formatTanggal(a.tanggal).bulan }}</div>
-          <div class="al-date-year">{{ formatTanggal(a.tanggal).tahun }}</div>
-        </div>
+        <select class="al-select" v-model="activeTipe">
+          <option v-for="t in tipeOptions" :key="t">{{ t }}</option>
+        </select>
+      </div>
 
-        <!-- Konten -->
-        <div class="al-content">
-          <div class="al-meta">
-            <span
-              class="al-tipe"
-              :style="{ background: tipeWarna[a.tipe]?.bg, color: tipeWarna[a.tipe]?.text }"
-            >{{ a.tipe }}</span>
+      <!-- Kosong -->
+      <div v-if="data.length === 0" class="al-empty">
+        Belum ada acara. Tambahkan di Google Sheets.
+      </div>
+      <div v-else-if="filtered.length === 0" class="al-empty">
+        Tidak ada acara {{ activeTab === 'Akan Datang' ? 'mendatang' : 'yang sudah lewat' }}
+        {{ activeTipe !== 'Semua Tipe' ? 'untuk tipe ' + activeTipe : '' }}.
+      </div>
 
-            <span
-              v-if="terbukaBadge[a.terbuka_umum]"
-              class="al-terbuka"
-              :style="{ color: terbukaBadge[a.terbuka_umum].warna }"
-            >● {{ terbukaBadge[a.terbuka_umum].label }}</span>
-
-            <span
-              v-if="!a.sudah_lewat && hariLagi(a.tanggal)"
-              class="al-countdown"
-            >{{ hariLagi(a.tanggal) }}</span>
+      <!-- Daftar -->
+      <div v-else class="al-grid">
+        <div
+          v-for="(a, i) in filtered" :key="i"
+          class="al-card"
+          :class="{ 'al-card--lewat': a.sudah_lewat }"
+        >
+          <!-- Tanggal -->
+          <div class="al-date">
+            <div class="al-date-day">{{ formatTanggal(a.tanggal).tanggal }}</div>
+            <div class="al-date-month">{{ formatTanggal(a.tanggal).bulan }}</div>
+            <div class="al-date-year">{{ formatTanggal(a.tanggal).tahun }}</div>
           </div>
 
-          <h3 class="al-title">
-            <a :href="url(a.link)">{{ a.title }}</a>
-          </h3>
+          <!-- Konten -->
+          <div class="al-content">
+            <div class="al-meta">
+              <span
+                class="al-tipe"
+                :style="{ background: tipeWarna[a.tipe]?.bg ?? 'rgba(100,100,100,0.1)', color: tipeWarna[a.tipe]?.text ?? '#666' }"
+              >{{ a.tipe }}</span>
 
-          <div class="al-info">
-            <span v-if="a.waktu_mulai">🕐 {{ a.waktu_mulai }}{{ a.waktu_selesai ? ' - ' + a.waktu_selesai : '' }} WIB</span>
-            <span>📍 {{ a.lokasi }}</span>
-            <span v-if="a.pemateri">🎤 {{ a.pemateri }}</span>
-          </div>
+              <span
+                v-if="terbukaBadge[a.terbuka_umum]"
+                class="al-terbuka"
+                :style="{ color: terbukaBadge[a.terbuka_umum].warna }"
+              >● {{ terbukaBadge[a.terbuka_umum].label }}</span>
 
-          <p v-if="a.deskripsi" class="al-desc">{{ a.deskripsi }}</p>
+              <span v-if="!a.sudah_lewat && hariLagi(a.tanggal)" class="al-countdown">
+                {{ hariLagi(a.tanggal) }}
+              </span>
+            </div>
 
-          <div class="al-footer">
-            <span class="al-hari">{{ formatTanggal(a.tanggal).hari }}</span>
-            <a :href="url(a.link)" class="al-link">Detail →</a>
+            <h3 class="al-title">{{ a.nama_acara }}</h3>
+
+            <div class="al-info">
+              <span v-if="a.waktu_mulai">
+                🕐 {{ a.waktu_mulai }}{{ a.waktu_selesai ? ' - ' + a.waktu_selesai : '' }} WIB
+              </span>
+              <span v-if="a.lokasi">📍 {{ a.lokasi }}</span>
+              <span v-if="a.pemateri">🎤 {{ a.pemateri }}</span>
+            </div>
+
+            <p v-if="a.keterangan" class="al-desc">{{ a.keterangan }}</p>
+
+            <div class="al-footer">
+              <span class="al-hari">{{ formatTanggal(a.tanggal).hari }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
+      <div class="al-sheets-footer">
+        {{ filtered.length }} acara ditampilkan
+      </div>
+    </template>
   </div>
 </template>
 
 <style scoped>
+.al-loading, .al-error, .al-empty {
+  text-align: center;
+  padding: 2.5rem;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--vp-c-divider);
+  border-top-color: var(--vp-c-brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Tabs */
 .al-tabs {
   display: flex;
@@ -196,10 +260,7 @@ const terbukaBadge = {
   border-radius: 99px;
   font-weight: 700;
 }
-.al-tab:not(.active) .al-badge {
-  background: var(--vp-c-brand);
-  color: #fff;
-}
+.al-tab:not(.active) .al-badge { background: var(--vp-c-brand); color: #fff; }
 
 .al-select {
   margin-left: auto;
@@ -212,20 +273,8 @@ const terbukaBadge = {
   cursor: pointer;
 }
 
-/* Empty */
-.al-empty {
-  text-align: center;
-  color: var(--vp-c-text-2);
-  padding: 3rem;
-  font-size: 0.9rem;
-}
-
 /* Grid */
-.al-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+.al-grid { display: flex; flex-direction: column; gap: 1rem; }
 
 /* Card */
 .al-card {
@@ -238,14 +287,8 @@ const terbukaBadge = {
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 
-.al-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-  border-color: var(--vp-c-brand-light);
-}
-
-.al-card--lewat {
-  opacity: 0.65;
-}
+.al-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); border-color: var(--vp-c-brand-light); }
+.al-card--lewat { opacity: 0.6; }
 
 /* Date box */
 .al-date {
@@ -284,30 +327,16 @@ const terbukaBadge = {
   border-radius: 99px;
 }
 
-.al-terbuka {
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.al-countdown {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--vp-c-brand);
-}
+.al-terbuka { font-size: 0.72rem; font-weight: 600; }
+.al-countdown { font-size: 0.72rem; font-weight: 700; color: var(--vp-c-brand); }
 
 .al-title {
   margin: 0 0 0.4rem;
   font-size: 1rem;
+  font-weight: 700;
   line-height: 1.4;
-}
-
-.al-title a {
   color: var(--vp-c-text-1);
-  text-decoration: none;
-  transition: color 0.2s;
 }
-
-.al-title a:hover { color: var(--vp-c-brand); }
 
 .al-info {
   display: flex;
@@ -328,28 +357,16 @@ const terbukaBadge = {
   overflow: hidden;
 }
 
-.al-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.al-footer { display: flex; justify-content: space-between; align-items: center; }
+.al-hari { font-size: 0.75rem; color: var(--vp-c-text-2); text-transform: capitalize; }
 
-.al-hari {
-  font-size: 0.75rem;
+.al-sheets-footer {
+  text-align: center;
+  font-size: 0.72rem;
   color: var(--vp-c-text-2);
-  text-transform: capitalize;
+  margin-top: 0.75rem;
 }
 
-.al-link {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--vp-c-brand);
-  text-decoration: none;
-}
-
-.al-link:hover { opacity: 0.75; }
-
-/* Mobile */
 @media (max-width: 640px) {
   .al-card { gap: 0.75rem; }
   .al-date { width: 48px; }
