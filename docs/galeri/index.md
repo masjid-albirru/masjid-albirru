@@ -40,5 +40,5 @@ Dokumentasi foto kegiatan dan kondisi Masjid Al-Birru dari waktu ke waktu.
 ---
 
 ::: info Kirim Foto
-Punya foto kegiatan masjid? Kirim ke **galeri@masjidalikhas.id** atau WhatsApp **0812-3456-7890** untuk ditambahkan ke galeri.
+Punya foto kegiatan masjid? Kirim ke **mediakreatif.albirru@gmail.com** atau WhatsApp **0813-9992-8319** untuk ditambahkan ke galeri.
 :::

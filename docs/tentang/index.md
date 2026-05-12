@@ -16,16 +16,15 @@ description: Profil lengkap Masjid Al-Birru — sejarah, visi misi, fasilitas, d
 | Keterangan | Detail |
 |------------|--------|
 | **Nama Masjid** | Masjid Al-Birru |
-| **Alamat** | Jl. Contoh No. 1, Kel. Contoh, Kec. Contoh |
+| **Alamat** | Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat |
 | **Kota** | Depok, Jawa Barat |
-| **Kode Pos** | 16400 |
-| **Tahun Berdiri** | 1985 |
+| **Kode Pos** | 16516 |
+| **Tahun Berdiri** | 2019 |
 | **Luas Bangunan** | ± 800 m² |
 | **Kapasitas** | ± 500 jamaah |
 | **Status** | Masjid Wakaf / Yayasan |
-| **No. Telp** | (021) 1234-5678 |
-| **WhatsApp** | 0812-3456-7890 |
-| **Email** | info@masjidalikhas.id |
+| **WhatsApp** | 0813-9992-8319 |
+| **Email** | mediakreatif.albirru@gmail.com |
 
 ---
 
@@ -92,11 +91,11 @@ Kini Masjid Al-Birru telah menjadi pusat kegiatan Islam di wilayahnya, menyeleng
 
 ## 📞 Kontak & Lokasi
 
-**Alamat:** Jl. Contoh No. 1, Depok, Jawa Barat
+**Alamat:** Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat
 
 **Jam Operasional Sekretariat:**
 - Senin – Jumat: 08.00 – 16.00 WIB
 - Sabtu: 08.00 – 12.00 WIB
 - Minggu & Hari Besar: Tutup
 
-[📍 Lihat di Google Maps](https://maps.google.com) | [📞 Hubungi Kami](/tentang/kontak)
+[📍 Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA) | [📞 Hubungi Kami](/tentang/kontak)

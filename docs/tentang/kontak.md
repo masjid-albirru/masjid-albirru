@@ -10,11 +10,9 @@ description: Informasi kontak dan lokasi Masjid Al-Birru
 ## 📍 Alamat
 
 **Masjid Al-Birru**
-Jl. Contoh No. 1, Kelurahan Contoh,
-Kecamatan Contoh, Kota Depok,
-Jawa Barat 16400
+Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 
-[📍 Lihat di Google Maps](https://maps.google.com)
+[📍 Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
 
 ---
 
@@ -22,10 +20,10 @@ Jawa Barat 16400
 
 | Keperluan | Kontak | |
 |-----------|--------|--|
-| **Sekretariat Umum** | 0812-3456-7890 | [WhatsApp](https://wa.me/6281234567890) |
-| **Bendahara** | 0812-9999-0000 | [WhatsApp](https://wa.me/6281299990000) |
+| **Sekretariat Umum** | 0812-3456-7890 | [WhatsApp](https://wa.me/6281399928319) |
+<!-- | **Bendahara** | 0812-9999-0000 | [WhatsApp](https://wa.me/6281299990000) |
 | **Humas & Publikasi** | 0812-8888-1111 | [WhatsApp](https://wa.me/6281288881111) |
-| **Darurat / Keamanan** | 0812-7777-2222 | Telepon |
+| **Darurat / Keamanan** | 0812-7777-2222 | Telepon | -->
 
 ---
 
@@ -33,10 +31,10 @@ Jawa Barat 16400
 
 | Keperluan | Email |
 |-----------|-------|
-| Umum & Informasi | info@masjidalikhas.id |
-| Donasi & Keuangan | keuangan@masjidalikhas.id |
-| Kirim Artikel/Konten | konten@masjidalikhas.id |
-| Galeri & Dokumentasi | galeri@masjidalikhas.id |
+| Umum & Informasi | mediakreatif.albirru@gmail.com |
+| Donasi & Keuangan | mediakreatif.albirru@gmail.com |
+| Kirim Artikel/Konten | mediakreatif.albirru@gmail.com |
+| Galeri & Dokumentasi | mediakreatif.albirru@gmail.com |
 
 ---
 
@@ -54,9 +52,8 @@ Jawa Barat 16400
 
 ## 📲 Media Sosial
 
-- **Instagram:** [@masjidalikhas](https://instagram.com/masjidalikhas)
+- **Instagram:** [@masjid.albirru](https://instagram.com/masjidalikhas)
 - **YouTube:** [Masjid Al-Birru Official](https://youtube.com/@masjid-al-ikhlas)
-- **Facebook:** [Masjid Al-Birru](https://facebook.com/masjidalikhas)
 - **WhatsApp Channel:** [Join Channel](https://whatsapp.com/channel/contoh)
 
 ---
@@ -66,5 +63,5 @@ Jawa Barat 16400
 Untuk pertanyaan atau masukan, silakan hubungi kami melalui WhatsApp atau email di atas. Kami akan merespons dalam 1x24 jam kerja.
 
 ::: tip Untuk Artikel & Konten
-Ingin mengirim artikel kajian, foto kegiatan, atau pengumuman? Kirim ke **konten@masjidalikhas.id** atau WhatsApp humas di atas. Pastikan konten sudah sesuai dengan nilai-nilai Islami.
+Ingin mengirim artikel kajian, foto kegiatan, atau pengumuman? Kirim ke **mediakreatif.albirru@gmail.com** atau WhatsApp humas di atas. Pastikan konten sudah sesuai dengan nilai-nilai Islami.
 :::

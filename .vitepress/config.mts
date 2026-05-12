@@ -33,7 +33,7 @@ export default defineConfig({
         items: [
           { text: 'Tentang Kami', link: '/tentang/' },
           { text: 'Pengurus', link: '/tentang/pengurus' },
-          { text: 'Fasilitas', link: '/tentang/fasilitas' },
+          // { text: 'Fasilitas', link: '/tentang/fasilitas' },
           { text: 'Galeri', link: '/galeri/' },
         ]
       },
