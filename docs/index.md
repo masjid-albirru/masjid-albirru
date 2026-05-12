@@ -16,7 +16,6 @@ hero:
     - theme: alt
       text: Jadwal Acara
       link: /acara/
-    
 
 features:
   - icon: 📰
@@ -50,6 +49,7 @@ features:
     link: /galeri/
     linkText: Lihat galeri
 ---
+<div style="max-width: 900px; margin: 3rem auto; padding: 0 1.5rem;">
 
 ## 🤲 Program Donasi & Infak
 <DonasiQRIS />
@@ -57,48 +57,12 @@ features:
 Amal yang sedikit tapi konsisten lebih dicintai Allah daripada amal besar yang terputus.
 :::
 
-<div style="max-width: 900px; margin: 3rem auto; padding: 0 1.5rem;">
-
 ## 🕌 Jadwal Sholat Hari Ini
 <JadwalSholat />
 
-## 📅 Acara Mendatang
+## 📋 Acara Mendatang
 
-<div class="event-card">
-  <div class="event-date">
-    <div class="day">10</div>
-    <div class="month">Mei</div>
-  </div>
-  <div>
-    <strong>Kajian Rutin Ba'da Subuh</strong><br>
-    <small>📍 Masjid Al-Birru · 05:00 - 06:00 WIB</small><br>
-    Tema: Akhlak Mulia dalam Kehidupan Sehari-hari
-  </div>
-</div>
-
-<div class="event-card">
-  <div class="event-date">
-    <div class="day">16</div>
-    <div class="month">Mei</div>
-  </div>
-  <div>
-    <strong>Pengajian Bulanan Ibu-Ibu</strong><br>
-    <small>📍 Masjid Al-Birru · 09:00 - 11:00 WIB</small><br>
-    Bersama Ustadzah Hj. Siti Aminah
-  </div>
-</div>
-
-<div class="event-card">
-  <div class="event-date">
-    <div class="day">24</div>
-    <div class="month">Mei</div>
-  </div>
-  <div>
-    <strong>Khataman Al-Qur'an & Doa Bersama</strong><br>
-    <small>📍 Masjid Al-Birru · 19:30 - 21:00 WIB</small><br>
-    Terbuka untuk seluruh jamaah dan masyarakat umum
-  </div>
-</div>
+<AcaraList />
 
 [Lihat semua acara →](/acara/)
 

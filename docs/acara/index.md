@@ -9,7 +9,7 @@ Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
 <KegiatanRutin />
 
-## 📋 Acara Mendatang (Mei 2026)
+## 📋 Acara Mendatang
 
 <AcaraList />
 

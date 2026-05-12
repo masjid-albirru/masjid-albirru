@@ -1,32 +1,27 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
 import { useData } from 'vitepress'
+import { computed } from 'vue'
 import PengumumanBanner from './PengumumanBanner.vue'
 import ShareButton from './ShareButton.vue'
 
 const { Layout } = DefaultTheme
 const { frontmatter } = useData()
 
-// Hanya tampil di halaman artikel (bukan homepage/landing)
-const showShare = computed(() => frontmatter.value.layout !== 'home')
-</script>
-
-<script>
-import { computed } from 'vue'
+const showShare = computed(() =>
+  frontmatter.value.layout !== 'home'
+)
 </script>
 
 <template>
   <Layout>
     <template #layout-top>
-      <!-- Banner Bismillah -->
       <div class="mosque-top-banner">
         <span class="arabic">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</span>
       </div>
-      <!-- Banner Pengumuman -->
       <PengumumanBanner />
     </template>
 
-    <!-- Share button di bawah setiap artikel -->
     <template #doc-after>
       <ShareButton v-if="showShare" />
     </template>
