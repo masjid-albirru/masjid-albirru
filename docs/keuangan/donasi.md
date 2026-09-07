@@ -1,6 +1,17 @@
 ---
-title: Program Donasi & Infak
-description: Informasi rekening dan program donasi Masjid Al-Birru
+title: Program Renovasi Struktur Bangunan
+description: >-
+  Lantai 2 (ruang utama) mengalami getar pada bagian lantai tengah, sehingga
+  perlu penguatan struktur bangun segera.
+
+  Mari jadi bagian dari kebaikan ini.
+
+
+  Kebutuhan Anggaran: Rp65.000.000
+tahun: 2026
+bulan: september
+total_pemasukan: 13845000
+total_pengeluaran: 625000
 ---
 
 # 🤲 Program Donasi & Infak
