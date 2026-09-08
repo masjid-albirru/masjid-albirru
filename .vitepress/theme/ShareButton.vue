@@ -11,7 +11,11 @@ const copied = ref(false)
 const pageUrl = computed(() => {
   const base = site.value.base.replace(/\/$/, '') // '/masjid-albirru'
   const path = route.path.replace(base, '')        // hapus prefix base dari path
-  return `https://masjid-albirru.github.io${base}${path}`
+  // Origin aktual (aman saat ganti domain); fallback untuk SSR/preview
+  const origin = typeof window !== 'undefined' && window.location.origin !== 'null'
+    ? window.location.origin
+    : 'https://masjid-albirru.github.io'
+  return `${origin}${base}${path}`
 })
 
 const pageTitle = computed(() => page.value.title || 'Masjid Al-Birru')

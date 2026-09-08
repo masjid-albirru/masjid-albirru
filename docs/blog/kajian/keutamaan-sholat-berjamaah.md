@@ -67,6 +67,6 @@ Masjid adalah rumah Allah. Setiap langkah kaki menuju masjid adalah catatan amal
 
 ---
 
-*Artikel ini disusun oleh Ust. Ahmad Fauzi, pengurus bidang dakwah Masjid Al-Birru.*
+*Artikel ini disusun oleh Ust. Ahmad Fauzi.*
 
 **Bagikan artikel ini** agar lebih banyak jamaah yang mengetahui keutamaan sholat berjamaah.

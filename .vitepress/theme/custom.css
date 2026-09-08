@@ -457,22 +457,6 @@ body {
 .financial-card.pengeluaran .amount { color: #dc2626; }
 .financial-card.saldo .amount       { color: var(--gold-dark); }
 
-/* ===== FOOTER ===== */
-.VPFooter {
-  background: var(--teal-900) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.VPFooter .message {
-  font-family: var(--vp-font-family-base);
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-.VPFooter .copyright {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
 /* ===== EVENT CARDS ===== */
 .event-card {
   border: 1px solid var(--warm-border);
@@ -635,4 +619,77 @@ body {
     display: flex !important;
     margin-right: 8px;
   }
+}
+
+/* ===== FOKUS KEYBOARD (aksesibilitas) ===== */
+/* Ring hanya muncul saat navigasi keyboard, tidak saat klik mouse */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dark a:focus-visible,
+.dark button:focus-visible,
+.dark input:focus-visible,
+.dark select:focus-visible,
+.dark summary:focus-visible,
+.dark [tabindex]:focus-visible {
+  outline-color: var(--teal-400);
+}
+
+/* ===== TARGET SENTUH =====
+   Perbesar area klik tanpa mengubah visual via pseudo-element */
+.pengumuman-banner .pb-close,
+.pengumuman-banner .pb-nav,
+.pengumuman-banner .pb-dot {
+  position: relative;
+}
+
+.pengumuman-banner .pb-close::after,
+.pengumuman-banner .pb-nav::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
+.pengumuman-banner .pb-dot::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* Tombol Salin di blok donasi lebih mudah disentuh */
+.copy-btn {
+  min-height: 30px;
+}
+
+/* ===== BERANDA: link "Lihat semua" konsisten dengan ProgramDonasi ===== */
+.home-lihat-semua {
+  text-align: center;
+  margin: 1.25rem 0;
+}
+
+.home-lihat-semua a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--teal-700);
+  text-decoration: none;
+}
+
+.home-lihat-semua a:hover { opacity: 0.75; }
+
+.dark .home-lihat-semua a { color: var(--teal-400); }
+
+.home-lihat-semua a::after {
+  content: '→';
+  font-weight: 600;
 }

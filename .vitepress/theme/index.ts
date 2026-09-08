@@ -9,6 +9,7 @@ import KeuanganSheets from './KeuanganSheets.vue'
 import KeuanganRingkas from './KeuanganRingkas.vue'
 import DonasiQRIS from './DonasiQRIS.vue'
 import ProgramDonasi from './ProgramDonasi.vue'
+import TombolDonasi from './TombolDonasi.vue'
 import PengumumanBanner from './PengumumanBanner.vue'
 import ShareButton from './ShareButton.vue'
 import AcaraList from './AcaraList.vue'
@@ -27,6 +28,7 @@ export default {
     app.component('KeuanganRingkas', KeuanganRingkas)
     app.component('DonasiQRIS', DonasiQRIS)
     app.component('ProgramDonasi', ProgramDonasi)
+    app.component('TombolDonasi', TombolDonasi)
     app.component('PengumumanBanner', PengumumanBanner)
     app.component('ShareButton', ShareButton)
     app.component('AcaraList', AcaraList)

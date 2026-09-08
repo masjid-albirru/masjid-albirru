@@ -60,18 +60,15 @@ Kini Masjid Al-Birru telah menjadi pusat kegiatan Islam di wilayahnya, menyeleng
 | Area parkir | Tersedia (±30 motor, 10 mobil) |
 | Pos keamanan | Dalam pembangunan |
 
-## Struktur Pengurus (Periode 2024–2027)
+## Struktur Pengurus DKM
 
 | Jabatan | Nama |
 |---------|------|
-| **Ketua Umum** | H. Abdullah Rahman |
-| **Ketua I (Ibadah & Dakwah)** | Ust. Ahmad Fauzi |
-| **Ketua II (Pendidikan)** | Drs. Rahmat Hidayat |
-| **Sekretaris** | M. Rizki Pratama, S.Kom |
-| **Bendahara** | Sulaiman, S.E. |
-| **Sie. Humas** | Fajar Nugroho |
-| **Sie. Kebersihan** | Pak Joko Santoso |
-| **Sie. Keamanan** | Pak Budi Hartono |
+| **Ketua** | Nanda Kurniawan, S.Sos. |
+| **Sekretaris** | Dodi Sutrisno, M.Pd. |
+| **Bendahara** | Iies Munandar, S.E. |
+
+[Struktur pengurus lengkap](/tentang/pengurus)
 
 ## Kontak & Lokasi
 

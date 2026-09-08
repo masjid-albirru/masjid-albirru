@@ -59,7 +59,9 @@ features:
 
 <AcaraList />
 
-[Lihat semua acara →](/acara/)
+<div class="home-lihat-semua">
+[Lihat semua acara](/acara/)
+</div>
 
 ## Ringkasan Keuangan
 

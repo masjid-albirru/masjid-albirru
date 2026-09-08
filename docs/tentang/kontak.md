@@ -16,7 +16,7 @@ Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 
 | Keperluan | Kontak | |
 |-----------|--------|--|
-| **Sekretariat Umum** | 0812-3456-7890 | [WhatsApp](https://wa.me/6281399928319) |
+| **Sekretariat Umum** | 0813-9992-8319 | [WhatsApp](https://wa.me/6281399928319) |
 <!-- | **Bendahara** | 0812-9999-0000 | [WhatsApp](https://wa.me/6281299990000) |
 | **Humas & Publikasi** | 0812-8888-1111 | [WhatsApp](https://wa.me/6281288881111) |
 | **Darurat / Keamanan** | 0812-7777-2222 | Telepon | -->
@@ -44,9 +44,9 @@ Di luar jam operasional, hubungi via WhatsApp. Pesan akan dibalas pada hari kerj
 
 ## Media Sosial
 
-- **Instagram:** [@masjid.albirru](https://instagram.com/masjidalikhas)
-- **YouTube:** [Masjid Al-Birru Official](https://youtube.com/@masjid-al-ikhlas)
-- **WhatsApp Channel:** [Join Channel](https://whatsapp.com/channel/contoh)
+- **Instagram:** [@masjid.albirru](https://www.instagram.com/masjid.albirru/)
+- **YouTube:** [Masjid Al-Birru Official](https://www.youtube.com/@masjidal-birru)
+<!-- - **WhatsApp Channel:** [Join Channel](https://whatsapp.com/channel/contoh) -->
 
 ## Kirim Pesan
 

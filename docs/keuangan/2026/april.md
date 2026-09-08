@@ -111,8 +111,8 @@ Alhamdulillah, bulan April menunjukkan surplus yang sehat. Dana renovasi tempat 
 
 | Jabatan | Nama | TTD |
 |---------|------|-----|
-| Ketua Takmir | H. Abdullah Rahman | *(tanda tangan)* |
-| Bendahara | Sulaiman | *(tanda tangan)* |
+| Ketua DKM | Nanda Kurniawan, S.Sos. | *(tanda tangan)* |
+| Bendahara | Iies Munandar, S.E. | *(tanda tangan)* |
 | Saksi | Ahmad Yusuf | *(tanda tangan)* |
 
 *Laporan diterbitkan: 1 Mei 2026*

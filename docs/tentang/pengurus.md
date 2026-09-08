@@ -1,100 +1,70 @@
 ---
-title: Struktur Pengurus Masjid Al-Birru
-description: Daftar pengurus Masjid Al-Birru periode 2024-2027
+title: Struktur Pengurus DKM Al Birru
+description: Struktur organisasi DKM Masjid Al-Birru — Penasihat, BPH, dan Bidang
 ---
 
-# Struktur Pengurus
+# Struktur Pengurus DKM Al Birru
 
-**Periode Kepengurusan: 2024 – 2027**
+## Penasihat
 
-## Dewan Pembina & Penasehat
+| Nama |
+|------|
+| Syamsul Bahri, S.E |
+| Marwadi Irawan, S.H. |
+| Azzam Kamil |
+| Zarkasih, S.H. |
+| Saan Santoso, S.Pd. |
+| Rahmat, S.Pd. |
 
-| Nama | Jabatan |
-|------|---------|
-| KH. Muhammad Taufiq | Penasehat Agama |
-| H. Wahyudin Santoso | Penasehat Umum |
-| Dr. Ir. Bambang Sugiarto | Penasehat |
-
-## Pengurus Harian
-
-### Pimpinan
-
-| Jabatan | Nama | Kontak |
-|---------|------|--------|
-| **Ketua Umum** | H. Abdullah Rahman | 0812-1111-0001 |
-| **Ketua I** (Ibadah & Dakwah) | Ust. Ahmad Fauzi | 0812-1111-0002 |
-| **Ketua II** (Pendidikan & Sosial) | Drs. Rahmat Hidayat | 0812-1111-0003 |
-
-### Sekretariat
-
-| Jabatan | Nama | Kontak |
-|---------|------|--------|
-| **Sekretaris Umum** | M. Rizki Pratama, S.Kom | 0812-1111-0004 |
-| **Sekretaris I** | Fajar Nugroho | 0812-1111-0005 |
-
-### Keuangan
-
-| Jabatan | Nama | Kontak |
-|---------|------|--------|
-| **Bendahara Umum** | Sulaiman, S.E. | 0812-1111-0006 |
-| **Bendahara I** | Hj. Fatimah Zahra | 0812-1111-0007 |
-
-## Seksi-Seksi
-
-### Seksi Ibadah & Dakwah
+## BPH
 
 | Jabatan | Nama |
 |---------|------|
-| Ketua Seksi | Ust. Hasan Basri |
-| Anggota | Ust. Mahmud Ali |
-| Anggota | Abdul Ghani |
+| **Ketua** | Nanda Kurniawan, S.Sos. |
+| **Sekretaris** | Dodi Sutrisno, M.Pd. |
+| **Bendahara** | Iies Munandar, S.E. |
 
-**Program:** Kajian rutin, khatib Jum'at, pembinaan imam & muadzin
-
-### Seksi Pendidikan
+## Bidang Ibadah dan Dakwah
 
 | Jabatan | Nama |
 |---------|------|
-| Ketua Seksi | Dra. Siti Rohimah |
-| Kepala TPA | Ustadzah Aminah |
-| Koordinator Tahfizh | Ust. Yusuf Al-Hafizh |
+| **Koordinator Bidang** | Naufal Fansuri, S.Pd. |
+| Anggota | Deden Syaputra, S.S., M.A. |
+| Anggota | Miftahul Huda |
+| Anggota | Farhan Ramadhan, S.Pd. |
+| Anggota | Akmal Fauzan |
+| Anggota | Khoirul Anwar |
 
-**Program:** TPA, Program Tahfizh, Majelis Taklim
-
-### Seksi Sosial & Kemasyarakatan
-
-| Jabatan | Nama |
-|---------|------|
-| Ketua Seksi | Pak Agus Salim |
-| Anggota | Pak Wahyu |
-| Anggota | Ibu Hartati |
-
-**Program:** Santunan yatim, bantuan dhuafa, ambulans masjid
-
-### Seksi Sarana & Prasarana
+## Bidang Media Informasi
 
 | Jabatan | Nama |
 |---------|------|
-| Ketua Seksi | Pak Joko Santoso |
-| Anggota Kebersihan | Pak Suroso |
-| Anggota Teknik | Pak Deden |
+| **Koordinator Bidang** | Muhammad Hafiz |
+| Anggota | Budi Hardiyanto |
+| Anggota | Muhammad Fadhlan, S.Kom. |
+| Anggota | Muhammad Rafi |
+| Anggota | Sulaiman |
+| Anggota | Noval, M.Pd. |
+| Anggota | Edi Sudrajat |
+| Anggota | Henda Perdana |
+| Anggota | Dylan Ardiansyah |
 
-### Seksi Keamanan
-
-| Jabatan | Nama |
-|---------|------|
-| Ketua Seksi | Pak Budi Hartono |
-| Anggota | Pak Ridwan |
-| Anggota | Pak Eko |
-
-### Seksi Humas & Publikasi
+## Bidang Sarana dan Prasarana
 
 | Jabatan | Nama |
 |---------|------|
-| Ketua Seksi | Fajar Nugroho |
-| Admin Website | M. Rizki Pratama |
-| Admin Media Sosial | Dian Pertiwi |
+| **Koordinator Bidang** | Dedi Irawan, S.Sos. |
+| Anggota | Malik Mulki, S.E., M.M. |
+| Anggota | Rizky Adi Mulyawan, S.Pd. |
+| Anggota | Pradika Fajar Cita, S.Pd. |
+| Anggota | Arsalih |
+| Anggota | Khoirudin |
 
-::: info Masa Bhakti
-Pengurus periode ini dilantik pada **15 Januari 2024** dan bertugas hingga **Desember 2027**.
-:::
+## Bidang Ekonomi
+
+| Jabatan | Nama |
+|---------|------|
+| **Koordinator Bidang** | Soleh Sofyan, S.Si., M.M. |
+| Anggota | Heryadi Dhanu Saputra, S.E. |
+| Anggota | Indra Pratama Putra, S.Pd. |
+| Anggota | Rahman |
