@@ -1,56 +1,104 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useData } from 'vitepress'
 import { ChevronLeft, ChevronRight, X, Info, HardHat, TriangleAlert } from 'lucide-vue-next'
+
 const { site } = useData()
 
 // Fungsi helper buat link dengan base otomatis
 function url(path) {
   return site.value.base + path.replace(/^\//, '')
 }
+
 // ============================================================
-// DATA PENGUMUMAN — kelola dari sini atau via Decap CMS
-// Set aktif: false untuk menyembunyikan banner
+// DATA PENGUMUMAN — dikelola lewat GOOGLE SHEETS
+// ------------------------------------------------------------
+// Struktur kolom (header baris pertama, harus persis):
+//   aktif,tipe,pesan,link,link_label
+//   - aktif  : ya | tidak
+//   - tipe   : info | penting | darurat
+//   - pesan  : teks pengumuman (boleh memakai koma)
+//   - link   : path halaman, boleh kosong
+//   - link_label : label tautan, boleh kosong
+// Contoh baris:
+//   ya,info,Kajian Rutin Malam Rabu ba'da Maghrib,/blog/kajian/keutamaan-sholat-berjamaah,Selengkapnya
+// Publish: File → Share → Publish to web → pilih sheet → CSV →
+// salin URL ke CSV_PENGUMUMAN_URL di bawah. Kosong = pakai data
+// cadangan. Pengumuman selesai → set aktif = tidak.
+// ------------------------------------------------------------
+const CSV_PENGUMUMAN_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZOtSWre8I4xMlqXOm6VYJMmBoCdCIDahi24vvY8kb8ZF6Qrg8dMtfYZhVIvu1X_F9B-lIFh5503bc/pub?gid=769753275&single=true&output=csv'
 // ============================================================
-const PENGUMUMAN = [
+
+// Data cadangan bila URL belum diisi / gagal diakses
+const FALLBACK_PENGUMUMAN = [
   {
-    aktif: true,
-    tipe: 'info',   // info | penting | darurat
+    aktif: 'ya',
+    tipe: 'info',
     pesan: 'Kajian Rutin Malam Rabu bersama Ust. Ahmad Fauzi — setiap Rabu ba\'da Maghrib di Masjid Al-Birru.',
     link: '/blog/kajian/keutamaan-sholat-berjamaah',
     link_label: 'Selengkapnya',
   },
   {
-    aktif: true,
+    aktif: 'ya',
     tipe: 'penting',
     pesan: 'Program donasi Renovasi Struktur Bangunan sedang berjalan — bantu kami capai target anggarannya!',
     link: '/donasi',
     link_label: 'Donasi Sekarang',
   },
 ]
-// ============================================================
 
-const aktifList = PENGUMUMAN.filter(p => p.aktif)
+function splitCSVLine(line) {
+  const cols = []
+  let cur = ''
+  let inQuote = false
+  for (const ch of line) {
+    if (ch === '"') { inQuote = !inQuote }
+    else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = '' }
+    else { cur += ch }
+  }
+  cols.push(cur.trim())
+  return cols
+}
+
+function parsePengumuman(text) {
+  const lines = text.trim().split(/\r?\n/)
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  return lines.slice(1).map(line => {
+    const cols = splitCSVLine(line)
+    const row = {}
+    headers.forEach((h, i) => { row[h] = (cols[i] ?? '').replace(/"/g, '') })
+    return row
+  }).filter(r => r.pesan && r.pesan.trim() !== '')
+}
+
+const semuaPengumuman = ref([])
+const siap = ref(false)
+
+// Daftar aktif + normalisasi tipe
+const aktifList = computed(() =>
+  semuaPengumuman.value
+    .filter(p => (p.aktif || 'ya').trim().toLowerCase() === 'ya')
+    .map(p => ({
+      ...p,
+      tipe: ['info', 'penting', 'darurat'].includes((p.tipe || '').trim().toLowerCase())
+        ? p.tipe.trim().toLowerCase()
+        : 'info',
+    }))
+)
+
 const current = ref(0)
 const dismissed = ref(false)
 
-// Auto-rotate jika lebih dari 1 pengumuman
-let timer
-onMounted(() => {
-  if (aktifList.length > 1) {
-    timer = setInterval(() => {
-      current.value = (current.value + 1) % aktifList.length
-    }, 5000)
-  }
-})
+// --- Collapse saat scroll ---
+// Banner menempel di atas (fixed). Saat halaman mulai di-scroll,
+// banner menyusut tingginya sehingga navbar naik ke posisi paling atas.
+const collapsed = ref(false)
 
-function next() {
-  current.value = (current.value + 1) % aktifList.length
+function onScroll() {
+  collapsed.value = window.scrollY > 48
 }
 
-function prev() {
-  current.value = (current.value - 1 + aktifList.length) % aktifList.length
-}
+const aktif = computed(() => aktifList.value[current.value] ?? null)
 
 const tipeIkon = {
   info: Info,
@@ -63,12 +111,94 @@ const warna = {
   penting: { bg: '#92400e', text: '#fef3c7' },
   darurat: { bg: '#991b1b', text: '#fee2e2' },
 }
+
+// Tutup banner per sesi browser (muncul lagi di kunjungan berikutnya)
+const DISMISS_KEY = 'pengumuman-ditutup'
+try {
+  dismissed.value = sessionStorage.getItem(DISMISS_KEY) === String(new Date().toDateString())
+} catch {}
+
+function tutup() {
+  dismissed.value = true
+  try { sessionStorage.setItem(DISMISS_KEY, new Date().toDateString()) } catch {}
+}
+
+// Auto-rotate jika lebih dari 1 pengumuman (data bisa datang async)
+let timer
+function aturTimer() {
+  clearInterval(timer)
+  if (aktifList.value.length > 1) {
+    timer = setInterval(() => {
+      current.value = (current.value + 1) % aktifList.value.length
+    }, 5000)
+  }
+}
+watch(aktifList, () => {
+  if (current.value >= aktifList.value.length) current.value = 0
+  aturTimer()
+})
+
+function next() {
+  current.value = (current.value + 1) % aktifList.value.length
+}
+
+function prev() {
+  current.value = (current.value - 1 + aktifList.value.length) % aktifList.value.length
+}
+
+// --- Sinkronisasi tinggi banner ke var VitePress ---
+// Tanpa ini, navbar fixed menutupi banner di desktop.
+const bannerEl = ref(null)
+const KUNCI_VAR = '--vp-layout-top-height'
+
+function updateTinggi() {
+  // Saat collapsed/dismissed, banner menyusut ke 0 — var = 0 juga.
+  const h = collapsed.value ? 0 : (dismissed.value ? 0 : (bannerEl.value?.offsetHeight ?? 0))
+  document.documentElement.style.setProperty(KUNCI_VAR, h + 'px')
+}
+
+let observer
+onMounted(async () => {
+  if (CSV_PENGUMUMAN_URL) {
+    try {
+      const res = await fetch(CSV_PENGUMUMAN_URL)
+      const rows = parsePengumuman(await res.text())
+      semuaPengumuman.value = rows.length > 0 ? rows : FALLBACK_PENGUMUMAN
+    } catch {
+      semuaPengumuman.value = FALLBACK_PENGUMUMAN
+    }
+  } else {
+    semuaPengumuman.value = FALLBACK_PENGUMUMAN
+  }
+  siap.value = true
+  aturTimer()
+
+  await nextTick()
+  updateTinggi()
+  observer = new ResizeObserver(updateTinggi)
+  if (bannerEl.value) observer.observe(bannerEl.value)
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+watch(dismissed, () => nextTick(updateTinggi))
+watch(collapsed, () => nextTick(updateTinggi))
+
+onBeforeUnmount(() => {
+  clearInterval(timer)
+  observer?.disconnect()
+  window.removeEventListener('scroll', onScroll)
+  document.documentElement.style.setProperty(KUNCI_VAR, '0px')
+})
 </script>
 
 <template>
-  <div v-if="!dismissed && aktifList.length > 0" class="pengumuman-banner"
-    :style="{ background: warna[aktifList[current].tipe].bg, color: warna[aktifList[current].tipe].text }">
-
+  <div
+    v-if="siap && !dismissed && aktif"
+    ref="bannerEl"
+    class="pengumuman-banner"
+    :class="{ 'pengumuman-banner--collapsed': collapsed }"
+    :style="{ background: warna[aktif.tipe].bg, color: warna[aktif.tipe].text }"
+  >
     <div class="pb-inner">
       <!-- Nav kiri -->
       <button v-if="aktifList.length > 1" class="pb-nav" @click="prev" aria-label="Pengumuman sebelumnya">
@@ -77,10 +207,10 @@ const warna = {
 
       <!-- Konten -->
       <div class="pb-content">
-        <component :is="tipeIkon[aktifList[current].tipe]" :size="15" class="pb-ikon" />
-        <span class="pb-pesan">{{ aktifList[current].pesan }}</span>
-        <a v-if="aktifList[current].link" :href="url(aktifList[current].link)" class="pb-link">
-          {{ aktifList[current].link_label }}
+        <component :is="tipeIkon[aktif.tipe]" :size="15" class="pb-ikon" />
+        <span class="pb-pesan">{{ aktif.pesan }}</span>
+        <a v-if="aktif.link" :href="url(aktif.link)" class="pb-link">
+          {{ aktif.link_label || 'Selengkapnya' }}
         </a>
       </div>
 
@@ -100,7 +230,7 @@ const warna = {
           ></span>
         </div>
 
-        <button class="pb-close" @click="dismissed = true" title="Tutup" aria-label="Tutup pengumuman">
+        <button class="pb-close" @click="tutup" title="Tutup" aria-label="Tutup pengumuman">
           <X :size="12" />
         </button>
       </div>
@@ -111,8 +241,22 @@ const warna = {
 
 <style scoped>
 .pengumuman-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--vp-z-index-layout-top, 40);
   width: 100%;
-  transition: background 0.4s;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, background-color 0.4s ease;
+  max-height: 96px;
+}
+
+/* Saat halaman di-scroll, banner menyusut & memudar — navbar kembali ke paling atas */
+.pengumuman-banner--collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .pb-inner {
