@@ -259,6 +259,9 @@ const totalLunas = computed(() =>
                       <BadgeCheck :size="13" />
                       Lunas
                     </span>
+                    <span v-else-if="gr.perOrang" class="dq-belum">
+                      Belum lunas
+                    </span>
                   </td>
                   <td class="dq-td-toggle">
                     <ChevronDown v-if="expanded[gi + '-' + p.no]" :size="15" />
@@ -567,6 +570,18 @@ const totalLunas = computed(() =>
   background: rgba(34, 197, 94, 0.1);
   padding: 2px 8px;
   border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Badge belum lunas — netral & redup */
+.dq-belum {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--vp-c-text-3);
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--vp-c-divider);
   white-space: nowrap;
 }
 
