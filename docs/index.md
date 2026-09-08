@@ -46,6 +46,10 @@ features:
     link: /galeri/
     linkText: Lihat galeri
 ---
+<script setup>
+import { withBase } from 'vitepress'
+</script>
+
 <div style="max-width: 900px; margin: 3rem auto; padding: 0 1.5rem;">
 
 ## Program Donasi & Infak
@@ -60,7 +64,7 @@ features:
 <AcaraList />
 
 <div class="home-lihat-semua">
-[Lihat semua acara](/acara/)
+<a :href="withBase('/acara/')">Lihat semua acara</a>
 </div>
 
 ## Ringkasan Keuangan
