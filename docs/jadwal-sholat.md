@@ -3,7 +3,7 @@ title: Jadwal Sholat
 description: Jadwal waktu sholat hari ini di Masjid Al-Birru, Depok — otomatis diperbarui setiap hari
 ---
 
-# 🕌 Jadwal Sholat Hari Ini
+# Jadwal Sholat Hari Ini
 
 <JadwalSholat />
 

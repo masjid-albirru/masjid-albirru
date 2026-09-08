@@ -3,17 +3,17 @@ title: Jadwal Acara & Kegiatan
 description: Jadwal lengkap acara dan kegiatan Masjid Al-Birru
 ---
 
-# 📅 Jadwal Acara & Kegiatan
+# Jadwal Acara & Kegiatan
 
 Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 
 <KegiatanRutin />
 
-## 📋 Acara Mendatang
+## Acara Mendatang
 
 <AcaraList />
 
-## 📆 Jadwal Khatib Jum'at — Mei 2026
+## Jadwal Khatib Jum'at
 
 <JadwalKhatib />
 

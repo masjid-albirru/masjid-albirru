@@ -10,10 +10,10 @@ tags: [sholat, berjamaah, ibadah, fiqh]
 # Keutamaan Sholat Berjamaah di Masjid
 
 <div class="article-meta">
-  <span>📅 1 Mei 2026</span>
-  <span>✍️ Ust. Ahmad Fauzi</span>
+  <span>1 Mei 2026</span>
+  <span>Ust. Ahmad Fauzi</span>
   <span class="tag">Kajian</span>
-  <span>⏱️ 5 menit baca</span>
+  <span>5 menit baca</span>
 </div>
 
 <div class="arabic">صَلَاةُ الرَّجُلِ فِي الْجَمَاعَةِ تُضَعَّفُ عَلَى صَلَاتِهِ فِي بَيْتِهِ وَفِي سُوقِهِ خَمْسًا وَعِشْرِينَ ضِعْفًا</div>
@@ -69,4 +69,4 @@ Masjid adalah rumah Allah. Setiap langkah kaki menuju masjid adalah catatan amal
 
 *Artikel ini disusun oleh Ust. Ahmad Fauzi, pengurus bidang dakwah Masjid Al-Birru.*
 
-**Bagikan artikel ini** agar lebih banyak jamaah yang mengetahui keutamaan sholat berjamaah. 🤲
+**Bagikan artikel ini** agar lebih banyak jamaah yang mengetahui keutamaan sholat berjamaah.

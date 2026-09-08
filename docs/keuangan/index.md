@@ -3,7 +3,7 @@ title: Laporan Keuangan Masjid
 description: Laporan keuangan transparan Masjid Al-Birru
 ---
 
-# 💰 Laporan Keuangan
+# Laporan Keuangan
 
 <KeuanganSheets />
 

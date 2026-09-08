@@ -3,11 +3,9 @@ title: Laporan Keuangan Tahunan
 description: Rekap laporan keuangan Masjid Al-Birru per tahun
 ---
 
-# 💰 Laporan Keuangan Tahunan
+# Laporan Keuangan Tahunan
 
----
-
-## 📊 Rekap Tahunan 2025
+## Rekap Tahunan 2025
 
 <div class="financial-summary">
   <div class="financial-card pemasukan">
@@ -46,21 +44,17 @@ description: Rekap laporan keuangan Masjid Al-Birru per tahun
 
 | Program | Anggaran | Realisasi | Status |
 |---------|----------|-----------|--------|
-| Renovasi atap masjid | Rp 80.000.000 | Rp 78.500.000 | ✅ Selesai |
-| Pengadaan sound system | Rp 25.000.000 | Rp 24.200.000 | ✅ Selesai |
-| Program sosial & santunan | Rp 30.000.000 | Rp 29.800.000 | ✅ Selesai |
-| Operasional & gaji | Rp 60.000.000 | Rp 58.400.000 | ✅ Selesai |
-| TPA & pendidikan | Rp 15.000.000 | Rp 14.700.000 | ✅ Selesai |
-| Kegiatan Ramadan 1445H | Rp 45.000.000 | Rp 44.100.000 | ✅ Selesai |
-| Lain-lain & darurat | Rp 30.000.000 | Rp 33.500.000 | ✅ Selesai |
+| Renovasi atap masjid | Rp 80.000.000 | Rp 78.500.000 | Selesai |
+| Pengadaan sound system | Rp 25.000.000 | Rp 24.200.000 | Selesai |
+| Program sosial & santunan | Rp 30.000.000 | Rp 29.800.000 | Selesai |
+| Operasional & gaji | Rp 60.000.000 | Rp 58.400.000 | Selesai |
+| TPA & pendidikan | Rp 15.000.000 | Rp 14.700.000 | Selesai |
+| Kegiatan Ramadan 1445H | Rp 45.000.000 | Rp 44.100.000 | Selesai |
+| Lain-lain & darurat | Rp 30.000.000 | Rp 33.500.000 | Selesai |
 
----
-
-## 📅 Laporan Per Bulan (2026)
+## Laporan Per Bulan (2026)
 
 Untuk laporan bulan per bulan tahun 2026, lihat di [halaman laporan keuangan](/keuangan/).
-
----
 
 ::: info Audit Keuangan
 Laporan keuangan tahunan diaudit oleh tim internal yang terdiri dari 3 orang jamaah yang ditunjuk dalam rapat tahunan. Dokumen asli tersedia untuk diperiksa di sekretariat masjid.

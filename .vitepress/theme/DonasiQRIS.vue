@@ -1,15 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import { QrCode, Landmark, Copy, Check, MessageCircle } from 'lucide-vue-next'
 
 const QRIS_STRING = '00020101021126640017ID.CO.BANKBSI.WWW0118936004510000097631021000004947680303UMI51440014ID.CO.QRIS.WWW0215ID10221742528100303UMI5204866153033605802ID5912DKM AL BIRRU6005DEPOK61051651662070703A0163041E63'
 
-
 const REKENING = [
   { bank: 'Bank Syariah Indonesia (BSI)', no: '7192880558', atas: 'DKM Al Birru'},
-]
-
-const PROGRAM = [
-  { nama: 'Wakaf Al-Quran', kode: 'WAKAF', target: 75000000, terkumpul: 7500000, icon: '📖', deadline: 'Agustus 2025' },
 ]
 
 const WA_NUMBER = '6281399928319'
@@ -54,24 +50,11 @@ function generateQR() {
   }
 }
 
-function persen(terkumpul, target) {
-  return Math.min(Math.round((terkumpul / target) * 100), 100)
-}
-
-function rupiah(angka) {
-  return 'Rp ' + Number(angka).toLocaleString('id-ID')
-}
-
 async function copyRek(no) {
   const clean = no.replace(/\s/g, '')
   await navigator.clipboard.writeText(clean)
   copied.value = no
   setTimeout(() => { copied.value = '' }, 2000)
-}
-
-function waLink(kode) {
-  const pesan = encodeURIComponent(`DONASI_[NAMA]_[NOMINAL]_${kode}\n\nAssalamualaikum, saya telah melakukan donasi untuk program ${kode} Masjid Al-Birru.`)
-  return `https://wa.me/${WA_NUMBER}?text=${pesan}`
 }
 </script>
 
@@ -81,70 +64,47 @@ function waLink(kode) {
     <!-- QRIS Section -->
     <div class="qris-section">
       <div class="qris-left">
-        <h3 class="qris-title">📱 Scan QRIS</h3>
-        <p class="qris-desc">Scan dengan aplikasi apapun — GoPay, OVO, DANA, ShopeePay, m-Banking, dll.</p>
+        <h3 class="qris-title">
+          <QrCode :size="18" />
+          Scan QRIS
+        </h3>
+        <p class="qris-desc">Scan dengan aplikasi pembayaran atau m-Banking pilihan Anda.</p>
         <div class="qris-box">
           <div v-if="!qrLoaded && !qrError" class="qr-loading">
             <span class="spinner"></span> Memuat QR...
           </div>
           <div v-if="qrError" class="qr-error">
-            ⚠️ Gagal memuat QR Code
+            Gagal memuat QR Code
           </div>
           <div id="qris-canvas" :style="{ display: qrLoaded ? 'block' : 'none' }"></div>
         </div>
-        <p class="qris-note">✅ Berlaku untuk semua dompet digital & m-Banking</p>
+        <p class="qris-note">Mendukung semua dompet digital dan m-Banking</p>
       </div>
 
       <!-- Rekening -->
       <div class="qris-right">
-        <h3 class="qris-title">🏦 Transfer Bank</h3>
+        <h3 class="qris-title">
+          <Landmark :size="18" />
+          Transfer Bank
+        </h3>
         <div class="rek-list">
           <div v-for="rek in REKENING" :key="rek.no" class="rek-card">
             <div class="rek-bank">{{ rek.bank }}</div>
             <div class="rek-no">
               {{ rek.no }}
               <button class="copy-btn" @click="copyRek(rek.no)">
-                {{ copied === rek.no ? '✅ Tersalin' : '📋 Salin' }}
+                <Check v-if="copied === rek.no" :size="12" />
+                <Copy v-else :size="12" />
+                {{ copied === rek.no ? 'Tersalin' : 'Salin' }}
               </button>
             </div>
             <div class="rek-atas">a.n. {{ rek.atas }}</div>
           </div>
         </div>
         <a :href="`https://wa.me/${WA_NUMBER}`" target="_blank" class="wa-btn">
-          💬 Konfirmasi via WhatsApp
+          <MessageCircle :size="15" />
+          Konfirmasi via WhatsApp
         </a>
-      </div>
-    </div>
-
-    <!-- Program Donasi -->
-    <div class="program-section">
-      <h3 class="program-title">🏗️ Program Donasi Aktif</h3>
-      <div class="program-grid">
-        <div v-for="prog in PROGRAM" :key="prog.kode" class="program-card">
-          <div class="prog-header">
-            <span class="prog-icon">{{ prog.icon }}</span>
-            <div>
-              <div class="prog-nama">{{ prog.nama }}</div>
-              <div class="prog-deadline">🗓️ Target: {{ prog.deadline }}</div>
-            </div>
-          </div>
-
-          <div class="prog-angka">
-            <span class="prog-terkumpul">{{ rupiah(prog.terkumpul) }}</span>
-            <span class="prog-target">dari {{ rupiah(prog.target) }}</span>
-          </div>
-
-          <div class="prog-bar-wrap">
-            <div class="prog-bar" :style="{ width: persen(prog.terkumpul, prog.target) + '%' }"></div>
-          </div>
-
-          <div class="prog-footer">
-            <span class="prog-persen">{{ persen(prog.terkumpul, prog.target) }}% tercapai</span>
-            <a :href="waLink(prog.kode)" target="_blank" class="prog-donasi-btn">
-              Donasi → {{ prog.kode }}
-            </a>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -169,9 +129,17 @@ function waLink(kode) {
 }
 
 .qris-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  color: var(--teal-700);
+}
+
+.qris-title svg {
+  color: var(--teal-600);
 }
 
 .qris-desc {
@@ -258,6 +226,9 @@ function waLink(kode) {
 }
 
 .copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.7rem;
   padding: 2px 8px;
   border-radius: 6px;
@@ -289,108 +260,6 @@ function waLink(kode) {
 }
 
 .wa-btn:hover { opacity: 0.85; }
-
-/* ===== Program ===== */
-.program-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-}
-
-.program-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
-.program-card {
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  padding: 1.25rem;
-  background: var(--vp-c-bg);
-  transition: box-shadow 0.2s;
-}
-
-.program-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-}
-
-.prog-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.prog-icon { font-size: 1.5rem; line-height: 1; }
-
-.prog-nama {
-  font-weight: 700;
-  font-size: 0.9rem;
-  line-height: 1.3;
-}
-
-.prog-deadline {
-  font-size: 0.72rem;
-  color: var(--vp-c-text-2);
-  margin-top: 2px;
-}
-
-.prog-angka {
-  margin-bottom: 6px;
-}
-
-.prog-terkumpul {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--vp-c-brand);
-  font-variant-numeric: tabular-nums;
-}
-
-.prog-target {
-  font-size: 0.75rem;
-  color: var(--vp-c-text-2);
-  margin-left: 4px;
-}
-
-.prog-bar-wrap {
-  height: 8px;
-  background: var(--vp-c-bg-soft);
-  border-radius: 99px;
-  overflow: hidden;
-  margin-bottom: 0.6rem;
-}
-
-.prog-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #0f6b78, #14b8c8);
-  border-radius: 99px;
-  transition: width 1s ease;
-}
-
-.prog-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.prog-persen {
-  font-size: 0.75rem;
-  color: var(--vp-c-text-2);
-}
-
-.prog-donasi-btn {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #fff;
-  background: var(--vp-c-brand);
-  padding: 3px 10px;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-.prog-donasi-btn:hover { opacity: 0.85; }
 
 /* Mobile */
 @media (max-width: 640px) {

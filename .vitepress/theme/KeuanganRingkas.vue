@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { TrendingUp, TrendingDown, Wallet, ArrowRight } from 'lucide-vue-next'
 
 const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
 
@@ -55,24 +56,36 @@ function rupiah(angka) {
 <template>
   <div class="keu-ringkas">
     <div v-if="loading" class="kr-loading">Memuat data keuangan...</div>
-    <div v-else-if="error" class="kr-error">⚠️ Gagal memuat data</div>
+    <div v-else-if="error" class="kr-error">Gagal memuat data</div>
     <template v-else>
       <div class="kr-cards">
         <div class="kr-card kr-masuk">
-          <div class="kr-label">Pemasukan</div>
-          <div class="kr-value">{{ rupiah(pemasukan) }}</div>
+          <TrendingUp :size="17" class="kr-icon" />
+          <div>
+            <div class="kr-label">Pemasukan</div>
+            <div class="kr-value">{{ rupiah(pemasukan) }}</div>
+          </div>
         </div>
         <div class="kr-card kr-keluar">
-          <div class="kr-label">Pengeluaran</div>
-          <div class="kr-value">{{ rupiah(pengeluaran) }}</div>
+          <TrendingDown :size="17" class="kr-icon" />
+          <div>
+            <div class="kr-label">Pengeluaran</div>
+            <div class="kr-value">{{ rupiah(pengeluaran) }}</div>
+          </div>
         </div>
         <div class="kr-card kr-saldo">
-          <div class="kr-label">Saldo Akhir</div>
-          <div class="kr-value">{{ rupiah(saldo) }}</div>
+          <Wallet :size="17" class="kr-icon" />
+          <div>
+            <div class="kr-label">Saldo Akhir</div>
+            <div class="kr-value">{{ rupiah(saldo) }}</div>
+          </div>
         </div>
       </div>
       <div class="kr-footer">
-        <a href="/masjid-albirru/keuangan/">Lihat laporan lengkap →</a>
+        <a href="/masjid-albirru/keuangan/">
+          Lihat laporan lengkap
+          <ArrowRight :size="13" />
+        </a>
       </div>
     </template>
   </div>
@@ -95,10 +108,18 @@ function rupiah(angka) {
 }
 
 .kr-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   padding: 1rem 1.25rem;
   border-radius: 12px;
   border: 1px solid var(--vp-c-divider);
 }
+
+.kr-icon { flex-shrink: 0; margin-top: 2px; }
+.kr-masuk .kr-icon  { color: #16a34a; }
+.kr-keluar .kr-icon { color: #dc2626; }
+.kr-saldo .kr-icon  { color: var(--vp-c-brand); }
 
 .kr-label {
   font-size: 0.75rem;
@@ -127,6 +148,9 @@ function rupiah(angka) {
 }
 
 .kr-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--vp-c-brand);
   text-decoration: none;
   font-weight: 600;

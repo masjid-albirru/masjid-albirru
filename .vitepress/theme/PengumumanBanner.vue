@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useData } from 'vitepress'
+import { ChevronLeft, ChevronRight, X, Info, HardHat, TriangleAlert } from 'lucide-vue-next'
 const { site } = useData()
 
 // Fungsi helper buat link dengan base otomatis
@@ -15,7 +16,6 @@ const PENGUMUMAN = [
   {
     aktif: true,
     tipe: 'info',   // info | penting | darurat
-    ikon: '📢',
     pesan: 'Kajian Rutin Malam Rabu bersama Ust. Ahmad Fauzi — setiap Rabu ba\'da Maghrib di Masjid Al-Birru.',
     link: '/blog/kajian/keutamaan-sholat-berjamaah',
     link_label: 'Selengkapnya',
@@ -23,9 +23,8 @@ const PENGUMUMAN = [
   {
     aktif: true,
     tipe: 'penting',
-    ikon: '🏗️',
-    pesan: 'Program donasi Renovasi Tempat Wudhu masih berjalan — bantu kami capai target Rp 75 juta!',
-    link: '/keuangan/donasi',
+    pesan: 'Program donasi Renovasi Struktur Bangunan sedang berjalan — bantu kami capai target anggarannya!',
+    link: '/donasi',
     link_label: 'Donasi Sekarang',
   },
 ]
@@ -53,6 +52,12 @@ function prev() {
   current.value = (current.value - 1 + aktifList.length) % aktifList.length
 }
 
+const tipeIkon = {
+  info: Info,
+  penting: HardHat,
+  darurat: TriangleAlert,
+}
+
 const warna = {
   info:    { bg: '#0f6b78', text: '#fff' },
   penting: { bg: '#92400e', text: '#fef3c7' },
@@ -66,20 +71,24 @@ const warna = {
 
     <div class="pb-inner">
       <!-- Nav kiri -->
-      <button v-if="aktifList.length > 1" class="pb-nav" @click="prev">‹</button>
+      <button v-if="aktifList.length > 1" class="pb-nav" @click="prev" aria-label="Pengumuman sebelumnya">
+        <ChevronLeft :size="15" />
+      </button>
 
       <!-- Konten -->
       <div class="pb-content">
-        <span class="pb-ikon">{{ aktifList[current].ikon }}</span>
+        <component :is="tipeIkon[aktifList[current].tipe]" :size="15" class="pb-ikon" />
         <span class="pb-pesan">{{ aktifList[current].pesan }}</span>
         <a v-if="aktifList[current].link" :href="url(aktifList[current].link)" class="pb-link">
-          {{ aktifList[current].link_label }} →
+          {{ aktifList[current].link_label }}
         </a>
       </div>
 
       <!-- Nav kanan + dots + close -->
       <div class="pb-right">
-        <button v-if="aktifList.length > 1" class="pb-nav" @click="next">›</button>
+        <button v-if="aktifList.length > 1" class="pb-nav" @click="next" aria-label="Pengumuman berikutnya">
+          <ChevronRight :size="15" />
+        </button>
 
         <!-- Dots -->
         <div v-if="aktifList.length > 1" class="pb-dots">
@@ -91,7 +100,9 @@ const warna = {
           ></span>
         </div>
 
-        <button class="pb-close" @click="dismissed = true" title="Tutup">✕</button>
+        <button class="pb-close" @click="dismissed = true" title="Tutup" aria-label="Tutup pengumuman">
+          <X :size="12" />
+        </button>
       </div>
     </div>
 
@@ -124,7 +135,11 @@ const warna = {
   text-align: center;
 }
 
-.pb-ikon { font-size: 1rem; flex-shrink: 0; }
+.pb-ikon {
+  display: inline-flex;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
 
 .pb-pesan { line-height: 1.4; }
 
@@ -139,6 +154,9 @@ const warna = {
 .pb-link:hover { opacity: 1; }
 
 .pb-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255,255,255,0.2);
   border: none;
   color: inherit;
@@ -146,7 +164,6 @@ const warna = {
   height: 24px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 1rem;
   line-height: 1;
   flex-shrink: 0;
   transition: background 0.2s;
@@ -177,6 +194,9 @@ const warna = {
 .pb-dot.active { background: rgba(255,255,255,0.95); }
 
 .pb-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255,255,255,0.15);
   border: none;
   color: inherit;
@@ -184,7 +204,6 @@ const warna = {
   height: 22px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 0.65rem;
   line-height: 1;
   flex-shrink: 0;
   transition: background 0.2s;

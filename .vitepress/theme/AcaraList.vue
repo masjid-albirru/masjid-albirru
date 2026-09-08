@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useData } from 'vitepress'
+import { Clock, MapPin, User, CircleDot } from 'lucide-vue-next'
 
 const { site } = useData()
 
@@ -85,9 +86,9 @@ function hariLagi(str) {
   const today = new Date(); today.setHours(0,0,0,0)
   const target = new Date(str); target.setHours(0,0,0,0)
   const diff = Math.round((target - today) / (1000 * 60 * 60 * 24))
-  if (diff === 0) return '🟢 Hari ini!'
-  if (diff === 1) return '⏰ Besok'
-  if (diff <= 7) return `⏳ ${diff} hari lagi`
+  if (diff === 0) return 'Hari ini'
+  if (diff === 1) return 'Besok'
+  if (diff <= 7) return `${diff} hari lagi`
   return null
 }
 
@@ -115,7 +116,7 @@ const terbukaBadge = {
     </div>
 
     <div v-else-if="error" class="al-error">
-      ⚠️ Gagal memuat data. Periksa koneksi internet.
+      Gagal memuat data. Periksa koneksi internet.
     </div>
 
     <template v-else>
@@ -173,7 +174,10 @@ const terbukaBadge = {
                 v-if="terbukaBadge[a.terbuka_umum]"
                 class="al-terbuka"
                 :style="{ color: terbukaBadge[a.terbuka_umum].warna }"
-              >● {{ terbukaBadge[a.terbuka_umum].label }}</span>
+              >
+                <CircleDot :size="10" class="al-dot" />
+                {{ terbukaBadge[a.terbuka_umum].label }}
+              </span>
 
               <span v-if="!a.sudah_lewat && hariLagi(a.tanggal)" class="al-countdown">
                 {{ hariLagi(a.tanggal) }}
@@ -183,11 +187,18 @@ const terbukaBadge = {
             <h3 class="al-title">{{ a.nama_acara }}</h3>
 
             <div class="al-info">
-              <span v-if="a.waktu_mulai">
-                🕐 {{ a.waktu_mulai }}{{ a.waktu_selesai ? ' - ' + a.waktu_selesai : '' }} WIB
+              <span v-if="a.waktu_mulai" class="al-info-item">
+                <Clock :size="13" />
+                {{ a.waktu_mulai }}{{ a.waktu_selesai ? ' - ' + a.waktu_selesai : '' }} WIB
               </span>
-              <span v-if="a.lokasi">📍 {{ a.lokasi }}</span>
-              <span v-if="a.pemateri">🎤 {{ a.pemateri }}</span>
+              <span v-if="a.lokasi" class="al-info-item">
+                <MapPin :size="13" />
+                {{ a.lokasi }}
+              </span>
+              <span v-if="a.pemateri" class="al-info-item">
+                <User :size="13" />
+                {{ a.pemateri }}
+              </span>
             </div>
 
             <p v-if="a.keterangan" class="al-desc">{{ a.keterangan }}</p>
@@ -295,9 +306,9 @@ const terbukaBadge = {
   flex-shrink: 0;
   width: 56px;
   text-align: center;
-  background: linear-gradient(135deg, #0f6b78, #0a4a54);
+  background: var(--teal-700);
   color: #fff;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 8px 4px;
   display: flex;
   flex-direction: column;
@@ -327,7 +338,16 @@ const terbukaBadge = {
   border-radius: 99px;
 }
 
-.al-terbuka { font-size: 0.72rem; font-weight: 600; }
+.al-terbuka {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.al-dot { flex-shrink: 0; }
+
 .al-countdown { font-size: 0.72rem; font-weight: 700; color: var(--vp-c-brand); }
 
 .al-title {
@@ -345,6 +365,17 @@ const terbukaBadge = {
   font-size: 0.78rem;
   color: var(--vp-c-text-2);
   margin-bottom: 0.4rem;
+}
+
+.al-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.al-info-item svg {
+  color: var(--teal-600);
+  flex-shrink: 0;
 }
 
 .al-desc {

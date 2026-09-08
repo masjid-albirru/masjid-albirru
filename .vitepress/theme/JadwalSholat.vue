@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { MoonStar, Sun, CloudSun, Sunset, MapPin } from 'lucide-vue-next'
 
 // Koordinat Masjid Al-Birru (Depok, Jawa Barat)
 // Ganti dengan koordinat yang tepat jika perlu
@@ -14,7 +15,7 @@ const error = ref(false)
 
 const namaWaktu = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya']
 const keyAPI   = ['Fajr',  'Dhuhr',  'Asr',   'Maghrib', 'Isha']
-const ikonWaktu = ['🌙', '☀️', '🌤️', '🌅', '🌙']
+const ikonWaktu = [MoonStar, Sun, CloudSun, Sunset, MoonStar]
 
 // Update jam setiap detik
 let interval
@@ -106,7 +107,10 @@ function isBerikutnya(index) {
     <div class="js-header">
       <div class="js-jam">{{ jamSekarang }}</div>
       <div class="js-tanggal">{{ tanggalSekarang }}</div>
-      <div class="js-kota">📍 {{ KOTA }}</div>
+      <div class="js-kota">
+        <MapPin :size="12" class="js-kota-icon" />
+        {{ KOTA }}
+      </div>
     </div>
 
     <!-- Loading -->
@@ -116,7 +120,7 @@ function isBerikutnya(index) {
 
     <!-- Error -->
     <div v-else-if="error" class="js-error">
-      ⚠️ Gagal memuat jadwal. Periksa koneksi internet.
+      Gagal memuat jadwal. Periksa koneksi internet.
     </div>
 
     <!-- Jadwal -->
@@ -138,7 +142,7 @@ function isBerikutnya(index) {
             'js-item--berikutnya': isBerikutnya(i)
           }"
         >
-          <div class="js-ikon">{{ ikonWaktu[i] }}</div>
+          <component :is="ikonWaktu[i]" :size="18" class="js-ikon" />
           <div class="js-nama">{{ nama }}</div>
           <div class="js-waktu">{{ formatWaktu(waktuSholat?.[keyAPI[i]]) }}</div>
           <div v-if="isBerikutnya(i)" class="js-badge">Berikutnya</div>
@@ -155,12 +159,12 @@ function isBerikutnya(index) {
 
 <style scoped>
 .jadwal-sholat {
-  background: linear-gradient(135deg, #0f6b78 0%, #0a4a54 100%);
-  border-radius: 16px;
+  background: var(--teal-900);
+  border-radius: 12px;
   padding: 1.75rem;
   color: #fff;
   margin: 2rem 0;
-  box-shadow: 0 8px 32px rgba(15, 107, 120, 0.3);
+  border: 1px solid var(--teal-700);
 }
 
 /* Header */
@@ -185,9 +189,17 @@ function isBerikutnya(index) {
 }
 
 .js-kota {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 0.78rem;
   opacity: 0.65;
   margin-top: 2px;
+}
+
+.js-kota-icon {
+  opacity: 0.8;
 }
 
 /* Countdown */
@@ -239,8 +251,11 @@ function isBerikutnya(index) {
 }
 
 .js-ikon {
-  font-size: 1.2rem;
-  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 6px;
+  color: var(--gold-light);
 }
 
 .js-nama {

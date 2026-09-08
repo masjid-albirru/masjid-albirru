@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { BarChart3, ReceiptText, ArrowDownToLine, ArrowUpFromLine } from 'lucide-vue-next'
 
 const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
 
@@ -132,13 +133,16 @@ function formatTanggal(str) {
   <div class="keuangan-sheets">
 
     <div v-if="error" class="ks-error">
-      ⚠️ Gagal memuat data. Periksa koneksi internet.
+      Gagal memuat data. Periksa koneksi internet.
     </div>
 
     <template v-else>
 
       <!-- ===== REKAP TAHUNAN ===== -->
-      <h3 class="ks-section-title">📊 Rekap Per Bulan</h3>
+      <h3 class="ks-section-title">
+        <BarChart3 :size="17" />
+        Rekap Per Bulan
+      </h3>
 
       <div v-if="loadingRekap" class="ks-loading">
         <span class="spinner"></span> Memuat rekap...
@@ -168,7 +172,10 @@ function formatTanggal(str) {
       </div>
 
       <!-- ===== DETAIL TRANSAKSI ===== -->
-      <h3 class="ks-section-title" style="margin-top: 2rem">📋 Detail Transaksi</h3>
+      <h3 class="ks-section-title" style="margin-top: 2rem">
+        <ReceiptText :size="17" />
+        Detail Transaksi
+      </h3>
 
       <!-- Pilih tahun -->
       <div class="ks-toolbar">
@@ -183,7 +190,7 @@ function formatTanggal(str) {
         </div>
 
         <div class="ks-filters">
-          <input v-model="search" class="ks-search" placeholder="🔍 Cari keterangan..." />
+          <input v-model="search" class="ks-search" placeholder="Cari keterangan..." />
           <select v-model="activeBulan" class="ks-select">
             <option v-for="b in bulanOptions" :key="b">{{ b }}</option>
           </select>
@@ -241,7 +248,12 @@ function formatTanggal(str) {
               <td>{{ r.keterangan }}</td>
               <td>
                 <span class="ks-jenis-badge" :class="r.jenis?.toLowerCase() === 'pemasukan' ? 'ks-jenis--masuk' : 'ks-jenis--keluar'">
-                  {{ r.jenis?.toLowerCase() === 'pemasukan' ? '↑' : '↓' }} {{ r.jenis }}
+                  <ArrowUpFromLine
+                    v-if="r.jenis?.toLowerCase() === 'pemasukan'"
+                    :size="12"
+                  />
+                  <ArrowDownToLine v-else :size="12" />
+                  {{ r.jenis }}
                 </span>
               </td>
               <td :class="r.jenis?.toLowerCase() === 'pemasukan' ? 'ks-masuk' : 'ks-keluar'">
@@ -266,9 +278,17 @@ function formatTanggal(str) {
 .keuangan-sheets { margin: 1.5rem 0; }
 
 .ks-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 1rem;
+  color: var(--teal-700);
+}
+
+.ks-section-title svg {
+  color: var(--teal-600);
 }
 
 .ks-loading, .ks-empty, .ks-error {
@@ -335,6 +355,9 @@ function formatTanggal(str) {
 .ks-row--keluar td { background: rgba(239,68,68,0.03); }
 
 .ks-jenis-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 2px 8px;

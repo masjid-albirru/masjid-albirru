@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { CalendarDays, User, Archive, Megaphone } from 'lucide-vue-next'
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQVpTzZUDk9wpJi-AeS_iVKZsZr_xOWhD-1kft0DRegMjS94PuDhfszzI7o5Deo2UJJJDyt7tG8WbHr/pub?gid=0&single=true&output=csv'
 
@@ -87,7 +88,7 @@ function formatTanggal(str) {
     </div>
 
     <div v-else-if="error" class="jk-error">
-      ⚠️ Gagal memuat data. Periksa koneksi internet.
+      Gagal memuat data. Periksa koneksi internet.
     </div>
 
     <template v-else-if="data.length === 0">
@@ -98,14 +99,20 @@ function formatTanggal(str) {
 
       <!-- Highlight Khatib Jum'at Ini -->
       <div v-if="khatibIni" class="jk-highlight">
-        <div class="jk-highlight-label">🕌 Khatib Jum'at Ini</div>
+        <div class="jk-highlight-label">
+          <Megaphone :size="14" />
+          Khatib Jum'at Ini
+        </div>
         <div class="jk-highlight-khatib">{{ khatibIni.khatib }}</div>
         <div v-if="khatibIni.tema" class="jk-highlight-tema">"{{ khatibIni.tema }}"</div>
         <div class="jk-highlight-tanggal">{{ formatTanggal(khatibIni.tanggal) }}</div>
       </div>
 
       <!-- Mendatang -->
-      <h3 class="jk-section-title">📅 Jadwal Mendatang</h3>
+      <h3 class="jk-section-title">
+        <CalendarDays :size="17" />
+        Jadwal Mendatang
+      </h3>
 
       <div v-if="mendatang.length === 0" class="jk-empty-small">
         Belum ada jadwal mendatang.
@@ -139,7 +146,8 @@ function formatTanggal(str) {
       <!-- Arsip -->
       <details v-if="lewat.length > 0" class="jk-lewat">
         <summary class="jk-lewat-toggle">
-          📜 Arsip Jadwal Khatib ({{ lewat.length }} entri)
+          <Archive :size="14" />
+          Arsip Jadwal Khatib ({{ lewat.length }} entri)
         </summary>
         <div class="jk-table-wrap">
           <table class="jk-table jk-table--lewat">
@@ -193,18 +201,22 @@ function formatTanggal(str) {
 
 /* Highlight */
 .jk-highlight {
-  background: linear-gradient(135deg, #0f6b78, #0a4a54);
+  background: var(--teal-700);
   color: #fff;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
   text-align: center;
+  border: 1px solid var(--teal-600);
 }
 
 .jk-highlight-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  opacity: 0.75;
+  opacity: 0.85;
   margin-bottom: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -230,9 +242,17 @@ function formatTanggal(str) {
 
 /* Section title */
 .jk-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 1rem;
+  color: var(--teal-700);
+}
+
+.jk-section-title svg {
+  color: var(--teal-600);
 }
 
 /* Table */
@@ -291,6 +311,9 @@ function formatTanggal(str) {
 .jk-lewat { margin-top: 0.5rem; }
 
 .jk-lewat-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--vp-c-text-2);

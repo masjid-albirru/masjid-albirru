@@ -1,88 +1,159 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import {
+  Wallet, Users, Layers, BadgeCheck, Beef, Drumstick,
+  ChevronRight, ChevronDown, CircleAlert, Loader2
+} from 'lucide-vue-next'
 
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaKEyByjvn6DX0SFqozsV11R8Sg-U-R7VP570NcYNUgvVaaF_JhUBGXuusNGGqQmeZW3WObiXSvRcd/pub?gid=0&single=true&output=csv'
+// ============================================================
+// DATA TABUNGAN QURBAN — dikelola lewat GOOGLE SHEETS
+// Sapi: gid=0 · Kambing: gid=1591452287 (spreadsheet yang sama)
+// Update angka cukup lewat spreadsheet, halaman menarik otomatis.
+// ============================================================
+const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQI4qLTRQGU5bREmlIGpUCitTLUVAjb1A8FDRLcCbp8LwKk9ACuqtgXaxYPYPycxjUKXSEN8bJSW1g3/pub'
+const SHEET_SAPI    = `${SHEET_BASE}?gid=0&single=true&output=csv`
+const SHEET_KAMBING = `${SHEET_BASE}?gid=1591452287&single=true&output=csv`
 
-const data = ref([])
+const grupSapi = ref([])
+const grupKambing = ref([])
 const loading = ref(true)
 const error = ref(false)
-const search = ref('')
-const filterStatus = ref('Semua')
-const filterHewan = ref('Semua')
+const expanded = ref({})
 
 onMounted(async () => {
   try {
-    const res = await fetch(CSV_URL)
-    const text = await res.text()
-    data.value = parseCSV(text)
-  } catch (e) {
+    const [sapi, kambing] = await Promise.all([
+      fetch(SHEET_SAPI).then(r => r.text()),
+      fetch(SHEET_KAMBING).then(r => r.text()),
+    ])
+    grupSapi.value = parseTabungan(sapi)
+    grupKambing.value = parseTabungan(kambing, 'Kambing')
+  } catch {
     error.value = true
   } finally {
     loading.value = false
   }
 })
 
-function parseCSV(text) {
-  const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-  return lines.slice(1).map(line => {
-    // Handle quoted fields dengan koma di dalamnya
-    const cols = []
-    let current = ''
-    let inQuote = false
-    for (const ch of line) {
-      if (ch === '"') { inQuote = !inQuote }
-      else if (ch === ',' && !inQuote) { cols.push(current.trim()); current = '' }
-      else { current += ch }
+function splitCSVLine(line) {
+  const cols = []
+  let cur = ''
+  let inQuote = false
+  for (const ch of line) {
+    if (ch === '"') { inQuote = !inQuote }
+    else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = '' }
+    else { cur += ch }
+  }
+  cols.push(cur.trim())
+  return cols
+}
+
+function angka(v) {
+  // Terima "Rp1,400,000", "400000", "Rp0", kosong
+  const n = parseInt(String(v ?? '').replace(/[^0-9-]/g, ''), 10)
+  return isNaN(n) ? 0 : n
+}
+
+// Parse buku tabungan: baris judul kelompok, header NO/NAMA,
+// label bulan, lalu baris peserta.
+function parseTabungan(text, namaGrupDefault) {
+  const lines = text.trim().split(/\r?\n/).map(splitCSVLine)
+  const groups = []
+  let g = null
+  let bulan = []
+  let totalIdx = -1
+
+  for (const cols of lines) {
+    const c0 = (cols[0] || '').trim()
+    const c1 = (cols[1] || '').trim()
+
+    // Baris judul kelompok: "A. KELOMPOK 1 (7 JUTA)"
+    // Angka dalam kurung = target PER ORANG
+    const mGrup = c0.match(/^[A-Za-z]\.\s*(.+)$/)
+    if (mGrup && !/^\d+$/.test(c0)) {
+      const label = mGrup[1].trim()
+      const mTarget = label.match(/\((\d+)\s*JUTA\)/i)
+      g = { nama: label, perOrang: mTarget ? parseInt(mTarget[1], 10) * 1e6 : null, peserta: [] }
+      groups.push(g)
+      bulan = []
+      totalIdx = -1
+      continue
     }
-    cols.push(current.trim())
 
-    const row = {}
-    headers.forEach((h, i) => { row[h] = cols[i] ?? '' })
-    return row
-  }).filter(r => r.nama && r.nama.trim() !== '')
+    // Baris header "NO,NAMA,BULAN...TOTAL"
+    if (c0.toUpperCase() === 'NO' && c1.toUpperCase() === 'NAMA') {
+      if (!g) { g = { nama: namaGrupDefault, perOrang: null, peserta: [] }; groups.push(g) }
+      totalIdx = cols.findIndex(c => c.toUpperCase() === 'TOTAL')
+      bulan = []
+      continue
+    }
+
+    // Baris label bulan: kolom0&1 kosong, kolom2+ nama bulan
+    if (!c0 && !c1 && totalIdx > 0) {
+      bulan = cols.slice(2, totalIdx).map(c => c.trim()).filter(Boolean)
+      continue
+    }
+
+    // Baris peserta: kolom0 = nomor, kolom1 = nama
+    if (/^\d+$/.test(c0) && c1 && g) {
+      const nilai = {}
+      bulan.forEach((b, i) => { nilai[b] = angka(cols[2 + i]) })
+      const total = totalIdx >= 0 ? angka(cols[totalIdx]) : angka(cols[cols.length - 1])
+      g.peserta.push({ no: parseInt(c0, 10), nama: c1, nilai, total })
+    }
+  }
+  return groups
 }
 
-// Statistik
-const totalSapi = computed(() => data.value.filter(r => r.jenis_hewan?.toLowerCase().includes('sapi')).length)
-const totalKambing = computed(() => data.value.filter(r => r.jenis_hewan?.toLowerCase().includes('kambing')).length)
-const totalLunas = computed(() => data.value.filter(r => r.status?.toLowerCase() === 'lunas').length)
-
-// Opsi filter unik
-const statusOptions = computed(() => {
-  const set = new Set(data.value.map(r => r.status).filter(Boolean))
-  return ['Semua', ...Array.from(set)]
-})
-
-const hewanOptions = computed(() => {
-  const set = new Set(data.value.map(r => r.jenis_hewan).filter(Boolean))
-  return ['Semua', ...Array.from(set)]
-})
-
-// Filter + search
-const filtered = computed(() => {
-  return data.value.filter(r => {
-    const q = search.value.toLowerCase()
-    const matchSearch = !q ||
-      r.nama?.toLowerCase().includes(q) ||
-      r.atas_nama?.toLowerCase().includes(q)
-    const matchStatus = filterStatus.value === 'Semua' || r.status === filterStatus.value
-    const matchHewan  = filterHewan.value  === 'Semua' || r.jenis_hewan === filterHewan.value
-    return matchSearch && matchStatus && matchHewan
-  })
-})
-
-const statusStyle = {
-  'Lunas':    { bg: 'rgba(34,197,94,0.1)',   color: '#16a34a' },
-  'DP':       { bg: 'rgba(234,179,8,0.12)',  color: '#92400e' },
-  'Menunggu': { bg: 'rgba(100,100,100,0.1)', color: '#666'    },
+function rupiah(n) {
+  return 'Rp ' + Number(n).toLocaleString('id-ID')
 }
 
-function getStatusStyle(status) {
-  return statusStyle[status] ?? { bg: 'rgba(100,100,100,0.1)', color: '#666' }
+function terkumpul(gr) {
+  return gr.peserta.reduce((s, p) => s + p.total, 0)
 }
 
-const hewanIcon = (hewan) => hewan?.toLowerCase().includes('sapi') ? '🐄' : '🐑'
+// Target kelompok = target per orang × 7 slot
+function targetGrup(gr) {
+  return gr.perOrang ? gr.perOrang * 7 : null
+}
+
+function progress(gr) {
+  const t = targetGrup(gr)
+  if (!t) return 0
+  return Math.min(Math.round((terkumpul(gr) / t) * 100), 100)
+}
+
+// Lunas = total setoran mencapai target per orang
+function isLunas(p, gr) {
+  return gr.perOrang !== null && p.total >= gr.perOrang
+}
+
+function bulanBayar(p) {
+  return Object.entries(p.nilai).filter(([, v]) => v > 0)
+}
+
+function toggle(key) {
+  expanded.value[key] = !expanded.value[key]
+}
+
+// Statistik gabungan
+const totalDana = computed(() =>
+  [...grupSapi.value, ...grupKambing.value].reduce((s, gr) => s + terkumpul(gr), 0)
+)
+
+const totalPeserta = computed(() =>
+  [...grupSapi.value, ...grupKambing.value].reduce((s, gr) => s + gr.peserta.length, 0)
+)
+
+const totalKelompok = computed(() =>
+  grupSapi.value.length + grupKambing.value.length
+)
+
+const totalLunas = computed(() =>
+  [...grupSapi.value, ...grupKambing.value]
+    .reduce((s, gr) => s + gr.peserta.filter(p => isLunas(p, gr)).length, 0)
+)
 </script>
 
 <template>
@@ -90,12 +161,14 @@ const hewanIcon = (hewan) => hewan?.toLowerCase().includes('sapi') ? '🐄' : '�
 
     <!-- Loading -->
     <div v-if="loading" class="dq-loading">
-      <span class="spinner"></span> Memuat daftar qurban...
+      <Loader2 :size="18" class="dq-spin" />
+      Memuat data tabungan qurban...
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="dq-error">
-      ⚠️ Gagal memuat data. Periksa koneksi internet atau coba lagi.
+      <CircleAlert :size="16" />
+      Gagal memuat data. Periksa koneksi internet lalu muat ulang halaman.
     </div>
 
     <template v-else>
@@ -103,83 +176,184 @@ const hewanIcon = (hewan) => hewan?.toLowerCase().includes('sapi') ? '🐄' : '�
       <!-- Statistik -->
       <div class="dq-stats">
         <div class="dq-stat">
-          <div class="dq-stat-value">{{ data.length }}</div>
-          <div class="dq-stat-label">Total Shohibul Qurban</div>
+          <Wallet :size="18" class="dq-stat-icon" />
+          <div>
+            <div class="dq-stat-value">{{ rupiah(totalDana) }}</div>
+            <div class="dq-stat-label">Total Dana Terkumpul</div>
+          </div>
         </div>
         <div class="dq-stat">
-          <div class="dq-stat-value">🐄 {{ totalSapi }}</div>
-          <div class="dq-stat-label">Sapi</div>
+          <Users :size="18" class="dq-stat-icon" />
+          <div>
+            <div class="dq-stat-value">{{ totalPeserta }}</div>
+            <div class="dq-stat-label">Peserta Terisi</div>
+          </div>
         </div>
         <div class="dq-stat">
-          <div class="dq-stat-value">🐑 {{ totalKambing }}</div>
-          <div class="dq-stat-label">Kambing</div>
+          <Layers :size="18" class="dq-stat-icon" />
+          <div>
+            <div class="dq-stat-value">{{ totalKelompok }}</div>
+            <div class="dq-stat-label">Kelompok</div>
+          </div>
         </div>
         <div class="dq-stat">
-          <div class="dq-stat-value">{{ totalLunas }}</div>
-          <div class="dq-stat-label">Sudah Lunas</div>
+          <BadgeCheck :size="18" class="dq-stat-icon" />
+          <div>
+            <div class="dq-stat-value">{{ totalLunas }}</div>
+            <div class="dq-stat-label">Sudah Lunas</div>
+          </div>
         </div>
       </div>
 
-      <!-- Filter & Search -->
-      <div class="dq-filters">
-        <input
-          v-model="search"
-          class="dq-search"
-          type="text"
-          placeholder="🔍 Cari nama atau atas nama..."
-        />
-        <select v-model="filterHewan" class="dq-select">
-          <option v-for="h in hewanOptions" :key="h">{{ h }}</option>
-        </select>
-        <select v-model="filterStatus" class="dq-select">
-          <option v-for="s in statusOptions" :key="s">{{ s }}</option>
-        </select>
-      </div>
+      <!-- SAPI -->
+      <section class="dq-section">
+        <h3 class="dq-section-title">
+          <Beef :size="18" />
+          Sapi
+        </h3>
 
-      <!-- Tidak ada hasil -->
-      <div v-if="filtered.length === 0" class="dq-empty">
-        Tidak ada data yang cocok dengan pencarian.
-      </div>
+        <div v-if="grupSapi.length === 0" class="dq-empty">
+          Belum ada data kelompok sapi.
+        </div>
 
-      <!-- Tabel -->
-      <div v-else class="dq-table-wrap">
-        <table class="dq-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama Shohibul Qurban</th>
-              <th>Atas Nama</th>
-              <th>Hewan</th>
-              <th>Jumlah</th>
-              <th>Status</th>
-              <th>Catatan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, i) in filtered" :key="i">
-              <td class="dq-no">{{ row.no || i + 1 }}</td>
-              <td class="dq-nama">{{ row.nama }}</td>
-              <td class="dq-atas">{{ row.atas_nama || '—' }}</td>
-              <td class="dq-hewan">
-                {{ hewanIcon(row.jenis_hewan) }} {{ row.jenis_hewan }}
-              </td>
-              <td class="dq-jumlah">{{ row.jumlah }}</td>
-              <td>
-                <span
-                  class="dq-status"
-                  :style="{ background: getStatusStyle(row.status).bg, color: getStatusStyle(row.status).color }"
+        <div v-for="(gr, gi) in grupSapi" :key="gi" class="dq-group">
+          <div class="dq-group-head">
+            <div>
+              <div class="dq-group-nama">{{ gr.nama }}</div>
+              <div v-if="gr.perOrang" class="dq-group-target">
+                {{ rupiah(gr.perOrang) }} / orang &middot; target kelompok {{ rupiah(targetGrup(gr)) }}
+              </div>
+            </div>
+            <div class="dq-group-total">
+              <span class="dq-group-terkumpul">{{ rupiah(terkumpul(gr)) }}</span>
+              <span v-if="gr.perOrang" class="dq-group-persen">{{ progress(gr) }}%</span>
+            </div>
+          </div>
+
+          <div v-if="gr.perOrang" class="dq-bar">
+            <div class="dq-bar-fill" :style="{ width: progress(gr) + '%' }"></div>
+          </div>
+
+          <table class="dq-table">
+            <thead>
+              <tr>
+                <th class="dq-th-no">No</th>
+                <th>Nama</th>
+                <th class="dq-th-total">Total</th>
+                <th class="dq-th-status">Status</th>
+                <th class="dq-th-toggle"><span class="visually-hidden">Rincian</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="p in gr.peserta" :key="p.no">
+                <tr
+                  class="dq-row"
+                  :class="{ 'dq-row--open': expanded[gi + '-' + p.no] }"
+                  @click="toggle(gi + '-' + p.no)"
                 >
-                  {{ row.status || '—' }}
-                </span>
-              </td>
-              <td class="dq-catatan">{{ row.catatan || '—' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  <td class="dq-td-no">{{ p.no }}</td>
+                  <td class="dq-td-nama">{{ p.nama }}</td>
+                  <td class="dq-td-total">{{ rupiah(p.total) }}</td>
+                  <td class="dq-td-status">
+                    <span v-if="isLunas(p, gr)" class="dq-lunas">
+                      <BadgeCheck :size="13" />
+                      Lunas
+                    </span>
+                  </td>
+                  <td class="dq-td-toggle">
+                    <ChevronDown v-if="expanded[gi + '-' + p.no]" :size="15" />
+                    <ChevronRight v-else :size="15" />
+                  </td>
+                </tr>
+                <tr v-if="expanded[gi + '-' + p.no]" class="dq-detail-row">
+                  <td :colspan="5">
+                    <div v-if="bulanBayar(p).length" class="dq-bulan">
+                      <span v-for="[b, v] in bulanBayar(p)" :key="b" class="dq-bulan-chip">
+                        <span class="dq-bulan-nama">{{ b }}</span>
+                        <span class="dq-bulan-nilai">{{ rupiah(v) }}</span>
+                      </span>
+                    </div>
+                    <div v-else class="dq-bulan-kosong">
+                      Belum ada setoran tercatat.
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- KAMBING -->
+      <section class="dq-section">
+        <h3 class="dq-section-title">
+          <Drumstick :size="18" />
+          Kambing
+        </h3>
+
+        <div v-if="grupKambing.length === 0" class="dq-empty">
+          Belum ada data kambing.
+        </div>
+
+        <div v-for="(gr, gi) in grupKambing" :key="'k' + gi" class="dq-group">
+          <div class="dq-group-head">
+            <div>
+              <div class="dq-group-nama">{{ gr.nama }}</div>
+              <div v-if="gr.perOrang" class="dq-group-target">
+                {{ rupiah(gr.perOrang) }} / orang &middot; target kelompok {{ rupiah(targetGrup(gr)) }}
+              </div>
+            </div>
+            <div class="dq-group-total">
+              <span class="dq-group-terkumpul">{{ rupiah(terkumpul(gr)) }}</span>
+            </div>
+          </div>
+
+          <table class="dq-table">
+            <thead>
+              <tr>
+                <th class="dq-th-no">No</th>
+                <th>Nama</th>
+                <th class="dq-th-total">Total</th>
+                <th class="dq-th-status">Status</th>
+                <th class="dq-th-toggle"><span class="visually-hidden">Rincian</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="p in gr.peserta" :key="p.no">
+                <tr
+                  class="dq-row"
+                  :class="{ 'dq-row--open': expanded['k' + gi + '-' + p.no] }"
+                  @click="toggle('k' + gi + '-' + p.no)"
+                >
+                  <td class="dq-td-no">{{ p.no }}</td>
+                  <td class="dq-td-nama">{{ p.nama }}</td>
+                  <td class="dq-td-total">{{ rupiah(p.total) }}</td>
+                  <td class="dq-td-status"></td>
+                  <td class="dq-td-toggle">
+                    <ChevronDown v-if="expanded['k' + gi + '-' + p.no]" :size="15" />
+                    <ChevronRight v-else :size="15" />
+                  </td>
+                </tr>
+                <tr v-if="expanded['k' + gi + '-' + p.no]" class="dq-detail-row">
+                  <td :colspan="5">
+                    <div v-if="bulanBayar(p).length" class="dq-bulan">
+                      <span v-for="[b, v] in bulanBayar(p)" :key="b" class="dq-bulan-chip">
+                        <span class="dq-bulan-nama">{{ b }}</span>
+                        <span class="dq-bulan-nilai">{{ rupiah(v) }}</span>
+                      </span>
+                    </div>
+                    <div v-else class="dq-bulan-kosong">
+                      Belum ada setoran tercatat.
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <div class="dq-footer">
-        Menampilkan {{ filtered.length }} dari {{ data.length }} peserta ·
         Data diperbarui otomatis dari Google Sheets
       </div>
 
@@ -190,149 +364,271 @@ const hewanIcon = (hewan) => hewan?.toLowerCase().includes('sapi') ? '🐄' : '�
 <style scoped>
 .daftar-qurban { margin: 1.5rem 0; }
 
-/* Loading & Error */
+/* Loading & error */
 .dq-loading, .dq-error, .dq-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
-  padding: 2.5rem;
+  padding: 2rem;
   color: var(--vp-c-text-2);
   font-size: 0.9rem;
 }
 
-.spinner {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid var(--vp-c-divider);
-  border-top-color: var(--vp-c-brand);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  vertical-align: middle;
-  margin-right: 6px;
+.dq-empty {
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 12px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+.dq-spin { animation: dq-rot 0.9s linear infinite; }
+@keyframes dq-rot { to { transform: rotate(360deg); } }
 
 /* Statistik */
 .dq-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
 .dq-stat {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 1rem;
   background: var(--vp-c-bg-soft);
   border-radius: 10px;
   border: 1px solid var(--vp-c-divider);
 }
 
+.dq-stat-icon { flex-shrink: 0; color: var(--teal-600); }
+
 .dq-stat-value {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--vp-c-brand);
-  line-height: 1;
-  margin-bottom: 4px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 .dq-stat-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--vp-c-text-2);
   font-weight: 600;
 }
 
-/* Filters */
-.dq-filters {
+/* Section */
+.dq-section { margin-bottom: 2rem; }
+
+.dq-section-title {
   display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  color: var(--teal-700);
 }
 
-.dq-search {
-  flex: 1;
-  min-width: 200px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  border: 1.5px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.85rem;
-}
+.dq-section-title svg { color: var(--teal-600); }
 
-.dq-search:focus {
-  outline: none;
-  border-color: var(--vp-c-brand);
-}
-
-.dq-select {
-  padding: 7px 10px;
-  border-radius: 8px;
-  border: 1.5px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-/* Table */
-.dq-table-wrap {
-  overflow-x: auto;
-  border-radius: 10px;
+/* Grup */
+.dq-group {
   border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: var(--vp-c-bg);
 }
 
+.dq-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dq-group-nama {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: var(--vp-c-text-1);
+}
+
+.dq-group-target {
+  font-size: 0.72rem;
+  color: var(--vp-c-text-2);
+  margin-top: 2px;
+}
+
+.dq-group-total {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.dq-group-terkumpul {
+  display: block;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--teal-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.dark .dq-group-terkumpul { color: var(--teal-400); }
+
+.dq-group-persen {
+  font-size: 0.72rem;
+  color: var(--vp-c-text-2);
+}
+
+/* Progress bar */
+.dq-bar {
+  height: 6px;
+  background: var(--vp-c-bg-soft);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+}
+
+.dq-bar-fill {
+  height: 100%;
+  background: var(--teal-600);
+  border-radius: 99px;
+}
+
+/* Tabel */
 .dq-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
 }
 
 .dq-table th {
-  background: var(--vp-c-bg-soft);
-  padding: 0.65rem 1rem;
   text-align: left;
-  font-weight: 600;
-  font-size: 0.78rem;
-  color: var(--vp-c-text-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vp-c-text-3);
+  padding: 0.4rem 0.6rem;
   border-bottom: 1px solid var(--vp-c-divider);
-  white-space: nowrap;
 }
 
 .dq-table td {
-  padding: 0.65rem 1rem;
+  padding: 0.55rem 0.6rem;
   border-bottom: 1px solid var(--vp-c-divider);
   vertical-align: middle;
 }
 
 .dq-table tbody tr:last-child td { border-bottom: none; }
-.dq-table tbody tr:hover td { background: var(--vp-c-bg-soft); }
 
-.dq-no      { color: var(--vp-c-text-2); font-size: 0.8rem; width: 40px; }
-.dq-nama    { font-weight: 600; }
-.dq-atas    { color: var(--vp-c-text-2); font-size: 0.85rem; }
-.dq-hewan   { white-space: nowrap; }
-.dq-jumlah  { text-align: center; font-weight: 600; }
-.dq-catatan { color: var(--vp-c-text-2); font-size: 0.82rem; font-style: italic; }
+.dq-th-no, .dq-td-no { width: 2.2rem; }
+.dq-td-no { color: var(--vp-c-text-3); font-variant-numeric: tabular-nums; }
 
-.dq-status {
-  font-size: 0.72rem;
+.dq-td-nama { font-weight: 600; color: var(--vp-c-text-1); }
+
+.dq-th-total, .dq-td-total {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dq-td-total { font-weight: 700; color: var(--teal-700); }
+.dark .dq-td-total { color: var(--teal-400); }
+
+.dq-th-status, .dq-th-toggle { width: 4.2rem; }
+.dq-td-status, .dq-td-toggle { text-align: right; }
+
+.dq-th-toggle .visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Baris peserta bisa diklik */
+.dq-row { cursor: pointer; }
+.dq-row:hover td { background: var(--vp-c-bg-soft); }
+.dq-row--open td { background: var(--vp-c-bg-soft); }
+
+.dq-td-toggle svg { color: var(--vp-c-text-3); }
+
+/* Badge lunas */
+.dq-lunas {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 2px 10px;
+  color: #16a34a;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 2px 8px;
   border-radius: 99px;
   white-space: nowrap;
 }
 
-/* Footer */
+/* Baris detail bulanan */
+.dq-detail-row td {
+  background: var(--vp-c-bg-soft);
+  padding: 0.75rem 0.9rem;
+}
+
+.dq-bulan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dq-bulan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 0.72rem;
+}
+
+.dq-bulan-nama {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--vp-c-text-2);
+}
+
+.dq-bulan-nilai {
+  font-weight: 700;
+  color: var(--teal-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.dark .dq-bulan-nilai { color: var(--teal-400); }
+
+.dq-bulan-kosong {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+  font-style: italic;
+}
+
 .dq-footer {
   text-align: center;
   font-size: 0.72rem;
-  color: var(--vp-c-text-2);
-  margin-top: 0.75rem;
+  color: var(--vp-c-text-3);
+  margin-top: 1.25rem;
 }
 
 /* Mobile */
 @media (max-width: 640px) {
   .dq-stats { grid-template-columns: repeat(2, 1fr); }
-  .dq-search { min-width: 100%; }
+  .dq-stat-value { font-size: 1rem; }
+  .dq-group { padding: 1rem; }
+  .dq-group-head { flex-direction: column; gap: 0.35rem; }
+  .dq-group-total { text-align: left; }
+  .dq-table th, .dq-table td { padding: 0.5rem 0.45rem; }
+  .dq-th-status, .dq-td-status { display: none; }
 }
 </style>

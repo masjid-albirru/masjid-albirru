@@ -1,14 +1,14 @@
 ---
-title: Daftar Peserta Qurban 1447 H
-description: Daftar shohibul qurban Masjid Al-Birru tahun 1447 H / 2026 M
+title: Tabungan Qurban 1448 H
+description: Data tabungan qurban sapi dan kambing Masjid Al-Birru tahun 1448 H / 2027 M
 ---
 
-# 🐄 Daftar Peserta Qurban 1447 H
+# Tabungan Qurban 1448 H
 
-Berikut adalah daftar shohibul qurban Masjid Al-Birru tahun 1447 H / 2026 M. Data diperbarui secara otomatis.
+Data setoran tabungan qurban Masjid Al-Birru untuk tahun 1448 H. Diperbarui otomatis dari Google Sheets — klik baris peserta untuk melihat rincian setoran per bulan.
 
 <DaftarQurban />
 
-::: info Pendaftaran Qurban
-Untuk mendaftarkan qurban, silakan hubungi sekretariat masjid atau konfirmasi via WhatsApp.
+::: info Pendaftaran & Setoran
+Untuk mendaftar shohibul qurban atau menyetor tabungan qurban, silakan hubungi sekretariat masjid atau konfirmasi via WhatsApp. Anda juga dapat menabung bertahap hingga penuh sesuai target kelompok.
 :::

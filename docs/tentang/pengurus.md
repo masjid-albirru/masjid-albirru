@@ -3,11 +3,9 @@ title: Struktur Pengurus Masjid Al-Birru
 description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 ---
 
-# 👥 Struktur Pengurus
+# Struktur Pengurus
 
 **Periode Kepengurusan: 2024 – 2027**
-
----
 
 ## Dewan Pembina & Penasehat
 
@@ -16,8 +14,6 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 | KH. Muhammad Taufiq | Penasehat Agama |
 | H. Wahyudin Santoso | Penasehat Umum |
 | Dr. Ir. Bambang Sugiarto | Penasehat |
-
----
 
 ## Pengurus Harian
 
@@ -43,11 +39,9 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 | **Bendahara Umum** | Sulaiman, S.E. | 0812-1111-0006 |
 | **Bendahara I** | Hj. Fatimah Zahra | 0812-1111-0007 |
 
----
-
 ## Seksi-Seksi
 
-### 🕌 Seksi Ibadah & Dakwah
+### Seksi Ibadah & Dakwah
 
 | Jabatan | Nama |
 |---------|------|
@@ -57,9 +51,7 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 
 **Program:** Kajian rutin, khatib Jum'at, pembinaan imam & muadzin
 
----
-
-### 📚 Seksi Pendidikan
+### Seksi Pendidikan
 
 | Jabatan | Nama |
 |---------|------|
@@ -69,9 +61,7 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 
 **Program:** TPA, Program Tahfizh, Majelis Taklim
 
----
-
-### 🤝 Seksi Sosial & Kemasyarakatan
+### Seksi Sosial & Kemasyarakatan
 
 | Jabatan | Nama |
 |---------|------|
@@ -81,9 +71,7 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 
 **Program:** Santunan yatim, bantuan dhuafa, ambulans masjid
 
----
-
-### 🏗️ Seksi Sarana & Prasarana
+### Seksi Sarana & Prasarana
 
 | Jabatan | Nama |
 |---------|------|
@@ -91,9 +79,7 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 | Anggota Kebersihan | Pak Suroso |
 | Anggota Teknik | Pak Deden |
 
----
-
-### 🔒 Seksi Keamanan
+### Seksi Keamanan
 
 | Jabatan | Nama |
 |---------|------|
@@ -101,17 +87,13 @@ description: Daftar pengurus Masjid Al-Birru periode 2024-2027
 | Anggota | Pak Ridwan |
 | Anggota | Pak Eko |
 
----
-
-### 📢 Seksi Humas & Publikasi
+### Seksi Humas & Publikasi
 
 | Jabatan | Nama |
 |---------|------|
 | Ketua Seksi | Fajar Nugroho |
 | Admin Website | M. Rizki Pratama |
 | Admin Media Sosial | Dian Pertiwi |
-
----
 
 ::: info Masa Bhakti
 Pengurus periode ini dilantik pada **15 Januari 2024** dan bertugas hingga **Desember 2027**.

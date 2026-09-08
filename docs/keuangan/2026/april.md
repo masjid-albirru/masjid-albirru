@@ -11,11 +11,11 @@ status: selesai
 bendahara: Iis Munandar
 ---
 
-# 💰 Laporan Keuangan April 2026
+# Laporan Keuangan April 2026
 
 <div class="article-meta">
-  <span>📅 Periode: 1 – 30 April 2026</span>
-  <span>✍️ Bendahara: Bpk. Iis Munandar</span>
+  <span>Periode: 1 – 30 April 2026</span>
+  <span>Bendahara: Bpk. Iis Munandar</span>
   <span class="tag">Keuangan</span>
 </div>
 
@@ -23,9 +23,7 @@ bendahara: Iis Munandar
 
 > *"Dan barang apa saja yang kamu nafkahkan, maka Allah akan menggantinya dan Dia-lah Pemberi rezeki yang sebaik-baiknya."* — QS. Saba': 39
 
----
-
-## 📈 Ringkasan
+## Ringkasan
 
 <div class="financial-summary">
   <div class="financial-card pemasukan">
@@ -44,9 +42,7 @@ bendahara: Iis Munandar
 
 > **Saldo awal bulan (1 April 2026): Rp 29.700.000**
 
----
-
-## 📥 Rincian Pemasukan
+## Rincian Pemasukan
 
 | No | Tanggal | Keterangan | Jumlah |
 |----|---------|------------|--------|
@@ -65,9 +61,7 @@ bendahara: Iis Munandar
 | | | **Total Pemasukan** | **Rp 28.450.000** |
 {.total}
 
----
-
-## 📤 Rincian Pengeluaran
+## Rincian Pengeluaran
 
 | No | Tanggal | Keterangan | Jumlah |
 |----|---------|------------|--------|
@@ -86,9 +80,7 @@ bendahara: Iis Munandar
 | | | **Total Pengeluaran** | **Rp 15.720.000** |
 {.total}
 
----
-
-## 📊 Rekapitulasi
+## Rekapitulasi
 
 | Keterangan | Jumlah |
 |------------|--------|
@@ -98,9 +90,7 @@ bendahara: Iis Munandar
 | **= Saldo Akhir (30 April 2026)** | **Rp 42.430.000** |
 {.total}
 
----
-
-## 💼 Saldo per Pos Dana
+## Saldo per Pos Dana
 
 | Pos Dana | Saldo |
 |----------|-------|
@@ -111,15 +101,11 @@ bendahara: Iis Munandar
 | **Total** | **Rp 42.430.000** |
 {.total}
 
----
-
 ::: info Catatan Bendahara
 Laporan ini telah diverifikasi oleh Ketua Pengurus dan dua orang saksi dari jamaah masjid. Seluruh transaksi didukung dengan bukti fisik yang tersimpan di sekretariat masjid.
 
-Alhamdulillah, bulan April menunjukkan surplus yang sehat. Dana renovasi tempat wudhu terus bertumbuh. Semoga Allah melipatgandakan pahala para donatur. 🤲
+Alhamdulillah, bulan April menunjukkan surplus yang sehat. Dana renovasi tempat wudhu terus bertumbuh.
 :::
-
----
 
 **Mengetahui:**
 
@@ -131,6 +117,4 @@ Alhamdulillah, bulan April menunjukkan surplus yang sehat. Dana renovasi tempat 
 
 *Laporan diterbitkan: 1 Mei 2026*
 
----
-
-← [Laporan Maret 2026](/keuangan/2026/maret) | [Kembali ke Ringkasan Keuangan](/keuangan/) | [Laporan Mei 2026](/keuangan/) →
+[Laporan Maret 2026](/keuangan/2026/maret) · [Kembali ke Ringkasan Keuangan](/keuangan/) · [Laporan Mei 2026](/keuangan/)

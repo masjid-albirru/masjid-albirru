@@ -14,7 +14,7 @@ total_pemasukan: 13845000
 total_pengeluaran: 625000
 ---
 
-# 🤲 Program Donasi & Infak
+# Program Donasi & Infak
 
 <div class="arabic">مَّن ذَا الَّذِي يُقْرِضُ اللَّهَ قَرْضًا حَسَنًا...</div>
 
@@ -25,3 +25,5 @@ total_pengeluaran: 625000
 ::: tip Donasi Rutin
 Amal yang sedikit tapi konsisten lebih dicintai Allah daripada amal besar yang terputus.
 :::
+
+[Lihat semua program donasi →](/donasi)

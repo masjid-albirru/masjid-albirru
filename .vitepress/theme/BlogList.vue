@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { data as posts } from '../../docs/blog/posts.data.ts'
 import { withBase } from 'vitepress'
+import { Calendar, PenLine, Clock, BookOpen, Activity, Megaphone, ArrowRight } from 'lucide-vue-next'
 
 // Kumpulkan semua tag unik dari semua artikel
 const allTags = computed(() => {
@@ -24,12 +25,12 @@ function formatDate(dateStr) {
 }
 
 const categoryIcon = {
-  kajian:      '📖',
-  kegiatan:    '🏃',
-  pengumuman:  '📢',
-  Kajian:      '📖',
-  Kegiatan:    '🏃',
-  Pengumuman:  '📢',
+  kajian:      BookOpen,
+  kegiatan:    Activity,
+  pengumuman:  Megaphone,
+  Kajian:      BookOpen,
+  Kegiatan:    Activity,
+  Pengumuman:  Megaphone,
 }
 </script>
 
@@ -66,9 +67,17 @@ const categoryIcon = {
         <article v-for="post in filteredPosts" :key="post.link" class="post-card">
           <div class="post-header">
             <span class="post-category">
-              {{ categoryIcon[post.category] ?? '📝' }} {{ post.category }}
+              <component
+                :is="categoryIcon[post.category] ?? PenLine"
+                :size="14"
+                class="post-cat-icon"
+              />
+              {{ post.category }}
             </span>
-            <span class="post-date">📅 {{ formatDate(post.date) }}</span>
+            <span class="post-date">
+              <Calendar :size="13" />
+              {{ formatDate(post.date) }}
+            </span>
           </div>
 
           <h3 class="post-title">
@@ -90,9 +99,18 @@ const categoryIcon = {
               </button>
             </div>
             <div class="post-meta-right">
-              <span v-if="post.author" class="post-author">✍️ {{ post.author }}</span>
-              <span v-if="post.readTime" class="post-readtime">⏱️ {{ post.readTime }} mnt</span>
-              <a :href="withBase(post.link)" class="read-more">Baca →</a>
+              <span v-if="post.author" class="post-author">
+                <PenLine :size="12" />
+                {{ post.author }}
+              </span>
+              <span v-if="post.readTime" class="post-readtime">
+                <Clock :size="12" />
+                {{ post.readTime }} mnt baca
+              </span>
+              <a :href="withBase(post.link)" class="read-more">
+                Baca
+                <ArrowRight :size="13" />
+              </a>
             </div>
           </div>
         </article>
@@ -170,15 +188,28 @@ const categoryIcon = {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
   margin-bottom: 0.6rem;
   font-size: 0.78rem;
   color: var(--vp-c-text-2);
 }
 
 .post-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-weight: 600;
   color: var(--vp-c-brand);
   text-transform: capitalize;
+}
+
+.post-cat-icon { flex-shrink: 0; }
+
+.post-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .post-title {
@@ -250,7 +281,19 @@ const categoryIcon = {
   flex-wrap: wrap;
 }
 
+.post-meta-right .post-author,
+.post-meta-right .post-readtime {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-meta-right svg { color: var(--teal-600); flex-shrink: 0; }
+
 .read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 600;
   color: var(--vp-c-brand);
   text-decoration: none;

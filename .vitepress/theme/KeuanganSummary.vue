@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { data as laporan } from '../../docs/keuangan/keuangan.data.ts'
+import { BarChart3, TrendingUp, TrendingDown, Wallet, ArrowRight } from 'lucide-vue-next'
 
 const namaBulan = [
   '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -45,19 +46,31 @@ function selisih(p, pengeluaran) {
     <div v-for="grup in byTahun" :key="grup.tahun" class="ks-tahun">
 
       <!-- Ringkasan tahunan -->
-      <h3 class="ks-tahun-title">📊 Ringkasan {{ grup.tahun }}</h3>
+      <h3 class="ks-tahun-title">
+        <BarChart3 :size="17" />
+        Ringkasan {{ grup.tahun }}
+      </h3>
       <div class="ks-cards">
         <div class="ks-card ks-card--masuk">
-          <div class="ks-card-label">Total Pemasukan</div>
-          <div class="ks-card-value">{{ rupiah(grup.totalPemasukan) }}</div>
+          <TrendingUp :size="16" class="ks-card-ikon" />
+          <div>
+            <div class="ks-card-label">Total Pemasukan</div>
+            <div class="ks-card-value">{{ rupiah(grup.totalPemasukan) }}</div>
+          </div>
         </div>
         <div class="ks-card ks-card--keluar">
-          <div class="ks-card-label">Total Pengeluaran</div>
-          <div class="ks-card-value">{{ rupiah(grup.totalPengeluaran) }}</div>
+          <TrendingDown :size="16" class="ks-card-ikon" />
+          <div>
+            <div class="ks-card-label">Total Pengeluaran</div>
+            <div class="ks-card-value">{{ rupiah(grup.totalPengeluaran) }}</div>
+          </div>
         </div>
         <div class="ks-card ks-card--saldo">
-          <div class="ks-card-label">Saldo Akhir</div>
-          <div class="ks-card-value">{{ rupiah(grup.saldoAkhir) }}</div>
+          <Wallet :size="16" class="ks-card-ikon" />
+          <div>
+            <div class="ks-card-label">Saldo Akhir</div>
+            <div class="ks-card-value">{{ rupiah(grup.saldoAkhir) }}</div>
+          </div>
         </div>
       </div>
 
@@ -87,11 +100,14 @@ function selisih(p, pengeluaran) {
               <td class="ks-angka">{{ rupiah(lap.saldo_akhir) }}</td>
               <td>
                 <span class="ks-status" :class="lap.status === 'berjalan' ? 'ks-status--berjalan' : 'ks-status--selesai'">
-                  {{ lap.status === 'berjalan' ? '🔄 Berjalan' : '✅ Selesai' }}
+                  {{ lap.status === 'berjalan' ? 'Berjalan' : 'Selesai' }}
                 </span>
               </td>
               <td>
-                <a :href="lap.link" class="ks-link">Detail →</a>
+                <a :href="lap.link" class="ks-link">
+                  Detail
+                  <ArrowRight :size="13" />
+                </a>
               </td>
             </tr>
           </tbody>
@@ -118,10 +134,17 @@ function selisih(p, pengeluaran) {
 }
 
 .ks-tahun-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: var(--vp-c-text-1);
+  color: var(--teal-700);
+}
+
+.ks-tahun-title svg {
+  color: var(--teal-600);
 }
 
 /* Cards */
@@ -133,10 +156,18 @@ function selisih(p, pengeluaran) {
 }
 
 .ks-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   border-radius: 12px;
   padding: 1rem 1.25rem;
   border: 1px solid var(--vp-c-divider);
 }
+
+.ks-card-ikon { flex-shrink: 0; margin-top: 2px; }
+.ks-card--masuk .ks-card-ikon  { color: #16a34a; }
+.ks-card--keluar .ks-card-ikon { color: #dc2626; }
+.ks-card--saldo .ks-card-ikon  { color: var(--vp-c-brand); }
 
 .ks-card-label {
   font-size: 0.75rem;
@@ -216,6 +247,9 @@ function selisih(p, pengeluaran) {
 .ks-status--berjalan { background: rgba(234, 179, 8, 0.1);  color: #ca8a04; }
 
 .ks-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--vp-c-brand);

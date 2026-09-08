@@ -3,20 +3,16 @@ title: Kontak & Lokasi
 description: Informasi kontak dan lokasi Masjid Al-Birru
 ---
 
-# 📞 Kontak & Lokasi
+# Kontak & Lokasi
 
----
-
-## 📍 Alamat
+## Alamat
 
 **Masjid Al-Birru**
 Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 
-[📍 Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
+[Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
 
----
-
-## 📱 Kontak Langsung
+## Kontak Langsung
 
 | Keperluan | Kontak | |
 |-----------|--------|--|
@@ -25,9 +21,7 @@ Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 | **Humas & Publikasi** | 0812-8888-1111 | [WhatsApp](https://wa.me/6281288881111) |
 | **Darurat / Keamanan** | 0812-7777-2222 | Telepon | -->
 
----
-
-## 📧 Email
+## Email
 
 | Keperluan | Email |
 |-----------|-------|
@@ -36,9 +30,7 @@ Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 | Kirim Artikel/Konten | mediakreatif.albirru@gmail.com |
 | Galeri & Dokumentasi | mediakreatif.albirru@gmail.com |
 
----
-
-## 🕐 Jam Operasional Sekretariat
+## Jam Operasional Sekretariat
 
 | Hari | Jam |
 |------|-----|
@@ -46,19 +38,17 @@ Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 | Sabtu | 08.00 – 12.00 WIB |
 | Minggu & Hari Besar | Tutup |
 
-> 💡 **Catatan:** Di luar jam operasional, hubungi via WhatsApp. Pesan akan dibalas pada hari kerja berikutnya.
+::: info Catatan
+Di luar jam operasional, hubungi via WhatsApp. Pesan akan dibalas pada hari kerja berikutnya.
+:::
 
----
-
-## 📲 Media Sosial
+## Media Sosial
 
 - **Instagram:** [@masjid.albirru](https://instagram.com/masjidalikhas)
 - **YouTube:** [Masjid Al-Birru Official](https://youtube.com/@masjid-al-ikhlas)
 - **WhatsApp Channel:** [Join Channel](https://whatsapp.com/channel/contoh)
 
----
-
-## 💌 Kirim Pesan
+## Kirim Pesan
 
 Untuk pertanyaan atau masukan, silakan hubungi kami melalui WhatsApp atau email di atas. Kami akan merespons dalam 1x24 jam kerja.
 

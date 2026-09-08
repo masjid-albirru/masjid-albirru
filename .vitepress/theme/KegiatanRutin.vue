@@ -66,7 +66,7 @@ const hariIni = computed(() => {
     </div>
 
     <div v-else-if="error" class="kr-error">
-      ⚠️ Gagal memuat data. Periksa koneksi internet.
+      Gagal memuat data. Periksa koneksi internet.
     </div>
 
     <div v-else-if="data.length === 0" class="kr-empty">

@@ -3,3 +3,9 @@ node_modules/
 .vitepress/cache
 .DS_Store
 *.local
+.agents/
+.opencode/
+AGENTS.md
+DESIGN.md
+inject-openagentic.py
+skills-lock.json

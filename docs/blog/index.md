@@ -3,7 +3,7 @@ title: Berita & Blog
 description: Artikel kajian, berita, dan pengumuman Masjid Al-Birru
 ---
 
-# 📰 Berita & Blog
+# Berita & Blog
 
 Kumpulan artikel kajian Islam, berita kegiatan, dan pengumuman resmi Masjid Al-Birru.
 

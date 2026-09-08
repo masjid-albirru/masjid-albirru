@@ -21,15 +21,19 @@ export default defineConfig({
     siteTitle: 'Masjid Al-Birru',
 
     nav: [
-      { text: '🏠 Beranda', link: '/' },
-      { text: '📰 Berita & Blog', link: '/blog/' },
-      { text: '📅 Acara', link: '/acara/' },
+      { text: 'Beranda', link: '/' },
+      { text: 'Berita & Blog', link: '/blog/' },
+      { text: 'Acara', link: '/acara/' },
       {
-        text: '💰 Keuangan',
+        text: 'Keuangan',
         link: '/keuangan/'
       },
       {
-        text: '🕌 Masjid',
+        text: 'Donasi',
+        link: '/donasi'
+      },
+      {
+        text: 'Masjid',
         items: [
           { text: 'Tentang Kami', link: '/tentang/' },
           { text: 'Pengurus', link: '/tentang/pengurus' },
@@ -37,14 +41,14 @@ export default defineConfig({
           { text: 'Galeri', link: '/galeri/' },
         ]
       },
-      { text: '📞 Kontak', link: '/tentang/kontak' },
-      { text: '🐂 Qurban', link: '/qurban' },
+      { text: 'Kontak', link: '/tentang/kontak' },
+      { text: 'Qurban', link: '/qurban' },
     ],
 
     sidebar: {
       '/blog/': [
         {
-          text: '📰 Blog & Berita',
+          text: 'Blog & Berita',
           items: [
             { text: 'Semua Artikel', link: '/blog/' },
             // kalau mau nanti ada kategori khusus bisa ditambahkan di sini, misalnya:
@@ -56,7 +60,7 @@ export default defineConfig({
       ],
       '/acara/': [
         {
-          text: '📅 Acara & Kegiatan',
+          text: 'Acara & Kegiatan',
           items: [
             { text: 'Semua Acara', link: '/acara/' },
             // { text: 'Jadwal Sholat Jum\'at', link: '/acara/jumat' },
@@ -68,16 +72,24 @@ export default defineConfig({
       ],
       '/keuangan/': [
         {
-          text: '💰 Laporan Keuangan',
+          text: 'Laporan Keuangan',
           items: [
             { text: 'Keuangan Masjid', link: '/keuangan/' },
-            { text: 'Program Donasi', link: '/keuangan/donasi' },
+            { text: 'Program Donasi', link: '/donasi' },
+          ]
+        }
+      ],
+      '/donasi': [
+        {
+          text: 'Donasi',
+          items: [
+            { text: 'Program Donasi & Infak', link: '/donasi' },
           ]
         }
       ],
       '/tentang/': [
         {
-          text: '🕌 Tentang Masjid',
+          text: 'Tentang Masjid',
           items: [
             { text: 'Profil Masjid', link: '/tentang/' },
             { text: 'Struktur Pengurus', link: '/tentang/pengurus' },
@@ -96,7 +108,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم',
+      message: 'Jl. Sirnagalih No.21, Cinangka, Sawangan, Depok, Jawa Barat 16516',
       copyright: `© ${new Date().getFullYear()} Masjid Al-Birru. Semua hak dilindungi.`
     },
 
@@ -139,8 +151,8 @@ export default defineConfig({
     },
 
     docFooter: {
-      prev: '← Sebelumnya',
-      next: 'Selanjutnya →'
+      prev: 'Sebelumnya',
+      next: 'Selanjutnya'
     },
 
     outline: {
