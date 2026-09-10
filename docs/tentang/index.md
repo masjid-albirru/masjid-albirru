@@ -18,8 +18,9 @@ description: Profil lengkap Masjid Al-Birru — sejarah, visi misi, fasilitas, d
 | **Kota** | Depok, Jawa Barat |
 | **Kode Pos** | 16516 |
 | **Tahun Berdiri** | 2019 |
-| **Luas Bangunan** | ± 800 m2 |
-| **Kapasitas** | ± 500 jamaah |
+| **Luas Tanah** | ± 1000 m2 |
+| **Luas Bangunan** | ± 448 m2 |
+| **Kapasitas** | ± 600 jamaah |
 | **Status** | Masjid Wakaf / Yayasan |
 | **WhatsApp** | 0813-9992-8319 |
 | **Email** | mediakreatif.albirru@gmail.com |
@@ -28,23 +29,36 @@ description: Profil lengkap Masjid Al-Birru — sejarah, visi misi, fasilitas, d
 
 ### Visi
 
-Menjadi masjid yang makmur, modern, dan menjadi pusat peradaban Islam yang memberi manfaat bagi seluruh lapisan masyarakat.
+Menjadi Sentra Pemberdayaan Umat yang Mengokohkan Iman, Memakmurkan Ekonomi, dan Membangun Peradaban”
 
 ### Misi
 
-1. Menyelenggarakan ibadah dan syiar Islam yang tertib, khusyuk, dan berkualitas
-2. Mengembangkan program pendidikan Islam mulai dari anak-anak hingga dewasa
-3. Memberdayakan ekonomi umat melalui program zakat, infak, dan sedekah
-4. Membangun komunitas jamaah yang solid, berakhlak mulia, dan berdaya
-5. Menjaga transparansi dan akuntabilitas dalam pengelolaan masjid
+**Penguatan Ibadah, Ilmu, dan Dakwah**
+1. Menyelenggarakan peribadatan yang khusyuk, nyaman, dan sesuai sunnah.
+​2. Menjadi pusat literasi dan kajian Islam yang berwawasan luas dan solutif.
+3. Menyelenggarakan dakwah digital yang kreatif, adaptif, inovatif dan berkelanjuan.
+
+**Pemberdayaan Ekonomi**
+1. Mengelola ZISWAF (Zakat, Infaq, Sodaqoh, Wakaf) secara profesional dan produktif.
+​2. Membentuk unit usaha masjid (Baitul Maal wat Tamwil/Koperasi) untuk memodali UMKM jamaah.
+
+**Membangun Peradaban (Sosial)**
+1. Membangun solidaritas sosial melalui program santunan-santunan dan lain sebagainya.
+​2. Mencetak kader pemimpin muda yang kompeten secara moral dan intelektual.
+
+**Layanan Unggul**
+1. Menyelenggarakan pelayanan jamaah yang baik di Masjid, seperti penyediaan minuman ringan, makanan, dan lain sebagainya.
+
+**Sarana & Prasarana**
+1. Melaksanakan peneliharaan berkala.
+2. Peningkatan kualitas sarana & prasarana, sebagai upaya menghadirkan kenyamanan jama’ah.
 
 ## Sejarah Singkat
 
-Masjid Al-Birru didirikan pada tahun **1985** atas prakarsa warga setempat yang dipelopori oleh almarhum **H. Muhammad Yusuf**. Awalnya masjid ini hanya berupa musholla kecil berukuran 8×10 meter.
+<p align="justify"> Masjid Al-Birru mulai dibangun pada September 2019 dan mulai beroperasi pada Januari 2021. Masjid ini merupakan wakaf dari Bpk. H. Bayu Priawan Djokosoetono, seorang pengusaha transportasi asal Indonesia. Dibangun di atas lahan 1000 m2, dengan luas bangunan masjid 2 lantai dengan total 448 m2, masjid ini mampu menampung hingga 600 jama'ah. </p>
 
-Seiring berkembangnya pemukiman, musholla direnovasi menjadi masjid permanen pada tahun **1995** dengan kapasitas 200 jamaah. Renovasi besar terakhir dilakukan pada tahun **2018**, memperluas kapasitas hingga 500 jamaah dengan fasilitas yang lebih modern.
-
-Kini Masjid Al-Birru telah menjadi pusat kegiatan Islam di wilayahnya, menyelenggarakan berbagai program dakwah, pendidikan, dan sosial kemasyarakatan.
+<p align="justify"> Masjid Al-Birru tidak hanya sebagai tempat untuk ibadah salat lima waktu saja. Lebih dari itu, Masjid ini merupakan pusat kegiatan keagamaan kaum Muslimin yang ada di wilayah Kp. Kebon Barat Kelurahan Cinangka Kecamatan Sawangan Kota depok. Mulai dari menggelar pengajian Al-Quran untuk anak-anak hingga dewasa, tabligh keagamaan, bantunan sosial, dan lain-lain.
+Untuk menopang kegiatan dakwahnya, masjid ini sudah merintis beragam lini usaha, seperti penyewaan aula, wedding organizer, konveksi, taman jajan, dan penyewaan lahan parkir. </p>
 
 ## Fasilitas
 

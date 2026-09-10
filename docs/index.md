@@ -4,8 +4,8 @@ title: Beranda
 
 hero:
   name: "Masjid Al-Birru"
-  text: "Bersatu dalam Iman & Ukhuwah"
-  tagline: "Website resmi Masjid Al-Birru. Informasi jadwal sholat, acara, berita, dan laporan keuangan masjid untuk seluruh jamaah."
+  text: "Masjid Makmur, Umat Unggul"
+  tagline: "Website resmi Masjid Al-Birru. Informasi kegiatan, acara, berita, dan laporan keuangan masjid untuk seluruh jamaah."
   actions:
     - theme: brand
       text: Baca Berita Terbaru
