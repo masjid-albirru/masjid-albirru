@@ -16,6 +16,15 @@ export default defineConfig({
     ['meta', { property: 'og:site_name', content: 'Masjid Al-Birru' }],
     ['meta', { property: 'og:image', content: 'https://masjid-albirru.github.io/masjid-albirru/images/albirru.jpg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    [
+      'script',
+      {
+        defer: true,
+        type: 'module',
+        src: 'https://static.cloudflareinsights.com/beacon.min.js',
+        'data-cf-beacon': '{"token": "476a93ee439a45c0b02e1a863f55f82e", "spa": true}',
+      },
+    ],
   ],
 
   themeConfig: {
