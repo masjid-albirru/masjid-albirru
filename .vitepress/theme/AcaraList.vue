@@ -75,7 +75,7 @@ const filtered = computed(() => {
 function formatTanggal(str) {
   const d = new Date(str)
   return {
-    hari: d.toLocaleDateString('id-ID', { weekday: 'long' }),
+    hari: d.toLocaleDateString('id-ID', { weekday: 'long' }).replace('Minggu', 'Ahad'),
     tanggal: d.getDate(),
     bulan: d.toLocaleDateString('id-ID', { month: 'short' }),
     tahun: d.getFullYear(),

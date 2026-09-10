@@ -79,7 +79,7 @@ const jamSekarang = computed(() => {
 })
 
 const tanggalSekarang = computed(() => {
-  return sekarang.value.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return sekarang.value.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).replace('Minggu', 'Ahad')
 })
 
 function formatWaktu(str) {

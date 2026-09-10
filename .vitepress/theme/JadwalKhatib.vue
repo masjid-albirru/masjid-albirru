@@ -22,7 +22,7 @@ onMounted(async () => {
 
 function parseCSV(text) {
   const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase())
   const sekarang = new Date(); sekarang.setHours(0,0,0,0)
 
   return lines.slice(1).map(line => {
@@ -43,7 +43,7 @@ function parseCSV(text) {
     row.sudah_lewat = t < sekarang
     return row
   })
-  .filter(r => r.tanggal && r.khatib)
+  .filter(r => r.tanggal)
   .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
 }
 
@@ -63,9 +63,10 @@ const mendatang = computed(() => data.value.filter(r => !r.sudah_lewat))
 const lewat     = computed(() => [...data.value.filter(r => r.sudah_lewat)].reverse())
 
 const khatibIni = computed(() => {
-  if (!mendatang.value.length) return null
-  const t = new Date(mendatang.value[0].tanggal); t.setHours(0,0,0,0)
-  return t.getTime() === jumatTerdekat.getTime() ? mendatang.value[0] : null
+  const next = mendatang.value[0]
+  if (!next || !next.khatib) return null
+  const t = new Date(next.tanggal); t.setHours(0,0,0,0)
+  return t.getTime() === jumatTerdekat.getTime() ? next : null
 })
 
 function isJumatIni(str) {
@@ -104,6 +105,19 @@ function formatTanggal(str) {
           Khatib Jum'at Ini
         </div>
         <div class="jk-highlight-khatib">{{ khatibIni.khatib }}</div>
+        <div
+          v-if="khatibIni.imam || khatibIni.muadzin"
+          class="jk-highlight-petugas"
+        >
+          <div v-if="khatibIni.imam" class="jk-petugas-item">
+            <span class="jk-petugas-role">Imam</span>
+            <span class="jk-petugas-nama">{{ khatibIni.imam }}</span>
+          </div>
+          <div v-if="khatibIni.muadzin" class="jk-petugas-item">
+            <span class="jk-petugas-role">Muadzin</span>
+            <span class="jk-petugas-nama">{{ khatibIni.muadzin }}</span>
+          </div>
+        </div>
         <div v-if="khatibIni.tema" class="jk-highlight-tema">"{{ khatibIni.tema }}"</div>
         <div class="jk-highlight-tanggal">{{ formatTanggal(khatibIni.tanggal) }}</div>
       </div>
@@ -124,7 +138,9 @@ function formatTanggal(str) {
             <tr>
               <th>Tanggal</th>
               <th>Khatib</th>
-              <th>Tema Khutbah</th>
+              <th>Imam</th>
+              <th>Muadzin</th>
+              <th>Tema</th>
             </tr>
           </thead>
           <tbody>
@@ -136,8 +152,10 @@ function formatTanggal(str) {
                 {{ formatTanggal(k.tanggal) }}
                 <span v-if="isJumatIni(k.tanggal)" class="jk-badge-ini">Jum'at Ini</span>
               </td>
-              <td class="jk-td-khatib">{{ k.khatib }}</td>
-              <td class="jk-td-tema">{{ k.tema || '—' }}</td>
+              <td class="jk-td-khatib">{{ k.khatib || '-' }}</td>
+              <td class="jk-td-imam">{{ k.imam || '-' }}</td>
+              <td class="jk-td-muadzin">{{ k.muadzin || '-' }}</td>
+              <td class="jk-td-tema">{{ k.tema || '-' }}</td>
             </tr>
           </tbody>
         </table>
@@ -155,14 +173,18 @@ function formatTanggal(str) {
               <tr>
                 <th>Tanggal</th>
                 <th>Khatib</th>
-                <th>Tema Khutbah</th>
+                <th>Imam</th>
+                <th>Muadzin</th>
+                <th>Tema</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(k, i) in lewat" :key="i">
                 <td class="jk-td-tanggal">{{ formatTanggal(k.tanggal) }}</td>
-                <td class="jk-td-khatib">{{ k.khatib }}</td>
-                <td class="jk-td-tema">{{ k.tema || '—' }}</td>
+                <td class="jk-td-khatib">{{ k.khatib || '-' }}</td>
+                <td class="jk-td-imam">{{ k.imam || '-' }}</td>
+                <td class="jk-td-muadzin">{{ k.muadzin || '-' }}</td>
+                <td class="jk-td-tema">{{ k.tema || '-' }}</td>
               </tr>
             </tbody>
           </table>
@@ -226,6 +248,26 @@ function formatTanggal(str) {
   font-size: 1.6rem;
   font-weight: 800;
   margin-bottom: 0.3rem;
+}
+
+.jk-highlight-petugas {
+  margin-bottom: 0.3rem;
+  line-height: 1.7;
+}
+
+.jk-petugas-role {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.jk-petugas-nama {
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .jk-highlight-tema {
@@ -293,6 +335,8 @@ function formatTanggal(str) {
 
 .jk-td-tanggal { white-space: nowrap; font-weight: 500; }
 .jk-td-khatib  { font-weight: 600; }
+.jk-td-imam,
+.jk-td-muadzin { color: var(--vp-c-text-2); }
 .jk-td-tema    { color: var(--vp-c-text-2); font-style: italic; }
 
 .jk-badge-ini {
