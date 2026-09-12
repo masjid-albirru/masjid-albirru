@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { BarChart3, ReceiptText, ArrowDownToLine, ArrowUpFromLine } from 'lucide-vue-next'
+import { LAPORAN_KEUANGAN_AKTIF } from './fitur'
 
 const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
 
@@ -22,6 +23,10 @@ const activeJenis = ref('Semua')
 const search = ref('')
 
 onMounted(async () => {
+  if (!LAPORAN_KEUANGAN_AKTIF) {
+    loadingRekap.value = false
+    return
+  }
   await fetchRekap()
   await fetchTransaksi(activeTahun.value)
 })
@@ -132,7 +137,9 @@ function formatTanggal(str) {
 <template>
   <div class="keuangan-sheets">
 
-    <div v-if="error" class="ks-error">
+    <KeuanganSegeraHadir v-if="!LAPORAN_KEUANGAN_AKTIF" />
+
+    <div v-else-if="error" class="ks-error">
       Gagal memuat data. Periksa koneksi internet.
     </div>
 

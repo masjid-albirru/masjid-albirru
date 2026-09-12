@@ -8,5 +8,5 @@ description: Laporan keuangan transparan Masjid Al-Birru
 <KeuanganSheets />
 
 ::: tip Pertanyaan Keuangan?
-Untuk pertanyaan terkait laporan keuangan, silakan hubungi Bendahara Masjid: **Bpk. Iis Munandar** — WhatsApp **0812-9999-0000**
+Untuk pertanyaan terkait laporan keuangan, silakan hubungi Bendahara Masjid: **Bpk. Iis Munandar** — WhatsApp **0813-9992-8319**
 :::

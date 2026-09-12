@@ -35,6 +35,7 @@ export default defineConfig({
       { text: 'Beranda', link: '/' },
       { text: 'Berita & Blog', link: '/blog/' },
       { text: 'Acara', link: '/acara/' },
+      { text: 'Jadwal Imam', link: '/jadwal-imam' },
       {
         text: 'Keuangan',
         link: '/keuangan/'
@@ -74,6 +75,14 @@ export default defineConfig({
             // { text: 'Kajian Rutin', link: '/acara/kajian-rutin' },
             // { text: 'Ramadan', link: '/acara/ramadan' },
             // { text: 'Hari Besar Islam', link: '/acara/hari-besar' },
+          ]
+        }
+      ],
+      '/jadwal-imam': [
+        {
+          text: 'Jadwal Imam',
+          items: [
+            { text: 'Jadwal Imam Harian', link: '/jadwal-imam' },
           ]
         }
       ],

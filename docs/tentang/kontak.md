@@ -36,7 +36,7 @@ Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
 |------|-----|
 | Senin – Jumat | 08.00 – 16.00 WIB |
 | Sabtu | 08.00 – 12.00 WIB |
-| Minggu & Hari Besar | Tutup |
+| Ahad & Hari Besar | Tutup |
 
 ::: info Catatan
 Di luar jam operasional, hubungi via WhatsApp. Pesan akan dibalas pada hari kerja berikutnya.

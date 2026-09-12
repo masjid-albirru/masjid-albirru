@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { withBase } from 'vitepress'
 import { TrendingUp, TrendingDown, Wallet, ArrowRight } from 'lucide-vue-next'
+import { LAPORAN_KEUANGAN_AKTIF } from './fitur'
 
 const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
 
@@ -11,6 +13,10 @@ const loading = ref(true)
 const error = ref(false)
 
 onMounted(async () => {
+  if (!LAPORAN_KEUANGAN_AKTIF) {
+    loading.value = false
+    return
+  }
   try {
     const res = await fetch(CSV_REKAP)
     const text = await res.text()
@@ -55,7 +61,8 @@ function rupiah(angka) {
 
 <template>
   <div class="keu-ringkas">
-    <div v-if="loading" class="kr-loading">Memuat data keuangan...</div>
+    <KeuanganSegeraHadir v-if="!LAPORAN_KEUANGAN_AKTIF" compact />
+    <div v-else-if="loading" class="kr-loading">Memuat data keuangan...</div>
     <div v-else-if="error" class="kr-error">Gagal memuat data</div>
     <template v-else>
       <div class="kr-cards">
@@ -82,7 +89,7 @@ function rupiah(angka) {
         </div>
       </div>
       <div class="kr-footer">
-        <a href="/masjid-albirru/keuangan/">
+        <a :href="withBase('/keuangan/')">
           Lihat laporan lengkap
           <ArrowRight :size="13" />
         </a>

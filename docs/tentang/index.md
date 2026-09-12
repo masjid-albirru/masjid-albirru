@@ -91,6 +91,6 @@ Untuk menopang kegiatan dakwahnya, masjid ini sudah merintis beragam lini usaha,
 **Jam Operasional Sekretariat:**
 - Senin – Jumat: 08.00 – 16.00 WIB
 - Sabtu: 08.00 – 12.00 WIB
-- Minggu & Hari Besar: Tutup
+- Ahad & Hari Besar: Tutup
 
 [Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA) · [Hubungi Kami](/tentang/kontak)
