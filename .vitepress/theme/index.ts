@@ -18,6 +18,7 @@ import JadwalKhatib from './JadwalKhatib.vue'
 import DaftarQurban from './DaftarQurban.vue'
 import KegiatanRutin from './KegiatanRutin.vue'
 import JadwalImam from './JadwalImam.vue'
+import LokasiMasjid from './LokasiMasjid.vue'
 
 export default {
   extends: DefaultTheme,
@@ -39,5 +40,6 @@ export default {
     app.component('DaftarQurban', DaftarQurban)
     app.component('KegiatanRutin', KegiatanRutin)
     app.component('JadwalImam', JadwalImam)
+    app.component('LokasiMasjid', LokasiMasjid)
   },
 }

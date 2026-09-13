@@ -73,6 +73,6 @@ import { withBase } from 'vitepress'
 
 ## Alamat Masjid
 
-**Lokasi:** Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516 · [Lihat di Google Maps](https://maps.app.goo.gl/irpLduEHRHQXqvoKA)
+<LokasiMasjid />
 
 </div>
