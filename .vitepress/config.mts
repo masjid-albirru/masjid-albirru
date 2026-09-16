@@ -1,20 +1,57 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, type HeadConfig } from 'vitepress'
+
+const SITE_URL = 'https://masjid-albirru.id'
+const OG_IMAGE = `${SITE_URL}/images/albirru.jpg`
+
+const dataMasjid = {
+  '@context': 'https://schema.org',
+  '@type': 'Mosque',
+  name: 'Masjid Al-Birru',
+  url: `${SITE_URL}/`,
+  image: OG_IMAGE,
+  logo: `${SITE_URL}/images/albirru-transparent.png`,
+  telephone: '+62-813-9992-8319',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan',
+    addressLocality: 'Kota Depok',
+    addressRegion: 'Jawa Barat',
+    postalCode: '16516',
+    addressCountry: 'ID',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: -6.3763781,
+    longitude: 106.7576088,
+  },
+  sameAs: [
+    'https://www.youtube.com/@masjidal-birru',
+    'https://www.instagram.com/masjid.albirru/',
+    'https://wa.me/6281399928319',
+  ],
+}
 
 export default defineConfig({
   base: '/',
   title: 'Masjid Al-Birru',
+  titleTemplate: ':title | Masjid Al-Birru',
   description: 'Website Resmi Masjid Al-Birru - Informasi, Berita, Acara & Laporan Keuangan',
   lang: 'id-ID',
   cleanUrls: true,
-  
+
+  sitemap: {
+    hostname: SITE_URL,
+  },
+
   head: [
-    ['link', { rel: 'icon', href: '/icons/favicon.ico' }],
-    ['link', { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/images/albirru-transparent.png' }],
+    ['link', { rel: 'apple-touch-icon', href: '/images/albirru-transparent.png' }],
     ['meta', { name: 'theme-color', content: '#0f6b78' }],
+    ['meta', { name: 'google-site-verification', content: '1emjbuqq75S_nTzZjTeG1A33ePkcZmvxhn0qxSrQA3k' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'id_ID' }],
     ['meta', { property: 'og:site_name', content: 'Masjid Al-Birru' }],
-    ['meta', { property: 'og:image', content: 'https://masjid-albirru.id/images/albirru.jpg' }],
+    ['meta', { property: 'og:image', content: OG_IMAGE }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     [
       'script',
@@ -181,13 +218,38 @@ export default defineConfig({
   },
 
   srcDir: 'docs',
-  
+
   markdown: {
     theme: {
       light: 'github-light',
       dark: 'github-dark'
     },
     lineNumbers: false,
+  },
+
+  // canonical, og:url, dan judul/deskripsi sosial per halaman.
+  // Judul dari frontmatter dipakai ulang agar tiap halaman punya sinyal unik.
+  transformHead({ page, pageData, title, description }) {
+    const head: HeadConfig[] = []
+
+    if (pageData.isNotFound) return head
+
+    const path = ('/' + page.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')) || '/'
+    const canonical = SITE_URL + path
+
+    head.push(['link', { rel: 'canonical', href: canonical }])
+    head.push(['meta', { property: 'og:url', content: canonical }])
+    head.push(['meta', { property: 'og:title', content: title }])
+    head.push(['meta', { property: 'og:description', content: description }])
+    head.push(['meta', { name: 'twitter:title', content: title }])
+    head.push(['meta', { name: 'twitter:description', content: description }])
+    head.push([
+      'script',
+      { type: 'application/ld+json' },
+      JSON.stringify(dataMasjid),
+    ])
+
+    return head
   },
 
   ignoreDeadLinks: true,
