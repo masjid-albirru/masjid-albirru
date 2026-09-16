@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  base: '/masjid-albirru/',
+  base: '/',
   title: 'Masjid Al-Birru',
   description: 'Website Resmi Masjid Al-Birru - Informasi, Berita, Acara & Laporan Keuangan',
   lang: 'id-ID',
@@ -14,7 +14,7 @@ export default defineConfig({
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'id_ID' }],
     ['meta', { property: 'og:site_name', content: 'Masjid Al-Birru' }],
-    ['meta', { property: 'og:image', content: 'https://masjid-albirru.github.io/masjid-albirru/images/albirru.jpg' }],
+    ['meta', { property: 'og:image', content: 'https://masjid-albirru.id/images/albirru.jpg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     [
       'script',
