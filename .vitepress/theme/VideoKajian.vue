@@ -53,8 +53,11 @@ function formatTanggal(str) {
     </div>
 
     <template v-else>
-      <!-- Grid video reguler -->
-      <div v-if="videos.length" class="vk-grid">
+      <!-- Video reguler -->
+      <section v-if="videos.length" aria-labelledby="vk-video-judul">
+        <h3 id="vk-video-judul" class="vk-subjudul">Video</h3>
+
+        <div class="vk-grid">
         <article
           v-for="video in videos"
           :key="video.id"
@@ -104,6 +107,15 @@ function formatTanggal(str) {
             </div>
           </div>
         </article>
+        </div>
+      </section>
+
+      <!-- Link kanal, tepat di bawah grid video -->
+      <div v-if="videos.length" class="vk-footer">
+        <a :href="CHANNEL_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
+          <Youtube :size="14" />
+          Lihat semua video di kanal YouTube
+        </a>
       </div>
 
       <!-- Rel Shorts -->
@@ -162,13 +174,9 @@ function formatTanggal(str) {
       </section>
     </template>
 
-    <!-- Footer -->
-    <div v-if="!loading && !error && (videos.length || shorts.length)" class="vk-footer">
-      <a v-if="videos.length" :href="CHANNEL_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
-        <Youtube :size="14" />
-        Lihat semua video di kanal YouTube
-      </a>
-      <a v-if="shorts.length" :href="SHORTS_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
+    <!-- Footer: link Shorts di bawah rel Shorts -->
+    <div v-if="!loading && !error && shorts.length" class="vk-footer">
+      <a :href="SHORTS_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
         <Play :size="14" />
         Lihat semua Shorts
       </a>
@@ -325,8 +333,6 @@ function formatTanggal(str) {
 /* Shorts */
 .vk-shorts {
   margin-top: 2rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--warm-border);
 }
 
 .vk-subjudul {
