@@ -3,7 +3,6 @@ layout: home
 title: Masjid Al-Birru | Masjid di Cinangka, Depok
 titleTemplate: false
 description: Masjid Al-Birru di Jl. Sirnagalih No.21, Cinangka, Sawangan, Depok. Jadwal sholat, jadwal imam, kajian, acara, dan laporan keuangan masjid.
----
 
 hero:
   name: "Masjid Al-Birru"
