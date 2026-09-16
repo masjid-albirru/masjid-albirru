@@ -29,7 +29,7 @@ features:
     linkText: Lihat jadwal
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>'
     title: Laporan Keuangan
-    details: Transparansi keuangan masjid — laporan bulanan pemasukan dan pengeluaran yang terbuka untuk jamaah.
+    details: Transparansi keuangan masjid, laporan bulanan pemasukan dan pengeluaran yang terbuka untuk jamaah.
     link: /keuangan/
     linkText: Lihat laporan
   - icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"></path><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"></path><path d="m2 16 6 6"></path><circle cx="16" cy="9" r="2.9"></circle><circle cx="6" cy="5" r="3"></circle></svg>'
@@ -69,7 +69,7 @@ import { withBase } from 'vitepress'
 <a :href="withBase('/acara/')">Lihat semua acara</a>
 </div>
 
-## Kajian Video
+## Video Kajian & Shorts
 
 <VideoKajian />
 

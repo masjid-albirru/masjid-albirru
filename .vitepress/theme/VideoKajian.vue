@@ -4,11 +4,14 @@ import { withBase } from 'vitepress'
 import { Play, Youtube, CalendarDays } from 'lucide-vue-next'
 
 const CHANNEL_URL = 'https://www.youtube.com/channel/UCbEPa8MAlTIzLkm_5brGjGQ'
+const SHORTS_URL = `${CHANNEL_URL}/shorts`
 
 const videos = ref([])
+const shorts = ref([])
 const loading = ref(true)
 const error = ref(false)
 const videoAktif = ref(null) // id video yang sedang diputar (lite-embed)
+const shortAktif = ref(null) // id short yang sedang diputar (lite-embed)
 
 onMounted(async () => {
   try {
@@ -16,6 +19,7 @@ onMounted(async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const json = await res.json()
     videos.value = json.videos ?? []
+    shorts.value = json.shorts ?? []
   } catch {
     error.value = true
   } finally {
@@ -44,68 +48,129 @@ function formatTanggal(str) {
     </div>
 
     <!-- Kosong -->
-    <div v-else-if="videos.length === 0" class="vk-status">
+    <div v-else-if="videos.length === 0 && shorts.length === 0" class="vk-status">
       Belum ada video yang diunggah.
     </div>
 
-    <!-- Grid video -->
-    <div v-else class="vk-grid">
-      <article
-        v-for="video in videos"
-        :key="video.id"
-        class="vk-kartu"
-      >
-        <!-- Player (lite-embed: iframe hanya dibuat saat diklik) -->
-        <div v-if="videoAktif === video.id" class="vk-player">
-          <iframe
-            :src="`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`"
-            :title="video.title"
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
-        </div>
-
-        <!-- Thumbnail + tombol play -->
-        <button
-          v-else
-          type="button"
-          class="vk-thumb"
-          :aria-label="`Putar video: ${video.title}`"
-          @click="videoAktif = video.id"
+    <template v-else>
+      <!-- Grid video reguler -->
+      <div v-if="videos.length" class="vk-grid">
+        <article
+          v-for="video in videos"
+          :key="video.id"
+          class="vk-kartu"
         >
-          <img
-            :src="video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`"
-            :alt="`Thumbnail video: ${video.title}`"
-            loading="lazy"
-            @error="$event.target.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`"
-          />
-          <span class="vk-play">
-            <Play :size="22" class="vk-play-ikon" />
-          </span>
-        </button>
-
-        <!-- Info -->
-        <div class="vk-info">
-          <a
-            class="vk-judul"
-            :href="`https://www.youtube.com/watch?v=${video.id}`"
-            target="_blank"
-            rel="noopener noreferrer"
-          >{{ video.title }}</a>
-          <div class="vk-tanggal">
-            <CalendarDays :size="12" />
-            {{ formatTanggal(video.published) }}
+          <!-- Player (lite-embed: iframe hanya dibuat saat diklik) -->
+          <div v-if="videoAktif === video.id" class="vk-player">
+            <iframe
+              :src="`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`"
+              :title="video.title"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
           </div>
+
+          <!-- Thumbnail + tombol play -->
+          <button
+            v-else
+            type="button"
+            class="vk-thumb"
+            :aria-label="`Putar video: ${video.title}`"
+            @click="videoAktif = video.id"
+          >
+            <img
+              :src="video.thumbnail || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`"
+              :alt="`Thumbnail video: ${video.title}`"
+              loading="lazy"
+              @error="$event.target.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`"
+            />
+            <span class="vk-play">
+              <Play :size="22" class="vk-play-ikon" />
+            </span>
+          </button>
+
+          <!-- Info -->
+          <div class="vk-info">
+            <a
+              class="vk-judul"
+              :href="`https://www.youtube.com/watch?v=${video.id}`"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ video.title }}</a>
+            <div class="vk-tanggal">
+              <CalendarDays :size="12" />
+              {{ formatTanggal(video.published) }}
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Rel Shorts -->
+      <section v-if="shorts.length" class="vk-shorts" aria-labelledby="vk-shorts-judul">
+        <h3 id="vk-shorts-judul" class="vk-subjudul">Shorts</h3>
+
+        <div class="vk-shorts-rel" tabindex="0" role="region" aria-label="Daftar video Shorts">
+          <article
+            v-for="short in shorts"
+            :key="short.id"
+            class="vk-short"
+          >
+            <div v-if="shortAktif === short.id" class="vk-short-player">
+              <iframe
+                :src="`https://www.youtube-nocookie.com/embed/${short.id}?autoplay=1&rel=0`"
+                :title="short.title"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
+
+            <button
+              v-else
+              type="button"
+              class="vk-short-thumb"
+              :aria-label="`Putar Shorts: ${short.title}`"
+              @click="shortAktif = short.id"
+            >
+              <img
+                :src="short.thumbnail || `https://i.ytimg.com/vi/${short.id}/hqdefault.jpg`"
+                :alt="`Thumbnail Shorts: ${short.title}`"
+                loading="lazy"
+                @error="$event.target.src = `https://i.ytimg.com/vi/${short.id}/hqdefault.jpg`"
+              />
+              <span class="vk-short-badge">Shorts</span>
+              <span class="vk-short-play">
+                <Play :size="20" class="vk-play-ikon" />
+              </span>
+            </button>
+
+            <div class="vk-short-info">
+              <a
+                class="vk-short-judul"
+                :href="`https://www.youtube.com/shorts/${short.id}`"
+                target="_blank"
+                rel="noopener noreferrer"
+              >{{ short.title }}</a>
+              <div class="vk-tanggal">
+                <CalendarDays :size="12" />
+                {{ formatTanggal(short.published) }}
+              </div>
+            </div>
+          </article>
         </div>
-      </article>
-    </div>
+      </section>
+    </template>
 
     <!-- Footer -->
-    <div v-if="!loading && !error && videos.length" class="vk-footer">
-      <a :href="CHANNEL_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
+    <div v-if="!loading && !error && (videos.length || shorts.length)" class="vk-footer">
+      <a v-if="videos.length" :href="CHANNEL_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
         <Youtube :size="14" />
         Lihat semua video di kanal YouTube
+      </a>
+      <a v-if="shorts.length" :href="SHORTS_URL" target="_blank" rel="noopener noreferrer" class="vk-footer-link">
+        <Play :size="14" />
+        Lihat semua Shorts
       </a>
     </div>
   </div>
@@ -257,16 +322,151 @@ function formatTanggal(str) {
   color: var(--vp-c-text-2);
 }
 
+/* Shorts */
+.vk-shorts {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--warm-border);
+}
+
+.vk-subjudul {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teal-700);
+}
+
+.dark .vk-subjudul {
+  color: var(--teal-400);
+}
+
+/* Rel horizontal dengan scroll-snap; overflow dikurung di container ini
+   sehingga tidak menimbulkan scroll horizontal pada halaman */
+.vk-shorts-rel {
+  --vk-short-w: 172px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--vk-short-w);
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+.vk-shorts-rel:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 4px;
+}
+
+.vk-short {
+  scroll-snap-align: start;
+}
+
+.vk-short-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--teal-900);
+  cursor: pointer;
+}
+
+/* Thumbnail 4:3 dari YouTube memuat bingkai vertikal di tengah;
+   object-fit: cover pada kotak 9:16 menampilkan bingkai itu tanpa pilar hitam */
+.vk-short-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.vk-short-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--teal-900);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.vk-short-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vk-short-play .vk-play-ikon {
+  width: 38px;
+  height: 38px;
+  padding: 10px;
+}
+
+.vk-short-thumb:hover .vk-play-ikon,
+.vk-short-thumb:focus-visible .vk-play-ikon {
+  background: var(--teal-600);
+}
+
+.vk-short-player {
+  aspect-ratio: 9 / 16;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+}
+
+.vk-short-player iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.vk-short-info {
+  padding: 8px 2px 0;
+}
+
+.vk-short-judul {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+}
+
+.vk-short-judul:hover {
+  color: var(--teal-600);
+}
+
 /* Footer */
 .vk-footer {
   margin-top: 14px;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
 }
 
 .vk-footer-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
+  padding: 4px 6px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--teal-700);
@@ -284,5 +484,11 @@ function formatTanggal(str) {
 
 .dark .vk-footer-link:hover {
   color: var(--teal-500);
+}
+
+@media (max-width: 480px) {
+  .vk-shorts-rel {
+    --vk-short-w: 148px;
+  }
 }
 </style>
