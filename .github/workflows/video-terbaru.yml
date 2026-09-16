@@ -1,0 +1,102 @@
+name: 🎬 Perbarui Video YouTube Terbaru
+
+on:
+  schedule:
+    # Setiap hari 00:00 UTC (±07:00 WIB)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: video-terbaru
+  cancel-in-progress: false
+
+jobs:
+  perbarui-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ambil RSS YouTube & tulis youtube.json
+        run: |
+          node <<'EOF'
+          const fs = require('fs')
+          const path = 'docs/public/data/youtube.json'
+          const CHANNEL_ID = 'UCbEPa8MAlTIzLkm_5brGjGQ'
+          const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`
+          const MAKS_VIDEO = 6
+          const PANJANG_DESKRIPSI = 300
+
+          function xmlUnescape(s) {
+            return s
+              .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+              .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+              .replace(/&quot;/g, '"')
+              .replace(/&apos;/g, "'")
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&amp;/g, '&')
+          }
+
+          function potongDeskripsi(s) {
+            if (s.length <= PANJANG_DESKRIPSI) return s
+            return s.slice(0, PANJANG_DESKRIPSI).replace(/\s+\S*$/, '') + '…'
+          }
+
+          async function main() {
+            const res = await fetch(RSS_URL)
+            if (!res.ok) throw new Error(`RSS HTTP ${res.status}`)
+            const xml = await res.text()
+
+            const entries = xml.split('<entry>').slice(1).map(e => e.split('</entry>')[0])
+            const videos = entries.map(entry => {
+              const ambil = tag => {
+                const m = entry.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`))
+                return m ? m[1] : ''
+              }
+              const thumbMatch = entry.match(/<media:thumbnail[^>]*url="([^"]+)"/)
+              return {
+                id: xmlUnescape(ambil('yt:videoId')),
+                title: xmlUnescape(ambil('title')),
+                published: xmlUnescape(ambil('published')),
+                thumbnail: thumbMatch ? xmlUnescape(thumbMatch[1]) : '',
+                description: potongDeskripsi(xmlUnescape(ambil('media:description')).replace(/\s+/g, ' ').trim()),
+              }
+            }).filter(v => v.id && v.title).slice(0, MAKS_VIDEO)
+
+            if (videos.length === 0) throw new Error('RSS tidak berisi video')
+
+            const baru = {
+              channelId: CHANNEL_ID,
+              diperbarui: new Date().toISOString(),
+              videos,
+            }
+            const isiBaru = JSON.stringify(baru, null, 2) + '\n'
+
+            const lama = fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : ''
+            if (lama === isiBaru) {
+              console.log('Tidak ada video baru — lewati commit.')
+              return
+            }
+
+            fs.writeFileSync(path, isiBaru)
+            console.log(`youtube.json diperbarui: ${videos.length} video.`)
+          }
+
+          main().catch(err => { console.error(err); process.exit(1) })
+          EOF
+
+      - name: Commit jika ada perubahan
+        run: |
+          if git diff --quiet docs/public/data/youtube.json; then
+            echo "Tidak ada perubahan."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/public/data/youtube.json
+            git commit -m "chore(data): perbarui daftar video YouTube"
+            git push
+          fi

@@ -69,6 +69,10 @@ import { withBase } from 'vitepress'
 <a :href="withBase('/acara/')">Lihat semua acara</a>
 </div>
 
+## Kajian Video
+
+<VideoKajian />
+
 ## Ringkasan Keuangan
 
 <KeuanganRingkas />
