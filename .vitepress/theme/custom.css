@@ -693,3 +693,23 @@ summary:focus-visible,
   content: '→';
   font-weight: 600;
 }
+
+/* ===== BERANDA: heading section tanpa garis abu, pemisah berupa
+   hairline emas pendek di bawah tiap H2 (identity motif, DESIGN.md).
+   Ritme antar-section diatur oleh jarak, bukan garis penuh. ===== */
+.VPHome .vp-doc h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 2.5rem;
+  padding-bottom: 0.35rem;
+}
+
+.VPHome .vp-doc h2::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  margin-top: 0.4rem;
+}
