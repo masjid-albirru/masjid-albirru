@@ -8,7 +8,7 @@ description: Informasi kontak dan lokasi Masjid Al-Birru
 ## Alamat
 
 **Masjid Al-Birru**
-Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516
+Jl. SMP Muhammadiyah 29 RT 05/08 no.122, Cinangka, Sawangan, Depok.
 
 <LokasiMasjid />
 

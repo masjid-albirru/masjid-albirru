@@ -1,7 +1,7 @@
 <script setup>
 import { MapPin, Navigation } from 'lucide-vue-next'
 
-const ALAMAT = 'Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516'
+const ALAMAT = 'Jl. SMP Muhammadiyah 29 RT 05/08 no.122, Cinangka, Sawangan, Depok.'
 const QUERY = encodeURIComponent('Masjid Al-Birru, Jl. Sirnagalih No.21, Cinangka, Sawangan, Depok')
 const LINK_ARAH = 'https://maps.app.goo.gl/irpLduEHRHQXqvoKA'
 </script>

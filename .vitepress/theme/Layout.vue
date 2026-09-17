@@ -47,7 +47,7 @@ const tahun = new Date().getFullYear()
             <a :href="withBase(t.href)" class="sf-link">{{ t.text }}</a>
           </template>
         </nav>
-        <p class="sf-alamat">Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat 16516</p>
+        <p class="sf-alamat">Jl. SMP Muhammadiyah 29 RT 05/08 no.122, Cinangka, Sawangan, Depok.</p>
         <p class="sf-copy">&copy; {{ tahun }} Masjid Al-Birru. Semua hak dilindungi.</p>
       </footer>
     </template>
