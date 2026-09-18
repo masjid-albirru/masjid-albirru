@@ -62,6 +62,7 @@ function persen(p) {
       <footer class="sd-foot">
         <p class="sd-ajakan">Salurkan donasi Anda</p>
         <p class="sd-situs">masjid-albirru.id</p>
+        <p class="sd-situs">BSI 7192880558 a.n. DKM Al Birru</p>
       </footer>
     </div>
   </div>
