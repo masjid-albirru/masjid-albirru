@@ -5,8 +5,29 @@
  * Warna dipatok light-theme (bukan CSS var) agar hasil gambar konsisten
  * di mode gelap maupun terang.
  */
+import { ref, onMounted } from 'vue'
+import QRCode from 'qrcode'
+import { QRIS_STRING } from './donasiData.js'
+
 defineProps({
   program: { type: Object, required: true },
+})
+
+// QR QRIS digenerate sekali saat mount sebagai data URL —
+// html-to-image merender <img> data URL tanpa masalah CORS.
+const qrDataUrl = ref('')
+
+onMounted(async () => {
+  try {
+    qrDataUrl.value = await QRCode.toDataURL(QRIS_STRING, {
+      width: 480,
+      margin: 1,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#0d3d45', light: '#ffffff' },
+    })
+  } catch (e) {
+    console.error('Gagal generate QR QRIS:', e)
+  }
 })
 
 function angka(v) {
@@ -60,9 +81,16 @@ function persen(p) {
       </div>
 
       <footer class="sd-foot">
-        <p class="sd-ajakan">Salurkan donasi Anda</p>
-        <p class="sd-situs">masjid-albirru.id</p>
-        <p class="sd-situs">BSI 7192880558 a.n. DKM Al Birru</p>
+        <div v-if="qrDataUrl" class="sd-qr">
+          <span class="sd-qr-merchant">DKM AL-BIRRU</span>
+          <img :src="qrDataUrl" alt="" width="170" height="170">
+          <span class="sd-qr-caption">Scan QRIS</span>
+        </div>
+        <div class="sd-cta">
+          <p class="sd-ajakan">Salurkan donasi Anda</p>
+          <p class="sd-situs">masjid-albirru.id</p>
+          <p class="sd-rekening">BSI 7192880558 a.n. DKM Al Birru</p>
+        </div>
       </footer>
     </div>
   </div>
@@ -115,7 +143,7 @@ function persen(p) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 18px;
+  gap: 14px;
   min-height: 0;
 }
 
@@ -141,21 +169,21 @@ function persen(p) {
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.78);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 /* Fokus tunggal kartu: persentase capaian */
 .sd-fokus {
-  margin-top: 26px;
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
 .sd-persen {
-  font-size: 104px;
+  font-size: 88px;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -205,10 +233,50 @@ function persen(p) {
 
 .sd-foot {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 24px;
+  align-items: center;
+  gap: 28px;
+  padding-top: 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+/* Kartu QR putih agar mudah discan dari status WA */
+.sd-qr {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px 12px 8px;
+}
+
+.sd-qr img {
+  display: block;
+  width: 170px;
+  height: 170px;
+}
+
+.sd-qr-merchant {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #0d3d45;
+}
+
+.sd-qr-caption {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #0d3d45;
+}
+
+.sd-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
 .sd-ajakan {
@@ -219,8 +287,15 @@ function persen(p) {
 
 .sd-situs {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #33bdd4;
+}
+
+.sd-rekening {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
 }
 </style>

@@ -1,15 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { QrCode, Landmark, Copy, Check, MessageCircle } from 'lucide-vue-next'
-
-const QRIS_STRING = '00020101021126640017ID.CO.BANKBSI.WWW0118936004510000097631021000004947680303UMI51440014ID.CO.QRIS.WWW0215ID10221742528100303UMI5204866153033605802ID5912DKM AL BIRRU6005DEPOK61051651662070703A0163041E63'
-
-const REKENING = [
-  { bank: 'Bank Syariah Indonesia (BSI)', no: '7192880558', atas: 'DKM Al Birru'},
-]
-
-const WA_NUMBER = '6281399928319'
-// ============================================================
+import { QRIS_STRING, REKENING, WA_NUMBER } from './donasiData.js'
 
 const qrLoaded = ref(false)
 const qrError = ref(false)

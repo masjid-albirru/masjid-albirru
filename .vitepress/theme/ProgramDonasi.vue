@@ -286,7 +286,7 @@ async function unduhStatus(p) {
               >
                 <Loader2 v-if="statusProses === (p.kode || '?')" :size="13" class="pd-spin" />
                 <ImageDown v-else :size="13" />
-                Status WA
+                Share Progres Donasi
               </button>
             </div>
           </div>
