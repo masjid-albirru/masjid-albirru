@@ -113,7 +113,9 @@ function persen(p) {
   display: flex;
   flex-direction: column;
   padding: 56px 52px;
-  background: #0d3d45;
+  /* Gradien dua-nada (alasan hierarki: identitas atas gelap -> aksi bawah terang),
+     bukan dekorasi — sesuai DESIGN.md §dials ENERGY 1. */
+  background: linear-gradient(180deg, #0d3d45 0%, #0f6b78 100%);
   color: #ffffff;
   font-family: 'Lato', 'Segoe UI', sans-serif;
   text-align: left;
@@ -167,7 +169,7 @@ function persen(p) {
   margin: 0;
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -191,7 +193,7 @@ function persen(p) {
 
 .sd-persen-caption {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sd-bar {
@@ -222,13 +224,13 @@ function persen(p) {
 
 .sd-target {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sd-deadline {
   margin: 0;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sd-foot {
@@ -282,20 +284,22 @@ function persen(p) {
 .sd-ajakan {
   margin: 0;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sd-situs {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #33bdd4;
+  /* Putih, bukan teal-400: kontras 6.2:1 di footer (area gradien terang),
+     teal-400 hanya 2.75:1 di sana. */
+  color: #ffffff;
 }
 
 .sd-rekening {
   margin: 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
   font-variant-numeric: tabular-nums;
 }
 </style>
