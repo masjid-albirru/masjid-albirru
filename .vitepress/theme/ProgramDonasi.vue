@@ -1,10 +1,12 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useData } from 'vitepress'
 import {
   CalendarClock, Wallet, ArrowRight, ExternalLink,
-  Loader2, CircleAlert
+  Loader2, CircleAlert, ImageDown
 } from 'lucide-vue-next'
+import * as htmlToImage from 'html-to-image'
+import StatusDonasi from './StatusDonasi.vue'
 
 const props = defineProps({
   /** true = tampilan ringkas (dipakai di beranda), false = lengkap (halaman /donasi) */
@@ -146,6 +148,55 @@ function waLink(kode) {
   const pesan = encodeURIComponent(`DONASI_[NAMA]_[NOMINAL]_${kode}\n\nAssalamualaikum, saya telah melakukan donasi untuk program ${kode} Masjid Al-Birru.`)
   return `https://wa.me/${WA_NUMBER}?text=${pesan}`
 }
+
+// ============================================================
+// GAMBAR STATUS WA — render kartu donasi jadi PNG 1080x1920
+// ============================================================
+const statusRef = ref(null)              // elemen kartu offscreen (StatusDonasi)
+const statusProgram = ref(null)          // data program yang sedang dirender
+const statusProses = ref('')             // kode program yang sedang diproses
+
+async function unduhStatus(p) {
+  if (statusProses.value) return
+  statusProses.value = p.kode || '?'
+  try {
+    // 1. Pasang data ke kartu offscreen, tunggu Vue merender DOM-nya.
+    statusProgram.value = p
+    await nextTick()
+    await new Promise(r => setTimeout(r, 50)) // beri waktu font/layout settle
+
+    // 2. DOM -> PNG (scale 2: 540x960 -> 1080x1920)
+    const blob = await htmlToImage.toBlob(statusRef.value.$el.querySelector('.sd-status'), {
+      pixelRatio: 2,
+      backgroundColor: '#0d3d45',
+    })
+    if (!blob) throw new Error('render gagal')
+
+    const namaFile = `donasi-${String(p.kode || 'program').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`
+
+    // 3. Web Share API (HP): share sheet bisa langsung ke status WA.
+    const file = new File([blob], namaFile, { type: 'image/png' })
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Donasi ' + p.nama })
+      return
+    }
+
+    // 4. Fallback desktop: unduh manual.
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = namaFile
+    a.click()
+    URL.revokeObjectURL(a.href)
+  } catch (e) {
+    // User membatalkan share sheet dihitung AbortError — bukan kegagalan.
+    if (e && e.name !== 'AbortError') {
+      console.error('Gagal membuat gambar status donasi:', e)
+      alert('Maaf, gagal membuat gambar. Coba lagi.')
+    }
+  } finally {
+    statusProses.value = ''
+  }
+}
 </script>
 
 <template>
@@ -221,10 +272,23 @@ function waLink(kode) {
             >
               Konfirmasi Donasi
             </a>
-            <a v-if="p.link" :href="url(p.link)" class="pd-detail">
-              Detail
-              <ExternalLink :size="13" />
-            </a>
+            <div class="pd-footer-kanan">
+              <a v-if="p.link" :href="url(p.link)" class="pd-detail">
+                Detail
+                <ExternalLink :size="13" />
+              </a>
+              <button
+                type="button"
+                class="pd-status"
+                :disabled="statusProses === (p.kode || '?')"
+                title="Buat gambar untuk status WhatsApp"
+                @click="unduhStatus(p)"
+              >
+                <Loader2 v-if="statusProses === (p.kode || '?')" :size="13" class="pd-spin" />
+                <ImageDown v-else :size="13" />
+                Status WA
+              </button>
+            </div>
           </div>
         </article>
       </div>
@@ -236,6 +300,9 @@ function waLink(kode) {
         </a>
       </div>
     </template>
+
+    <!-- Kartu offscreen untuk render gambar status (tidak terlihat di halaman) -->
+    <StatusDonasi ref="statusRef" :program="statusProgram || {}" />
   </div>
 </template>
 
@@ -444,6 +511,35 @@ function waLink(kode) {
 }
 
 .pd-detail:hover { opacity: 0.75; }
+
+.pd-footer-kanan {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.pd-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--teal-700);
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dark .pd-status { color: var(--teal-400); }
+
+.pd-status:hover { background: var(--vp-c-bg-soft); }
+
+.pd-status:disabled { opacity: 0.6; cursor: wait; }
 
 .pd-more {
   text-align: center;
