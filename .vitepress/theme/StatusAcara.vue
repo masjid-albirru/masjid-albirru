@@ -4,8 +4,15 @@
  * Warna dipatok light-theme agar hasil gambar konsisten di mode gelap/terang.
  */
 import { Clock, MapPin, User } from 'lucide-vue-next'
+import { useData } from 'vitepress'
 
-const props = defineProps({
+const { site } = useData()
+
+// Logo emblem (tanpa wordmark) untuk watermark — path base-aware
+// agar aman bila config.base berubah.
+const logoUrl = site.value.base.replace(/\/$/, '') + '/images/uploads/logo-al-birru.png'
+
+defineProps({
   acara: { type: Object, required: true },
 })
 
@@ -53,11 +60,33 @@ const terbukaBadge = {
   'Tidak (Jamaah saja)': { label: 'Jamaah Masjid', warna: '#93c5fd' },
   'Khusus Muslimah':     { label: 'Khusus Muslimah', warna: '#d8b4fe' },
 }
+
+// Grain inline (SVG feTurbulence sebagai data URL): menekan banding pada
+// gradien saat diekspor jadi PNG status WA. Pola sama dengan StatusDonasi —
+// data URL, bukan file eksternal, jadi html-to-image merendernya tanpa CORS.
+// Opacity 0.05: terlihat di PNG nyata, hampir tak terlihat di layar.
+const GRAIN_URL =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">` +
+      `<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>` +
+      `<feColorMatrix type="saturate" values="0"/></filter>` +
+      `<rect width="120" height="120" filter="url(%23n)" opacity="0.5"/></svg>`
+  )
+
+// Dipakai lewat binding style; dibungkus kutip agar tanda kurung dalam
+// data URL tidak merusak fungsi CSS url().
+const grainCss = 'url("' + GRAIN_URL + '")'
+
 </script>
 
 <template>
   <div class="sa-layer" aria-hidden="true">
     <div class="sa-status">
+      <img class="sa-watermark" :src="logoUrl" alt="">
+      <div class="sa-grain" :style="{ backgroundImage: grainCss }"></div>
+      <div class="sa-frame"></div>
+
       <header class="sa-head">
         <div class="sa-brand">Masjid Al-Birru</div>
         <div class="sa-motif"></div>
@@ -69,13 +98,14 @@ const terbukaBadge = {
 
         <div class="sa-date-block">
           <div class="sa-date-box">
+            <div class="sa-date-strip"></div>
             <div class="sa-day">{{ formatTanggal(acara.tanggal).tanggal }}</div>
             <div class="sa-month">{{ formatTanggal(acara.tanggal).bulan }}</div>
             <div class="sa-year">{{ formatTanggal(acara.tanggal).tahun }}</div>
           </div>
           <div class="sa-date-meta">
             <div class="sa-weekday">{{ formatTanggal(acara.tanggal).hari }}</div>
-            <div class="sa-countdown">{{ hariLagi(acara.tanggal) }}</div>
+            <div v-if="hariLagi(acara.tanggal)" class="sa-countdown">{{ hariLagi(acara.tanggal) }}</div>
           </div>
         </div>
 
@@ -125,19 +155,59 @@ const terbukaBadge = {
 }
 
 .sa-status {
+  position: relative;
   width: 540px;
   height: 960px;
   padding: 56px 44px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: #0d3d45;
+  /* Gradien dua-nada, senada kartu donasi: identitas atas gelap ->
+     aksi bawah terang (fungsi hierarki, sesuai DESIGN.md ENERGY 1). */
+  background: linear-gradient(180deg, #0d3d45 0%, #0f6b78 100%);
   color: #ffffff;
   font-family: 'Lato', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow: hidden;
 }
 
+/* Watermark logo emblem: identitas di belakang konten, opacity sangat
+   rendah agar tidak bersaing dengan teks. Menyentuh tepi kanan-bawah
+   agar terasa bagian kanvas, bukan stempel di tengah. */
+.sa-watermark {
+  position: absolute;
+  right: -60px;
+  bottom: -130px;
+  z-index: 0;
+  width: 470px;
+  height: 470px;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Grain menekan banding gradien di hasil ekspor PNG */
+.sa-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+/* Hairline frame emas: framing poster, tetap satu aksen emas dari DESIGN.md */
+.sa-frame {
+  position: absolute;
+  inset: 20px;
+  z-index: 1;
+  border: 1px solid rgba(232, 201, 122, 0.35);
+  pointer-events: none;
+}
+
 .sa-head {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -158,6 +228,8 @@ const terbukaBadge = {
 }
 
 .sa-body {
+  position: relative;
+  z-index: 2;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -203,6 +275,15 @@ const terbukaBadge = {
   gap: 2px;
 }
 
+/* Strip emas di kotak tanggal: tab kalender, aksen emas dipakai hemat */
+.sa-date-strip {
+  width: 28px;
+  height: 3px;
+  border-radius: 99px;
+  background: #c9a84c;
+  margin-bottom: 6px;
+}
+
 .sa-day {
   font-size: 44px;
   font-weight: 800;
@@ -235,10 +316,16 @@ const terbukaBadge = {
   color: #ffffff;
 }
 
+/* Countdown sebagai pill: menempel ke kotak tanggal, bukan teks lepas */
 .sa-countdown {
-  font-size: 14px;
-  font-weight: 600;
-  color: #33bdd4;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: rgba(232, 201, 122, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8c97a;
 }
 
 .sa-meta {
@@ -289,6 +376,8 @@ const terbukaBadge = {
 }
 
 .sa-foot {
+  position: relative;
+  z-index: 2;
   margin-top: auto;
   padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);

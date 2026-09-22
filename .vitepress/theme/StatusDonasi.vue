@@ -6,9 +6,16 @@
  * di mode gelap maupun terang.
  */
 import { ref, onMounted } from 'vue'
+import { useData } from 'vitepress'
 import QRCode from 'qrcode'
 import { CalendarClock } from 'lucide-vue-next'
 import { QRIS_STRING } from './donasiData.js'
+
+const { site } = useData()
+
+// Logo emblem untuk watermark — path base-aware agar aman bila
+// config.base berubah. Sama dengan StatusAcara.
+const logoUrl = site.value.base.replace(/\/$/, '') + '/images/uploads/logo-al-birru.png'
 
 defineProps({
   program: { type: Object, required: true },
@@ -59,11 +66,18 @@ const GRAIN_URL =
       `<feColorMatrix type="saturate" values="0"/></filter>` +
       `<rect width="120" height="120" filter="url(%23n)" opacity="0.5"/></svg>`
   )
+
+// Dipakai lewat binding style; dibungkus kutip agar tanda kurung dalam
+// data URL tidak merusak fungsi CSS url().
+const grainCss = 'url("' + GRAIN_URL + '")'
 </script>
 
 <template>
   <div class="sd-layer" aria-hidden="true">
     <div class="sd-status">
+      <img class="sd-watermark" :src="logoUrl" alt="">
+      <div class="sd-grain" :style="{ backgroundImage: grainCss }"></div>
+
       <header class="sd-head">
         <div class="sd-brand">Masjid Al-Birru</div>
         <div class="sd-motif"></div>
@@ -121,6 +135,7 @@ const GRAIN_URL =
 }
 
 .sd-status {
+  position: relative;
   width: 540px;
   height: 960px;
   box-sizing: border-box;
@@ -133,9 +148,38 @@ const GRAIN_URL =
   color: #ffffff;
   font-family: 'Lato', 'Segoe UI', sans-serif;
   text-align: left;
+  overflow: hidden;
+}
+
+/* Watermark logo emblem: sama dengan StatusAcara agar kartu terlihat
+   satu seri. object-fit cover + object-position top memotong sisa
+   wordmark gelap yang ikut dalam file aset. */
+.sd-watermark {
+  position: absolute;
+  right: -60px;
+  bottom: -130px;
+  z-index: 0;
+  width: 470px;
+  height: 470px;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Grain menekan banding gradien di hasil ekspor PNG */
+.sd-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.05;
+  pointer-events: none;
 }
 
 .sd-head {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -155,6 +199,8 @@ const GRAIN_URL =
 }
 
 .sd-body {
+  position: relative;
+  z-index: 2;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -246,6 +292,8 @@ const GRAIN_URL =
 }
 
 .sd-foot {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 28px;
