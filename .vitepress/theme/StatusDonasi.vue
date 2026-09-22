@@ -7,6 +7,7 @@
  */
 import { ref, onMounted } from 'vue'
 import QRCode from 'qrcode'
+import { CalendarClock } from 'lucide-vue-next'
 import { QRIS_STRING } from './donasiData.js'
 
 defineProps({
@@ -45,6 +46,19 @@ function persen(p) {
   if (target <= 0) return 0
   return Math.min(Math.round((angka(p.terkumpul) / target) * 100), 100)
 }
+
+// Grain inline (SVG feTurbulence sebagai data URL): menekan banding pada
+// gradien saat diekspor jadi PNG status WA. Bukan file eksternal —
+// html-to-image merender data URL tanpa masalah CORS. Opacity 0.05
+// (terlihat di PNG nyata, hampir tak terlihat di layar).
+const GRAIN_URL =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">` +
+      `<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>` +
+      `<feColorMatrix type="saturate" values="0"/></filter>` +
+      `<rect width="120" height="120" filter="url(%23n)" opacity="0.5"/></svg>`
+  )
 </script>
 
 <template>
@@ -167,18 +181,16 @@ function persen(p) {
 
 .sd-deskripsi {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.6;
+  /* Diperkecil sedikit supaya deskripsi panjang dari CSV tetap muat
+     penuh di kanvas 9:16 tanpa dipotong. */
+  font-size: 14px;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.85);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 /* Fokus tunggal kartu: persentase capaian */
 .sd-fokus {
-  margin-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 2px;

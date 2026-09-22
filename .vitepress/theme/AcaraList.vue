@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useData } from 'vitepress'
-import { Clock, MapPin, User, CircleDot } from 'lucide-vue-next'
+import { Clock, MapPin, User, CircleDot, ImageDown, Loader2 } from 'lucide-vue-next'
+import * as htmlToImage from 'html-to-image'
+import StatusAcara from './StatusAcara.vue'
 
 const { site } = useData()
 
@@ -106,6 +108,50 @@ const terbukaBadge = {
   'Tidak (Jamaah saja)': { label: 'Jamaah Masjid',   warna: '#0f6b78' },
   'Khusus Muslimah':     { label: 'Khusus Muslimah', warna: '#9333ea' },
 }
+
+// ============================================================
+// GAMBAR STATUS WA — render kartu acara jadi PNG 1080x1920
+// ============================================================
+const statusRef = ref(null)
+const statusAcara = ref(null)
+const statusProses = ref(false)
+
+async function unduhStatus(a) {
+  if (statusProses.value) return
+  statusProses.value = true
+  try {
+    statusAcara.value = a
+    await nextTick()
+    await new Promise(r => setTimeout(r, 50))
+
+    const blob = await htmlToImage.toBlob(statusRef.value.$el.querySelector('.sa-status'), {
+      pixelRatio: 2,
+      backgroundColor: '#0d3d45',
+    })
+    if (!blob) throw new Error('render gagal')
+
+    const namaFile = `acara-${String(a.nama_acara || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`
+
+    const file = new File([blob], namaFile, { type: 'image/png' })
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: a.nama_acara })
+      return
+    }
+
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = namaFile
+    link.click()
+    URL.revokeObjectURL(link.href)
+  } catch (e) {
+    if (e && e.name !== 'AbortError') {
+      console.error('Gagal membuat gambar status acara:', e)
+      alert('Maaf, gagal membuat gambar. Coba lagi.')
+    }
+  } finally {
+    statusProses.value = false
+  }
+}
 </script>
 
 <template>
@@ -205,6 +251,17 @@ const terbukaBadge = {
 
             <div class="al-footer">
               <span class="al-hari">{{ formatTanggal(a.tanggal).hari }}</span>
+              <button
+                type="button"
+                class="al-share"
+                :disabled="statusProses"
+                title="Buat gambar untuk status WhatsApp"
+                @click="unduhStatus(a)"
+              >
+                <Loader2 v-if="statusProses" :size="13" class="al-spin" />
+                <ImageDown v-else :size="13" />
+                Share Acara
+              </button>
             </div>
           </div>
         </div>
@@ -214,6 +271,9 @@ const terbukaBadge = {
         {{ filtered.length }} acara ditampilkan
       </div>
     </template>
+
+    <!-- Kartu offscreen untuk render gambar status acara -->
+    <StatusAcara ref="statusRef" :acara="statusAcara || {}" />
   </div>
 </template>
 
@@ -397,6 +457,31 @@ const terbukaBadge = {
   color: var(--vp-c-text-2);
   margin-top: 0.75rem;
 }
+
+.al-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--teal-700);
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dark .al-share { color: var(--teal-400); }
+
+.al-share:hover { background: var(--vp-c-bg-soft); }
+
+.al-share:disabled { opacity: 0.6; cursor: wait; }
+
+.al-spin { animation: al-spin-rot 0.9s linear infinite; }
+@keyframes al-spin-rot { to { transform: rotate(360deg); } }
 
 @media (max-width: 640px) {
   .al-card { gap: 0.75rem; }
