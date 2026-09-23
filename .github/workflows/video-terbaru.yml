@@ -30,6 +30,11 @@ jobs:
           const MAKS_VIDEO = 6
           const MAKS_SHORTS = 8
           const PANJANG_DESKRIPSI = 300
+          const MIRROR_URL = `https://inv.nadeko.net/feed/channel/${CHANNEL_ID}`
+          const HEADERS = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+            'Accept': 'application/atom+xml,application/xml;q=0.9,*/*;q=0.8',
+          }
 
           function xmlUnescape(s) {
             return s
@@ -47,10 +52,35 @@ jobs:
             return s.slice(0, PANJANG_DESKRIPSI).replace(/\s+\S*$/, '') + '…'
           }
 
+          async function ambilFeed(url, coba = 3) {
+            let status = 0
+            for (let i = 1; i <= coba; i++) {
+              const res = await fetch(url, { headers: HEADERS })
+              status = res.status
+              if (res.ok) return res.text()
+              const layakUlang = status === 404 || status === 429 || status >= 500
+              if (!layakUlang || i === coba) break
+              console.log(`RSS HTTP ${status}, coba lagi (${i}/${coba})...`)
+              await new Promise(tunggu => setTimeout(tunggu, 2000 * i))
+            }
+            throw new Error(`RSS HTTP ${status}`)
+          }
+
           async function main() {
-            const res = await fetch(RSS_URL)
-            if (!res.ok) throw new Error(`RSS HTTP ${res.status}`)
-            const xml = await res.text()
+            let xml
+            try {
+              xml = await ambilFeed(RSS_URL)
+              if (!xml.includes('<entry>')) throw new Error('feed tanpa entry')
+            } catch (utama) {
+              console.warn(`RSS utama gagal: ${utama.message}. Coba mirror...`)
+              try {
+                xml = await ambilFeed(MIRROR_URL, 1)
+                if (!xml.includes('<entry>')) throw new Error('mirror tanpa entry')
+              } catch (mirror) {
+                console.warn(`RSS mirror gagal: ${mirror.message}. Pakai youtube.json yang lama.`)
+                return
+              }
+            }
 
             const entries = xml.split('<entry>').slice(1).map(e => e.split('</entry>')[0])
             const semua = entries.map(entry => {
