@@ -126,11 +126,11 @@ collections:
       - { label: "Judul Album", name: title, widget: string, hint: "Contoh: Gotong Royong Bersih Masjid" }
       - { label: "Deskripsi Singkat", name: description, widget: text, required: false }
       - { label: "Tanggal Kegiatan", name: tanggal, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
-      - { label: "Foto Sampul", name: sampul, widget: image, hint: "JPG/WebP, lebar maks 1920px, di bawah 500KB" }
+      - { label: "Foto Sampul", name: sampul, widget: image, hint: "JPG/WebP/PNG, maks 4MB. Otomatis dikompres sebelum tayang." }
       - label: "Daftar Foto"
         name: foto
         widget: list
         hint: "Tambah satu per foto. Keterangan dipakai sebagai teks alt."
         fields:
-          - { label: "Gambar", name: gambar, widget: image, hint: "JPG/WebP, lebar maks 1920px, di bawah 500KB" }
+          - { label: "Gambar", name: gambar, widget: image, hint: "JPG/WebP/PNG, maks 4MB. Otomatis dikompres sebelum tayang." }
           - { label: "Keterangan Foto", name: keterangan, widget: string, required: false }

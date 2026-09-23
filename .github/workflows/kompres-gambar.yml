@@ -1,0 +1,60 @@
+name: 🖼️ Kompres Gambar Otomatis
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/public/images/uploads/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: kompres-gambar
+  cancel-in-progress: false
+
+jobs:
+  kompres:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependensi
+        run: npm ci
+
+      - name: Kompres gambar uploads
+        run: npm run images:compress
+
+      - name: Commit jika ada perubahan
+        id: commit
+        run: |
+          if git diff --quiet docs/public/images/uploads; then
+            echo "Tidak ada gambar yang bisa dikompres."
+            echo "berubah=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/public/images/uploads
+            git commit -m "chore(images): kompres otomatis gambar uploads"
+            git push
+            echo "berubah=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Push dari GITHUB_TOKEN tidak memicu workflow run baru (pencegah loop
+      # bawaan GitHub), jadi deploy diminta eksplisit agar gambar hasil
+      # kompres langsung tayang.
+      - name: Minta deploy ulang jika ada kompresi
+        if: steps.commit.outputs.berubah == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run "Deploy Website Masjid" --ref main
