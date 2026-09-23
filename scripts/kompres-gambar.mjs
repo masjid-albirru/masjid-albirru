@@ -50,12 +50,21 @@ for (const file of await kumpulkan(FOLDER)) {
     // Baca via buffer dulu: binding native sharp di sebagian lingkungan
     // gagal memory-map file besar langsung dari path (error UNKNOWN).
     const mentah = await readFile(file)
-    const gambar = sharp(mentah, { animated: false })
+    // .rotate() tanpa argumen = auto-orient dari tag EXIF, lalu tag dibuang.
+    // Tanpa ini, foto yang orientasinya disimpan sebagai tag EXIF (umum di
+    // kamera/HP) akan tersimpan dalam posisi mentah alias terlihat miring.
+    const gambar = sharp(mentah, { animated: false }).rotate()
     const meta = await gambar.metadata()
     if (!meta.width) continue
 
+    // metadata() melaporkan piksel mentah pra-rotasi. Untuk orientasi 5-8,
+    // lebar dan tinggi efektif bertukar, jadi lebar efektif harus dihitung
+    // agar keputusan resize tetap benar.
+    const orientasi = meta.orientation ?? 1
+    const lebarEfektif = orientasi >= 5 && orientasi <= 8 ? meta.height : meta.width
+
     let pipeline = gambar
-    const perluResize = meta.width > LEBAR_MAKS
+    const perluResize = lebarEfektif > LEBAR_MAKS
     if (perluResize) pipeline = pipeline.resize({ width: LEBAR_MAKS, withoutEnlargement: true })
 
     if (ext === '.jpg' || ext === '.jpeg') pipeline = pipeline.jpeg({ quality: KUALITAS, progressive: true })
