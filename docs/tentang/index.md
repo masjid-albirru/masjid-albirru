@@ -14,7 +14,7 @@ description: Profil lengkap Masjid Al-Birru — sejarah, visi misi, fasilitas, d
 | Keterangan | Detail |
 |------------|--------|
 | **Nama Masjid** | Masjid Al-Birru |
-| **Alamat** | Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat |
+| **Alamat** | Jl. SMP Muhammadiyah 29 RT 05/08 no.122, Cinangka, Sawangan, Depok, Jawa Barat |
 | **Kota** | Depok, Jawa Barat |
 | **Kode Pos** | 16516 |
 | **Tahun Berdiri** | 2019 |
@@ -86,7 +86,7 @@ Untuk menopang kegiatan dakwahnya, masjid ini sudah merintis beragam lini usaha,
 
 ## Kontak & Lokasi
 
-**Alamat:** Jl. Sirnagalih No.21, Cinangka, Kec. Sawangan, Kota Depok, Jawa Barat
+**Alamat:** Jl. SMP Muhammadiyah 29 RT 05/08 no.122, Cinangka, Sawangan, Depok, Jawa Barat
 
 **Jam Operasional Sekretariat:**
 - Senin – Jumat: 08.00 – 16.00 WIB
