@@ -17,6 +17,7 @@ const showShare = computed(() =>
 const tautan = [
   { text: 'Beranda', href: '/' },
   { text: 'Donasi', href: '/donasi' },
+  { text: 'LAZIRU', href: '/laziru/' },
   { text: 'Qurban', href: '/qurban' },
   { text: 'Kontak', href: '/tentang/kontak' },
 ]

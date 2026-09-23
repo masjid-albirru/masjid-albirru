@@ -78,6 +78,18 @@ export default defineConfig({
         link: '/keuangan/'
       },
       {
+        text: 'LAZIRU',
+        items: [
+          { text: 'Tentang LAZIRU', link: '/laziru/' },
+          { text: 'Santunan Sembako', link: '/laziru/santunan-sembako' },
+          { text: 'Santunan Yatim', link: '/laziru/santunan-yatim' },
+          { text: 'Santunan Sakit', link: '/laziru/santunan-sakit' },
+          { text: 'Santunan Kematian', link: '/laziru/santunan-kematian' },
+          { text: 'Pembiayaan UMKM', link: '/laziru/pembiayaan-umkm' },
+          { text: 'Beasiswa Tahfidz', link: '/laziru/beasiswa-tahfidz' },
+        ]
+      },
+      {
         text: 'Masjid',
         items: [
           { text: 'Tentang Kami', link: '/tentang/' },
@@ -155,6 +167,20 @@ export default defineConfig({
           text: 'Galeri',
           items: [
             { text: 'Galeri Masjid', link: '/galeri/' },
+          ]
+        }
+      ],
+      '/laziru/': [
+        {
+          text: 'LAZIRU',
+          items: [
+            { text: 'Tentang LAZIRU', link: '/laziru/' },
+            { text: 'Santunan Sembako', link: '/laziru/santunan-sembako' },
+            { text: 'Santunan Yatim', link: '/laziru/santunan-yatim' },
+            { text: 'Santunan Sakit', link: '/laziru/santunan-sakit' },
+            { text: 'Santunan Kematian', link: '/laziru/santunan-kematian' },
+            { text: 'Pembiayaan UMKM', link: '/laziru/pembiayaan-umkm' },
+            { text: 'Beasiswa Tahfidz', link: '/laziru/beasiswa-tahfidz' },
           ]
         }
       ],
