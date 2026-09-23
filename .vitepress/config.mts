@@ -84,9 +84,9 @@ export default defineConfig({
           { text: 'Pengurus', link: '/tentang/pengurus' },
           // { text: 'Fasilitas', link: '/tentang/fasilitas' },
           { text: 'Galeri', link: '/galeri/' },
+          { text: 'Kontak', link: '/tentang/kontak' },
         ]
       },
-      { text: 'Kontak', link: '/tentang/kontak' },
       { text: 'Qurban', link: '/qurban' },
     ],
 
@@ -147,6 +147,14 @@ export default defineConfig({
             { text: 'Profil Masjid', link: '/tentang/' },
             { text: 'Struktur Pengurus', link: '/tentang/pengurus' },
             { text: 'Kontak & Lokasi', link: '/tentang/kontak' },
+          ]
+        }
+      ],
+      '/galeri/': [
+        {
+          text: 'Galeri',
+          items: [
+            { text: 'Galeri Masjid', link: '/galeri/' },
           ]
         }
       ],

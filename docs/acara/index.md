@@ -18,5 +18,5 @@ Berikut adalah jadwal lengkap acara dan kegiatan rutin Masjid Al-Birru.
 <JadwalKhatib />
 
 ::: info Informasi Pendaftaran
-Untuk acara yang memerlukan pendaftaran, silakan hubungi sekretariat masjid melalui WhatsApp: **0812-3456-7890** atau datang langsung ke kantor takmir masjid.
+Untuk acara yang memerlukan pendaftaran, silakan hubungi sekretariat masjid melalui WhatsApp: **0813-9992-8319** atau datang langsung ke kantor takmir masjid.
 :::
