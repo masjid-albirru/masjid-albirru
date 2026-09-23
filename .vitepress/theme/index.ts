@@ -20,6 +20,7 @@ import KegiatanRutin from './KegiatanRutin.vue'
 import JadwalImam from './JadwalImam.vue'
 import LokasiMasjid from './LokasiMasjid.vue'
 import VideoKajian from './VideoKajian.vue'
+import GaleriList from './GaleriList.vue'
 
 export default {
   extends: DefaultTheme,
@@ -43,5 +44,6 @@ export default {
     app.component('JadwalImam', JadwalImam)
     app.component('LokasiMasjid', LokasiMasjid)
     app.component('VideoKajian', VideoKajian)
+    app.component('GaleriList', GaleriList)
   },
 }

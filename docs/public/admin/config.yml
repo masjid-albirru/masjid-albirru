@@ -114,3 +114,23 @@ collections:
       - { label: "Tanggal Jum'at", name: tanggal, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
       - { label: "Nama Khatib", name: khatib, widget: string }
       - { label: "Tema Khutbah", name: tema, widget: string, required: false }
+
+  # ─── GALERI ──────────────────────────────────────────────────────────────
+  - name: galeri
+    label: "🖼️ Galeri"
+    label_singular: "Album"
+    folder: docs/galeri/album
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Judul Album", name: title, widget: string, hint: "Contoh: Gotong Royong Bersih Masjid" }
+      - { label: "Deskripsi Singkat", name: description, widget: text, required: false }
+      - { label: "Tanggal Kegiatan", name: tanggal, widget: datetime, format: "YYYY-MM-DD", date_format: "DD MMMM YYYY", time_format: false }
+      - { label: "Foto Sampul", name: sampul, widget: image, hint: "JPG/WebP, lebar maks 1920px, di bawah 500KB" }
+      - label: "Daftar Foto"
+        name: foto
+        widget: list
+        hint: "Tambah satu per foto. Keterangan dipakai sebagai teks alt."
+        fields:
+          - { label: "Gambar", name: gambar, widget: image, hint: "JPG/WebP, lebar maks 1920px, di bawah 500KB" }
+          - { label: "Keterangan Foto", name: keterangan, widget: string, required: false }
