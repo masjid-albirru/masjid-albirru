@@ -5,7 +5,7 @@ description: Data tabungan qurban sapi dan kambing Masjid Al-Birru tahun 1448 H 
 
 # Tabungan Qurban 1448 H
 
-Data setoran tabungan qurban Masjid Al-Birru untuk tahun 1448 H. Diperbarui otomatis dari Google Sheets — klik baris peserta untuk melihat rincian setoran per bulan.
+Data setoran tabungan qurban Masjid Al-Birru untuk tahun 1448 H. Diperbarui otomatis — klik baris peserta untuk melihat rincian setoran per bulan.
 
 <DaftarQurban />
 

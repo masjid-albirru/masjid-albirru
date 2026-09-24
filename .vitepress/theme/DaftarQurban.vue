@@ -357,7 +357,7 @@ const totalLunas = computed(() =>
       </section>
 
       <div class="dq-footer">
-        Data diperbarui otomatis dari Google Sheets
+        Data diperbarui otomatis
       </div>
 
     </template>

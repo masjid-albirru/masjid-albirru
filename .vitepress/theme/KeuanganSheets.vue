@@ -274,7 +274,7 @@ function formatTanggal(str) {
 
       <div class="ks-footer">
         Menampilkan {{ filtered.length }} transaksi ·
-        Data diperbarui otomatis dari Google Sheets
+        Data diperbarui otomatis
       </div>
 
     </template>
