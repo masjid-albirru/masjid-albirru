@@ -48,6 +48,7 @@ collections:
     label: "📅 Acara & Kegiatan"
     label_singular: "Acara"
     folder: docs/acara
+    hide: true
     create: true
     slug: "{{tanggal}}-{{slug}}"
     fields:
@@ -76,6 +77,7 @@ collections:
     label: "💰 Laporan Keuangan"
     label_singular: "Laporan"
     folder: docs/keuangan
+    hide: true
     create: true
     slug: "{{slug}}"
     path: "{{tahun}}/{{slug}}"
@@ -108,6 +110,7 @@ collections:
     label: "🕌 Jadwal Khatib Jum'at"
     label_singular: "Jadwal Khatib"
     folder: docs/khatib
+    hide: true
     create: true
     slug: "{{tanggal}}"
     fields:
