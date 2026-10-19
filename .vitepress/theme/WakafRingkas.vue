@@ -65,7 +65,7 @@ function formatPersen(n) {
           <Coins :size="16" class="wr-ikon" />
           <div>
             <div class="wr-nilai">{{ rupiahRingkas(ringkasan.totalNilai) }}</div>
-            <div class="wr-label">Target · {{ luasM2(LUAS_TARGET_M2) }} wakaf</div>
+            <div class="wr-label">Target · {{ luasM2(LUAS_TARGET_M2) }}</div>
           </div>
         </div>
 

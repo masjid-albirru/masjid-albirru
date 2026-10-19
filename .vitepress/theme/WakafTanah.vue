@@ -97,7 +97,7 @@ function pilihWilayah(nama) {
           <Coins :size="18" class="wt-ikon" />
           <div class="wt-kartu-isi">
             <div class="wt-nilai">{{ rupiahRingkas(ringkasan.totalNilai) }}</div>
-            <div class="wt-label">Target · {{ luasM2(LUAS_TARGET_M2) }} wakaf</div>
+            <div class="wt-label">Target · {{ luasM2(LUAS_TARGET_M2) }}</div>
           </div>
         </div>
 
