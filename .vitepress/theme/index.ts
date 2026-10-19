@@ -21,6 +21,9 @@ import JadwalImam from './JadwalImam.vue'
 import LokasiMasjid from './LokasiMasjid.vue'
 import VideoKajian from './VideoKajian.vue'
 import GaleriList from './GaleriList.vue'
+import WakafTanah from './WakafTanah.vue'
+import WakafRingkas from './WakafRingkas.vue'
+import TombolShareWakaf from './TombolShareWakaf.vue'
 
 export default {
   extends: DefaultTheme,
@@ -45,5 +48,8 @@ export default {
     app.component('LokasiMasjid', LokasiMasjid)
     app.component('VideoKajian', VideoKajian)
     app.component('GaleriList', GaleriList)
+    app.component('WakafTanah', WakafTanah)
+    app.component('WakafRingkas', WakafRingkas)
+    app.component('TombolShareWakaf', TombolShareWakaf)
   },
 }

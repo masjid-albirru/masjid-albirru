@@ -58,6 +58,9 @@ import { withBase } from 'vitepress'
 <ProgramDonasi ringkas />
 <DonasiQRIS />
 
+## Wakaf Tanah
+<WakafRingkas />
+
 ## Jadwal Sholat Hari Ini
 <JadwalSholat />
 

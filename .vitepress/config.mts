@@ -72,7 +72,6 @@ export default defineConfig({
       { text: 'Beranda', link: '/' },
       { text: 'Berita & Blog', link: '/blog/' },
       { text: 'Acara', link: '/acara/' },
-      { text: 'Jadwal Imam', link: '/jadwal-imam' },
       {
         text: 'Keuangan',
         link: '/keuangan/'
@@ -95,10 +94,12 @@ export default defineConfig({
           { text: 'Tentang Kami', link: '/tentang/' },
           { text: 'Pengurus', link: '/tentang/pengurus' },
           // { text: 'Fasilitas', link: '/tentang/fasilitas' },
+          { text: 'Jadwal Imam', link: '/jadwal-imam' },
           { text: 'Galeri', link: '/galeri/' },
           { text: 'Kontak', link: '/tentang/kontak' },
         ]
       },
+      { text: 'Wakaf Tanah', link: '/wakaf-tanah' },
       { text: 'Qurban', link: '/qurban' },
     ],
 
