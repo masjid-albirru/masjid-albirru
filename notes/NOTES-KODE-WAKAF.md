@@ -130,7 +130,28 @@ Parser membaca ulang semua baris setiap kali halaman dimuat.
   atau `Rp0`. Titik adalah pemisah ribuan.
 - **Harga per m²** didefinisikan sebagai konstanta `HARGA_PER_M2` di
   `wakafData.js`. Saat ini Rp2.500.000. Mengubahnya = mengubah semua
-  tampilan "Nilai Wakaf" di halaman, beranda, dan kartu share.
+  tampilan "Target" di halaman, beranda, dan kartu share.
+
+## Target wakaf
+
+Target adalah target tetap (bukan nilai dari totalM2 saat ini), supaya
+progres bermakna walau wakif masih sedikit. Dua konstanta di
+`wakafData.js`:
+
+- `LUAS_TARGET_M2` — target dalam meter persegi (saat ini `1000`).
+- `NILAI_TARGET` — `LUAS_TARGET_M2 * HARGA_PER_M2` (saat ini
+  `2.500.000.000`).
+
+`ringkasan.totalNilai` menggunakan `NILAI_TARGET`. Efeknya:
+
+- Kartu "Target" di `/wakaf-tanah` menampilkan target rupiah + sub-teks
+  "Target · 1.000 m² wakaf".
+- Kartu ringkasan beranda menampilkan hal serupa.
+- Baris progres: "Rp X terkumpul dari target Rp Y (Z%)".
+- Kartu share 9:16 menampilkan "dari target Rp Y" di baris kedua.
+
+Untuk mengubah target cukup ganti `LUAS_TARGET_M2` di `wakafData.js` —
+semua tampilan ikut otomatis.
 
 ## Format angka
 

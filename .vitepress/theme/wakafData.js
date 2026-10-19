@@ -14,6 +14,14 @@
 /** Harga wakaf per meter persegi, sesuai ketentuan Northwestern. */
 export const HARGA_PER_M2 = 2500000
 
+/**
+ * Target pengumpulan wakaf tanah, dalam meter persegi.
+ * 1.000 m² × Rp2.500.000 = Rp2.500.000.000.
+ * Diubah di sini, halaman, beranda, dan kartu share ikut otomatis.
+ */
+export const LUAS_TARGET_M2 = 1000
+export const NILAI_TARGET = LUAS_TARGET_M2 * HARGA_PER_M2
+
 const SHEET_BASE =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTogozxD2SadoBM8A2tl8D9cPL_sY5iGgOMVdnwDBnrj7RjyR4lZXkSfW3WjVKZhl01Oc5faFzoV2o-/pub'
 
@@ -198,7 +206,12 @@ async function ambilSemua() {
     ringkas: {
       totalM2,
       totalSetoran,
-      totalNilai: Math.round(totalM2 * HARGA_PER_M2),
+      // totalNilai adalah target tetap (1.000 m² × Rp2.500.000), bukan
+      // nilai dari totalM2 saat ini — agar progres bermakna walau wakif
+      // masih sedikit. Mengubah LUAS_TARGET_M2 di atas mengubah semua
+      // tampilan "Nilai/Target" sekaligus.
+      totalNilai: NILAI_TARGET,
+      luasTarget: LUAS_TARGET_M2,
       jumlahWakif: wilayah.reduce((s, w) => s + w.wakif.length, 0),
       wilayahAktif: wilayahAktif.length,
       jumlahWilayah: WILAYAH_SHEET.length,

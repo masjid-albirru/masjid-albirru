@@ -9,7 +9,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useData } from 'vitepress'
 import QRCode from 'qrcode'
 import { QRIS_STRING, REKENING } from './donasiData.js'
-import { rupiah, luasM2 } from './wakafData.js'
+import { rupiah, luasM2, LUAS_TARGET_M2 } from './wakafData.js'
 
 const { site } = useData()
 
@@ -88,7 +88,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 
         <div class="sw-angka">
           <span class="sw-terkumpul">{{ rupiah(ringkasan.totalSetoran) }}</span>
-          <span class="sw-target">dari {{ rupiah(ringkasan.totalNilai) }}</span>
+          <span class="sw-target">dari target {{ rupiah(ringkasan.totalNilai) }}</span>
         </div>
 
         <ul v-if="wilayahTerisi.length" class="sw-wilayah">

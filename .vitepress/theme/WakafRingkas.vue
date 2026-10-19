@@ -7,7 +7,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { withBase } from 'vitepress'
 import { LandPlot, Coins, Map as PetaIcon, ArrowRight, CircleAlert, Loader2 } from 'lucide-vue-next'
-import { muatDataWakaf, rupiah, rupiahRingkas, luasM2 } from './wakafData.js'
+import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, LUAS_TARGET_M2 } from './wakafData.js'
 import TombolShareWakaf from './TombolShareWakaf.vue'
 
 const wilayah = ref([])
@@ -30,8 +30,13 @@ onMounted(async () => {
 const persenSetoran = computed(() => {
   const r = ringkasan.value
   if (!r || !r.totalNilai) return 0
-  return Math.min(Math.round((r.totalSetoran / r.totalNilai) * 100), 100)
+  return Math.min((r.totalSetoran / r.totalNilai) * 100, 100)
 })
+
+function formatPersen(n) {
+  if (n < 1) return n.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  return Math.round(n).toString()
+}
 </script>
 
 <template>
@@ -56,11 +61,11 @@ const persenSetoran = computed(() => {
           </div>
         </div>
 
-        <div class="wr-kartu">
+        <div class="wr-kartu wr-kartu--target">
           <Coins :size="16" class="wr-ikon" />
           <div>
             <div class="wr-nilai">{{ rupiahRingkas(ringkasan.totalNilai) }}</div>
-            <div class="wr-label">Nilai Wakaf</div>
+            <div class="wr-label">Target · {{ luasM2(LUAS_TARGET_M2) }} wakaf</div>
           </div>
         </div>
 
@@ -75,7 +80,7 @@ const persenSetoran = computed(() => {
 
       <div class="wr-setoran">
         <span class="wr-setoran-teks">
-          {{ rupiah(ringkasan.totalSetoran) }} terkumpul dari {{ rupiah(ringkasan.totalNilai) }}
+          {{ rupiah(ringkasan.totalSetoran) }} terkumpul dari target {{ rupiah(ringkasan.totalNilai) }} ({{ formatPersen(persenSetoran) }}%)
         </span>
         <div
           class="wr-bar"

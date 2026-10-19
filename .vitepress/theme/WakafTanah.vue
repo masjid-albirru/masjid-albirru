@@ -9,7 +9,7 @@ import {
   LandPlot, Coins, Map as PetaIcon, Receipt,
   ChevronRight, ChevronDown, CircleAlert, Loader2
 } from 'lucide-vue-next'
-import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, HARGA_PER_M2 } from './wakafData.js'
+import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, LUAS_TARGET_M2, HARGA_PER_M2 } from './wakafData.js'
 import TombolShareWakaf from './TombolShareWakaf.vue'
 
 const wilayah = ref([])
@@ -44,8 +44,18 @@ const tab = computed(() =>
 const persenSetoran = computed(() => {
   const r = ringkasan.value
   if (!r || !r.totalNilai) return 0
-  return Math.min(Math.round((r.totalSetoran / r.totalNilai) * 100), 100)
+  return Math.min((r.totalSetoran / r.totalNilai) * 100, 100)
 })
+
+/**
+ * Tampilan persen yang tetap komunikatif walau masih sangat kecil.
+ * Di bawah 1% tampil satu desimal ("0,3%") supaya progres kecil tidak
+ * hilang jadi bulat 0; di atasnya tampil bilangan bulat.
+ */
+function formatPersen(n) {
+  if (n < 1) return n.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  return Math.round(n).toString()
+}
 
 function toggleBuka(nama, no) {
   const key = nama + '-' + no
@@ -83,11 +93,11 @@ function pilihWilayah(nama) {
           </div>
         </div>
 
-        <div class="wt-kartu wt-kartu--nilai">
+        <div class="wt-kartu wt-kartu--target">
           <Coins :size="18" class="wt-ikon" />
           <div class="wt-kartu-isi">
             <div class="wt-nilai">{{ rupiahRingkas(ringkasan.totalNilai) }}</div>
-            <div class="wt-label">Nilai Wakaf</div>
+            <div class="wt-label">Target · {{ luasM2(LUAS_TARGET_M2) }} wakaf</div>
           </div>
         </div>
 
@@ -103,12 +113,12 @@ function pilihWilayah(nama) {
       <div class="wt-setoran">
         <div class="wt-setoran-teks">
           <span class="wt-setoran-nilai">{{ rupiah(ringkasan.totalSetoran) }}</span>
-          <span class="wt-setoran-sisa">terkumpul dari {{ rupiah(ringkasan.totalNilai) }} ({{ persenSetoran }}%)</span>
+          <span class="wt-setoran-sisa">terkumpul dari target {{ rupiah(ringkasan.totalNilai) }} ({{ formatPersen(persenSetoran) }}%)</span>
         </div>
         <div
           class="wt-bar"
           role="progressbar"
-          :aria-valuenow="persenSetoran"
+          :aria-valuenow="Math.round(persenSetoran * 10) / 10"
           aria-valuemin="0"
           aria-valuemax="100"
           aria-label="Progres setoran wakaf tanah"
@@ -361,7 +371,9 @@ function pilihWilayah(nama) {
   height: 100%;
   background: var(--teal-600);
   border-radius: 99px;
-  min-width: 3px;
+  /* Saat progres masih sangat kecil, setopan minimum agar tidak hilang jadi
+     titik yang tak terlihat. */
+  min-width: 2px;
 }
 
 /* Aksi */
