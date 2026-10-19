@@ -1,5 +1,5 @@
 /**
- * Data wakaf tanah — Pemusyataan Wakaf Pembebasan Tanah H. Basir
+ * Data wakaf tanah — Wakaf Pembebasan Tanah H. Basir (Sebelah Barat Masjid Al-Birru)
  * oleh Pimpinan Ranting Muhammadiyah Cinangka.
  *
  * Satu sumber data untuk halaman /wakaf-tanah dan ringkasan beranda,
