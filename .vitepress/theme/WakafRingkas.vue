@@ -57,7 +57,7 @@ function formatPersen(n) {
           <LandPlot :size="16" class="wr-ikon" />
           <div>
             <div class="wr-nilai">{{ luasM2(ringkasan.totalM2) }}</div>
-            <div class="wr-label">Luas Wakaf</div>
+            <div class="wr-label">Luas Wakaf yang Diperoleh Saat Ini</div>
           </div>
         </div>
 

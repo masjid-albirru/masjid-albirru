@@ -10,5 +10,5 @@ description: Wakaf Pembebasan Tanah H. Basir oleh Pimpinan Ranting Muhammadiyah 
 <WakafTanah />
 
 ::: info Cara Berwakaf
-<p align="justify"> Pendaftaran wakif dilakukan oleh masing-masing Wilayah secara langsung kepada pengurus. Setoran bulanan bisa dibayar melalui tunai, QRIS atau transfer ke rekening masjid, lalu dikonfirmasi ke sekretariat/pengurus. </p>
+<p align="justify"> Pendaftaran wakif dilakukan oleh masing-masing Wilayah secara langsung kepada panitia wakaf. Setoran bulanan bisa dibayar melalui transfer ke rekening BSI a.n. PRM Cinangka 7376802986 atau melalui petugas resmi panitia wakaf tanah Pimpinan Ranting Muhammadiyah Cinangka. </p>
 :::

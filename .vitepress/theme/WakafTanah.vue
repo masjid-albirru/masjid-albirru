@@ -89,7 +89,7 @@ function pilihWilayah(nama) {
           <LandPlot :size="18" class="wt-ikon" />
           <div class="wt-kartu-isi">
             <div class="wt-nilai">{{ luasM2(ringkasan.totalM2) }}</div>
-            <div class="wt-label">Luas Wakaf</div>
+            <div class="wt-label">Luas Wakaf yang Diperoleh Saat Ini</div>
           </div>
         </div>
 
