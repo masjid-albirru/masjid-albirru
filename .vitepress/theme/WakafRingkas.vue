@@ -7,7 +7,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { withBase } from 'vitepress'
 import { LandPlot, Coins, Map as PetaIcon, ArrowRight, CircleAlert, Loader2 } from 'lucide-vue-next'
-import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, LUAS_TARGET_M2 } from './wakafData.js'
+import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, formatPersen, LUAS_TARGET_M2 } from './wakafData.js'
 import TombolShareWakaf from './TombolShareWakaf.vue'
 
 const wilayah = ref([])
@@ -32,11 +32,6 @@ const persenSetoran = computed(() => {
   if (!r || !r.totalNilai) return 0
   return Math.min((r.totalSetoran / r.totalNilai) * 100, 100)
 })
-
-function formatPersen(n) {
-  if (n < 1) return n.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  return Math.round(n).toString()
-}
 </script>
 
 <template>

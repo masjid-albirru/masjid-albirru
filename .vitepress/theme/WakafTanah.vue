@@ -1,7 +1,7 @@
 <script setup>
 /**
  * WakafTanah — daftar wakif & setoran per wilayah untuk pemusyataan
- * Wakaf Pembebasan Tanah H. Basir oleh PR Muhammadiyah Cinangka.
+ * Wakaf Pembebasan Tanah oleh PR Muhammadiyah Cinangka.
  * Sumber angka: spreadsheet yang sudah dipublish, satu tab per wilayah.
  */
 import { ref, computed, onMounted } from 'vue'
@@ -9,7 +9,7 @@ import {
   LandPlot, Coins, Map as PetaIcon, Receipt,
   ChevronRight, ChevronDown, CircleAlert, Loader2
 } from 'lucide-vue-next'
-import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, LUAS_TARGET_M2, HARGA_PER_M2 } from './wakafData.js'
+import { muatDataWakaf, rupiah, rupiahRingkas, luasM2, formatPersen, LUAS_TARGET_M2, HARGA_PER_M2 } from './wakafData.js'
 import TombolShareWakaf from './TombolShareWakaf.vue'
 
 const wilayah = ref([])
@@ -46,16 +46,6 @@ const persenSetoran = computed(() => {
   if (!r || !r.totalNilai) return 0
   return Math.min((r.totalSetoran / r.totalNilai) * 100, 100)
 })
-
-/**
- * Tampilan persen yang tetap komunikatif walau masih sangat kecil.
- * Di bawah 1% tampil satu desimal ("0,3%") supaya progres kecil tidak
- * hilang jadi bulat 0; di atasnya tampil bilangan bulat.
- */
-function formatPersen(n) {
-  if (n < 1) return n.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  return Math.round(n).toString()
-}
 
 function toggleBuka(nama, no) {
   const key = nama + '-' + no

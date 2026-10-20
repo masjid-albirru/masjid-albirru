@@ -1,5 +1,5 @@
 /**
- * Data wakaf tanah — Wakaf Pembebasan Tanah H. Basir (Sebelah Barat Masjid Al-Birru)
+ * Data wakaf tanah — Wakaf Pembebasan Tanah (Sebelah Barat Masjid Al-Birru)
  * oleh Pimpinan Ranting Muhammadiyah Cinangka.
  *
  * Satu sumber data untuk halaman /wakaf-tanah dan ringkasan beranda,
@@ -27,12 +27,13 @@ const SHEET_BASE =
 
 /** Tab wilayah sesuai urutan sheet di spreadsheet. */
 export const WILAYAH_SHEET = [
-  { nama: 'RT 01', gid: '2108613077' },
-  { nama: 'RT 02', gid: '49278673' },
-  { nama: 'RT 05', gid: '1223491287' },
-  { nama: 'KKS', gid: '4478687' },
-  { nama: 'KK Cura', gid: '119487636' },
-  { nama: 'SMP M 29', gid: '2098343335' },
+  { nama: 'RT 01/08', gid: '2108613077' },
+  { nama: 'RT 02/08', gid: '49278673' },
+  { nama: 'RT 05/08', gid: '1223491287' },
+  { nama: 'Kp. Kebon Selatan', gid: '4478687' },
+  { nama: 'Kp. Kebon Cura', gid: '119487636' },
+  { nama: 'SMP Muhammadiyah 29', gid: '2098343335' },
+  { nama: 'TPA Aisyiyah Cinangka', gid: '885998276' },
 ]
 
 const GID_RINCIAN = '1423454212'
@@ -182,6 +183,37 @@ async function ambilSheet(gid) {
   return res.text()
 }
 
+const NAMA_BULAN = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+]
+
+/** Samakan singkatan bulan dari sheet ("Agsts", "Ags") ke nama penuh. */
+function indeksBulan(nama) {
+  const n = String(nama ?? '').trim().toLowerCase()
+  if (!n) return -1
+  if (n.startsWith('agst') || n === 'ags' || n === 'agu') return 7
+  return NAMA_BULAN.findIndex(b => b.toLowerCase() === n)
+}
+
+/**
+ * Tanggal update = tanggal transaksi terakhir di sheet Rincian.
+ * Diambil dari data, bukan hardcode. null bila belum ada transaksi.
+ */
+function tanggalTerbaru(rincian) {
+  let maks = null
+  for (const t of rincian) {
+    const hari = parseInt(t.tanggal, 10)
+    const bulan = indeksBulan(t.bulan)
+    const tahun = parseInt(t.tahun, 10)
+    if (!hari || bulan < 0 || !tahun) continue
+    const d = new Date(tahun, bulan, hari)
+    if (!maks || d > maks) maks = d
+  }
+  if (!maks) return null
+  return `${maks.getDate()} ${NAMA_BULAN[maks.getMonth()]} ${maks.getFullYear()}`
+}
+
 /** Satu putaran ambil untuk seluruh tab; tab gagal tidak menggagalkan halaman. */
 async function ambilSemua() {
   const [hasilWilayah, hasilRincian] = await Promise.all([
@@ -215,6 +247,8 @@ async function ambilSemua() {
       jumlahWakif: wilayah.reduce((s, w) => s + w.wakif.length, 0),
       wilayahAktif: wilayahAktif.length,
       jumlahWilayah: WILAYAH_SHEET.length,
+      /** Tanggal transaksi terakhir, mis. "18 Oktober 2026". null bila kosong. */
+      diperbarui: tanggalTerbaru(hasilRincian),
     },
   }
 }
@@ -255,4 +289,21 @@ export function luasM2(n) {
     ? bulat.toLocaleString('id-ID')
     : bulat.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   return `${tampil} m²`
+}
+
+/**
+ * Persentase progres tanpa tanda "%" (template yang menambahkannya).
+ * Progres kecil tidak dibulatkan jadi 0: di bawah 1% dipakai dua desimal
+ * (mis. "0,28"), 1-10% satu desimal, di atasnya bilangan bulat.
+ */
+export function formatPersen(n) {
+  const angka = Number(n) || 0
+  if (angka <= 0) return '0'
+  if (angka < 1) {
+    return angka.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+  if (angka < 10) {
+    return angka.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  }
+  return Math.round(angka).toLocaleString('id-ID')
 }

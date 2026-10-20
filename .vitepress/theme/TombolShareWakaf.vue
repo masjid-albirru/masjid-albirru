@@ -21,19 +21,46 @@ const statusRef = ref(null)
 const proses = ref(false)
 const gagal = ref(false)
 
+/**
+ * Tunggu semua <img> di kartu selesai dimuat (QR dan dua logo diambil
+ * asinkron). Tanpa ini, gambar bisa ter-ekspor tanpa logo bila jaringannya
+ * lambat.
+ */
+async function tungguGambar(kartu, batasMs = 3000) {
+  const gambar = [...kartu.querySelectorAll('img')]
+  if (!gambar.length) return
+  const tunggu = gambar.map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve()
+    return new Promise((selesai) => {
+      img.addEventListener('load', selesai, { once: true })
+      img.addEventListener('error', selesai, { once: true })
+    })
+  })
+  // Jangan menggantung selamanya kalau ada aset yang macet.
+  await Promise.race([
+    Promise.all(tunggu),
+    new Promise(r => setTimeout(r, batasMs)),
+  ])
+}
+
 async function bagikan() {
   if (proses.value) return
   proses.value = true
   gagal.value = false
   try {
     await nextTick()
-    await new Promise(r => setTimeout(r, 60)) // beri waktu font & QR selesai
 
     const kartu = statusRef.value?.$el.querySelector('.sw-status')
     if (!kartu) throw new Error('kartu belum siap')
 
+    await tungguGambar(kartu)
+    await new Promise(r => setTimeout(r, 60)) // beri waktu font & layout settle
+
+    // Kanvas sudah 900x1600, jadi rasio 1:1 menghasilkan PNG tepat 900x1600.
     const blob = await htmlToImage.toBlob(kartu, {
-      pixelRatio: 2,
+      pixelRatio: 1,
+      width: 900,
+      height: 1600,
       backgroundColor: '#0d3d45',
     })
     if (!blob) throw new Error('render gagal')

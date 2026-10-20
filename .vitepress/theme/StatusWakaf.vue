@@ -1,55 +1,172 @@
 <script setup>
 /**
- * StatusWakaf — kartu 9:16 untuk dibagikan ke WhatsApp.
- * Dirender di luar layar lalu dikonversi ke PNG oleh TombolShareWakaf.vue.
- * Warna dipatok light-theme (bukan CSS var) supaya hasil gambarnya
- * sama di mode terang maupun gelap, sama seperti StatusDonasi.vue.
+ * StatusWakaf — kartu share 900x1600 (9:16) untuk Story/Status WhatsApp.
+ * Dirender di luar layar, lalu diekspor 1:1 (900x1600) oleh TombolShareWakaf.vue.
+ *
+ * Kanvas 900 px, margin 80 px. Konten hanya di y 224-1280 (zona aman
+ * atas 224, bawah 320); latar gradien boleh memenuhi seluruh kanvas.
+ *
+ * Warna dipatok (bukan CSS var) supaya hasil ekspor sama di mode terang
+ * maupun gelap. Satu aksen saja: emas #e8c97a.
  */
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useData } from 'vitepress'
-import QRCode from 'qrcode'
-import { QRIS_STRING, REKENING } from './donasiData.js'
-import { rupiah, luasM2, LUAS_TARGET_M2 } from './wakafData.js'
+import { REKENING } from './donasiData.js'
+import { rupiah, luasM2, formatPersen } from './wakafData.js'
 
 const { site } = useData()
-
-const logoUrl = site.value.base.replace(/\/$/, '') + '/images/uploads/logo-al-birru.png'
 
 const props = defineProps({
   ringkasan: { type: Object, required: true },
   wilayah: { type: Array, default: () => [] },
 })
 
-const qrDataUrl = ref('')
+/** Nama lengkap pengurus: dipakai untuk CTA dan "a.n." rekening. */
+const NAMA_PENGURUS = 'Pimpinan Ranting Muhammadiyah Cinangka'
+const URL_WAKAF = 'https://masjid-albirru.id/wakaf-tanah'
+
+const rekening = REKENING[1]
+const namaBank = rekening.bank.replace(/\s*\(.*\)$/, '')
+
+// Aset dimuat sebagai data URL agar html-to-image mengekspornya utuh
+// (terutama di Safari/iOS).
+const albirru = ref('')
+const muhammadiyah = ref('')
+/** Elemen kartu, dipakai untuk mengukur ruang tabel. */
+const kartu = ref(null)
+
+function aset(path) {
+  return site.value.base.replace(/\/$/, '') + path
+}
+
+async function keDataUrl(url, tipe) {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  if (tipe === 'svg') {
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(await res.text())
+  }
+  const blob = await res.blob()
+  return await new Promise((selesai, gagal) => {
+    const baca = new FileReader()
+    baca.onload = () => selesai(baca.result)
+    baca.onerror = gagal
+    baca.readAsDataURL(blob)
+  })
+}
 
 onMounted(async () => {
+  // Emblem Al-Birru resmi, dipasang langsung tanpa plate putih. Proporsi
+  // dan warna aset tidak diubah.
   try {
-    qrDataUrl.value = await QRCode.toDataURL(QRIS_STRING, {
-      width: 480,
-      margin: 1,
-      errorCorrectionLevel: 'M',
-      color: { dark: '#0d3d45', light: '#ffffff' },
-    })
+    albirru.value = await keDataUrl(aset('/images/albirru-emblem.png'), 'png')
   } catch (e) {
-    console.error('Gagal generate QR QRIS:', e)
+    console.error('Gagal memuat emblem Al-Birru:', e)
   }
+
+  try {
+    muhammadiyah.value = await keDataUrl(aset('/images/Muhammadiyah.svg'), 'svg')
+  } catch (e) {
+    console.error('Gagal memuat logo Muhammadiyah:', e)
+  }
+
+  // Font yang baru termuat bisa mengubah tinggi baris tabel.
+  if (document.fonts?.ready) document.fonts.ready.then(() => hitungBatas())
+  await hitungBatas()
 })
 
-const rekening = REKENING[0]
+watch(() => props.wilayah, hitungBatas)
+watch(() => props.ringkasan, hitungBatas)
 
-const persen = computed(() => {
-  const nilai = props.ringkasan.totalNilai
-  if (!nilai) return 0
-  return Math.min(Math.round((props.ringkasan.totalSetoran / nilai) * 100), 100)
+/** URL tanpa skema, untuk ditampilkan di footer. */
+const urlTampil = computed(() => URL_WAKAF.replace(/^https?:\/\//, ''))
+
+/** Persentase dana terkumpul terhadap target dana (bukan target luas). */
+const persenDana = computed(() => {
+  const target = props.ringkasan.totalNilai
+  if (!target) return 0
+  return Math.min((props.ringkasan.totalSetoran / target) * 100, 100)
 })
 
-// Hanya wilayah yang sudah ada wakifnya; wilayah kosong tidak ada artinya di kartu.
+/** Angka luas tanpa satuan; satuan "m²" dirender terpisah sebagai <sup>. */
+const angkaLuas = computed(() => luasM2(props.ringkasan.totalM2).replace(/\s*m²$/, ''))
+
+/** Wilayah yang sudah ada wakifnya, terbesar lebih dulu. */
 const wilayahTerisi = computed(() =>
   [...props.wilayah].filter(w => w.luas > 0).sort((a, b) => b.luas - a.luas)
 )
 
-// Grain inline (SVG feTurbulence sebagai data URL): menekan banding pada
-// gradien saat diekspor jadi PNG. Sama seperti kartu status donasi.
+/**
+ * Jumlah lokasi yang tampil. Dihitung dari ruang yang tersisa, bukan dari
+ * panjang nama: nama wilayah panjang membungkus ke dua baris sehingga
+ * tinggi baris tidak bisa ditebak. Sisanya dirangkum "+N lokasi lain".
+ */
+const batasTampil = ref(0)
+
+/**
+ * Ruang tinggi untuk baris "+N lokasi lain" (12 margin + 26 x 1.25).
+ * Hanya dipakai sebagai cadangan saat mengukur.
+ */
+const JARAK_AKHIR = 40
+
+/**
+ * Jumlah lokasi yang tampil ditentukan dari jarak nyata isi ke footer,
+ * bukan dari rekonstruksi tinggi (margin yang runtuh di luar flow flex
+ * membuat hasil hitungan meleset).
+ *
+ * Dipindai dari jumlah terbanyak ke paling sedikit, lalu diambil yang
+ * pertama muat. Urutannya penting: saat semua lokasi tampil, baris
+ * "+N lokasi lain" tidak dirender, sehingga ruang melompat naik. Berhenti
+ * pada kegagalan pertama (cara lama) justru membuang baris yang sebenarnya
+ * masih muat.
+ */
+async function hitungBatas() {
+  const akar = kartu.value
+  if (!akar) return
+  const total = wilayahTerisi.value.length
+  if (!total) { batasTampil.value = 0; return }
+
+  const grid = akar.querySelector('.sw-grid')
+  const footer = akar.querySelector('.sw-foot')
+
+  /** Jarak kosong dari isi tabel (termasuk baris sisa) ke atas footer. */
+  const jarak = () => {
+    const sisa = akar.querySelector('.sw-sisa')
+    const bawah = Math.max(
+      grid.getBoundingClientRect().bottom,
+      sisa ? sisa.getBoundingClientRect().bottom : -Infinity,
+    )
+    return footer.getBoundingClientRect().top - bawah
+  }
+
+  let pilihan = 1
+  for (let n = total; n >= 1; n--) {
+    batasTampil.value = n
+    await nextTick()
+    if (window.__jejak) window.__jejak.push({ n, jarak: Math.round(jarak()), sisa: !!akar.querySelector('.sw-sisa') })
+    if (jarak() >= JARAK_AKHIR) { pilihan = n; break }
+  }
+
+  // Kalau bahkan satu baris pun tidak muat, tetap tampilkan satu supaya
+  // tabel tidak kosong tanpa alasan.
+  batasTampil.value = pilihan
+  await nextTick()
+}
+
+const tabelTampil = computed(() => wilayahTerisi.value.slice(0, batasTampil.value))
+
+const sisaLokasi = computed(() => {
+  const tampil = tabelTampil.value.length
+  const semua = wilayahTerisi.value
+  if (semua.length <= tampil) return null
+  const sisa = semua.slice(tampil)
+  return {
+    jumlah: sisa.length,
+    luas: sisa.reduce((s, w) => s + w.luas, 0),
+  }
+})
+
+// Grain inline (SVG feTurbulence sebagai data URL) menekan banding gradien
+// pada hasil ekspor PNG.
 const GRAIN_URL =
   'data:image/svg+xml,' +
   encodeURIComponent(
@@ -64,54 +181,81 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 
 <template>
   <div class="sw-layer" aria-hidden="true">
-    <div class="sw-status">
-      <img class="sw-watermark" :src="logoUrl" alt="">
+    <div class="sw-status" ref="kartu">
       <div class="sw-grain" :style="{ backgroundImage: grainCss }"></div>
 
+      <!-- Lockup identitas: Al-Birru kiri, Muhammadiyah kanan, tinggi optik sama -->
       <header class="sw-head">
-        <div class="sw-brand">Masjid Al-Birru</div>
-        <div class="sw-motif"></div>
+        <div class="sw-lockup">
+          <img v-if="albirru" class="sw-mark" :src="albirru" alt="">
+          <span class="sw-brand">Masjid<br>Al-Birru</span>
+        </div>
+        <div class="sw-pr">
+          <p class="sw-pr-teks">Pimpinan Ranting<br>Muhammadiyah Cinangka</p>
+          <span class="sw-plate">
+            <img v-if="muhammadiyah" :src="muhammadiyah" alt="">
+          </span>
+        </div>
       </header>
 
-      <div class="sw-body">
-        <p class="sw-label">Wakaf Tanah</p>
-        <h4 class="sw-nama">Pembebasan Tanah H. Basir</h4>
+      <div class="sw-body" :class="{ 'sw-body--padat': !tabelTampil.length }">
+        <section class="sw-hero">
+          <p class="sw-eyebrow">Wakaf Tanah</p>
+          <p class="sw-judul">Pembebasan Tanah</p>
+          <p class="sw-luas">{{ angkaLuas }} m<sup>²</sup></p>
+          <p class="sw-luas-label">Luas wakaf yang diperoleh saat ini</p>
+        </section>
 
-        <div class="sw-fokus">
-          <span class="sw-luas">{{ luasM2(ringkasan.totalM2) }}</span>
-          <span class="sw-luas-caption">luas wakaf yang sudah dihimpun</span>
-        </div>
+        <section class="sw-dana">
+          <div
+            class="sw-bar"
+            role="progressbar"
+            :aria-valuenow="Math.round(persenDana * 100) / 100"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-label="`Dana terkumpul ${formatPersen(persenDana)} persen`"
+          >
+            <div class="sw-bar-fill" :style="{ width: Math.max(persenDana, 1.2) + '%' }"></div>
+          </div>
 
-        <div class="sw-bar">
-          <div class="sw-bar-fill" :style="{ width: persen + '%' }"></div>
-        </div>
+          <div class="sw-dana-baris">
+            <p class="sw-dana-nilai">{{ rupiah(ringkasan.totalSetoran) }}</p>
+            <p class="sw-target">dari target {{ rupiah(ringkasan.totalNilai) }}</p>
+          </div>
 
-        <div class="sw-angka">
-          <span class="sw-terkumpul">{{ rupiah(ringkasan.totalSetoran) }}</span>
-          <span class="sw-target">dari target {{ rupiah(ringkasan.totalNilai) }}</span>
-        </div>
+          <div class="sw-dana-baris sw-dana-baris--meta">
+            <p class="sw-dana-label">Dana terkumpul · <span class="sw-persen">{{ formatPersen(persenDana) }}%</span></p>
+            <p v-if="ringkasan.diperbarui" class="sw-update">Diperbarui {{ ringkasan.diperbarui }}</p>
+          </div>
+        </section>
 
-        <ul v-if="wilayahTerisi.length" class="sw-wilayah">
-          <li v-for="w in wilayahTerisi" :key="w.nama" class="sw-wilayah-item">
-            <span class="sw-wilayah-nama">{{ w.nama }}</span>
-            <span class="sw-wilayah-luas">{{ luasM2(w.luas) }}</span>
-          </li>
-        </ul>
+        <section v-if="tabelTampil.length" class="sw-rincian">
+          <p class="sw-rincian-judul">Rincian per lokasi</p>
+          <div class="sw-grid">
+            <div
+              v-for="(w, i) in wilayahTerisi"
+              :key="w.nama"
+              v-show="i < batasTampil"
+              class="sw-sel"
+            >
+              <span class="sw-sel-nama">{{ w.nama }}</span>
+              <span class="sw-sel-nilai">{{ luasM2(w.luas) }}</span>
+            </div>
+          </div>
+
+          <p v-if="sisaLokasi" class="sw-sisa">
+            +{{ sisaLokasi.jumlah }} lokasi lain
+            <span class="sw-sisa-nilai">{{ luasM2(sisaLokasi.luas) }}</span>
+          </p>
+        </section>
       </div>
 
       <footer class="sw-foot">
-        <div v-if="qrDataUrl" class="sw-qr">
-          <span class="sw-qr-merchant">DKM AL-BIRRU</span>
-          <img :src="qrDataUrl" alt="" width="170" height="170">
-          <span class="sw-qr-caption">Scan QRIS</span>
-        </div>
-        <div class="sw-cta">
-          <p class="sw-ajakan">Mari mewakafkan tanah masjid bersama</p>
-          <p class="sw-situs">masjid-albirru.id/wakaf-tanah</p>
-          <p class="sw-rekening">
-            {{ rekening.bank.split(' (')[0] }} {{ rekening.no }} a.n. {{ rekening.atas }}
-          </p>
-          <p class="sw-pengurus">PR Muhammadiyah Cinangka</p>
+        <div class="sw-rekening">
+          <p class="sw-bank">{{ namaBank }}</p>
+          <p class="sw-nomor">{{ rekening.no }}</p>
+          <p class="sw-atas">a.n. Pimpinan Ranting Muhammadiyah Cinangka</p>
+          <p class="sw-situs">Mari berwakaf tanah bersama <br> Pimpinan Ranting Muhammadiyah Cinangka</p>
         </div>
       </footer>
     </div>
@@ -119,48 +263,32 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 </template>
 
 <style scoped>
-/* Pembawa di luar layar; ukuran 540x960, diekspor @2x jadi 1080x1920 */
+/* Pembawa di luar layar. Kanvas 900x1600, diekspor 1:1. */
 .sw-layer {
   position: fixed;
   top: 0;
-  left: -10000px;
-  width: 540px;
+  left: -12000px;
+  width: 900px;
   pointer-events: none;
 }
 
+/* Selektor di-prefix .sw-status agar tidak kalah dari gaya .vp-doc. */
 .sw-status {
   position: relative;
-  width: 540px;
-  height: 960px;
+  width: 900px;
+  height: 1600px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  padding: 52px 48px;
-  /* Gradien dua nada sebagai pemisah hierarki: identitas atas gelap, ajakan
-     bawah tetap gelap namun diberi garis motif emas. Satu seri dengan
-     StatusDonasi agar kartu masjid ini terbaca satu keluarga. */
-  background: linear-gradient(180deg, #0d3d45 0%, #0f6b78 100%);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 224px 80px 320px;
+  background: linear-gradient(180deg, #0d3d45 0%, #0b4f5a 100%);
   color: #ffffff;
   font-family: 'Lato', 'Segoe UI', sans-serif;
   text-align: left;
   overflow: hidden;
 }
 
-.sw-watermark {
-  position: absolute;
-  right: -60px;
-  bottom: -130px;
-  z-index: 0;
-  width: 470px;
-  height: 470px;
-  object-fit: cover;
-  object-position: top;
-  opacity: 0.07;
-  pointer-events: none;
-  user-select: none;
-}
-
-.sw-grain {
+.sw-status .sw-grain {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -168,210 +296,288 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   pointer-events: none;
 }
 
-.sw-head {
+/* Header */
+.sw-status .sw-head {
   position: relative;
   z-index: 2;
+  height: 84px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
 }
-
-.sw-brand {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-/* Garis hairline emas: identity motif dari DESIGN.md */
-.sw-motif {
-  width: 56px;
-  height: 2px;
-  background: #e8c97a;
-}
-
-.sw-body {
-  position: relative;
-  z-index: 2;
-  flex: 1;
+.sw-status .sw-lockup {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  min-height: 0;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
 }
-
-.sw-label {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #33bdd4;
+.sw-status .sw-mark {
+  display: block;
+  height: 84px;
+  width: auto;
+  flex: 0 0 auto;
 }
-
-.sw-nama {
+.sw-status .sw-brand {
   margin: 0;
   font-size: 34px;
   font-weight: 700;
-  line-height: 1.25;
-  margin-top: -6px;
+  line-height: 1.1;
+  color: #ffffff;
+  white-space: nowrap;
 }
-
-/* Fokus tunggal kartu: luas wakaf. Persentase_bar dan setoran ada di bawah
-   sebagai informasi pendukung, bukan bersaing dengan angka luas. */
-.sw-fokus {
+.sw-status .sw-lockup::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.28);
+  margin-left: 22px;
+}
+.sw-status .sw-pr {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 16px;
 }
-
-.sw-luas {
-  font-size: 82px;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.sw-luas-caption {
-  font-size: 16px;
-  color: #e8e8e8;
-}
-
-.sw-bar {
-  height: 10px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.18);
-  overflow: hidden;
-  margin-top: 4px;
-}
-
-.sw-bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  background: #33bdd4;
-  min-width: 4px;
-}
-
-.sw-angka {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px;
-  font-variant-numeric: tabular-nums;
-}
-
-.sw-terkumpul {
+.sw-status .sw-pr-teks {
+  margin: 0;
   font-size: 25px;
-  font-weight: 700;
+  line-height: 1.25;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.86);
+  white-space: nowrap;
 }
-
-.sw-target {
-  font-size: 16px;
-  color: #e8e8e8;
-}
-
-/* Sebaran wakaf per wilayah: dua kolom agar muat di kanvas 9:16, urutan
-   mengikuti besaran wakaf supaya wilayah terbesar terbaca lebih dulu. */
-.sw-wilayah {
-  list-style: none;
-  margin: 10px 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 20px;
-}
-
-.sw-wilayah-item {
+.sw-status .sw-plate {
+  flex: 0 0 auto;
+  width: 76px;
+  height: 76px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 50%;
+  background: #ffffff;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  align-items: center;
+  justify-content: center;
+}
+.sw-status .sw-plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.sw-wilayah-nama {
-  font-size: 15px;
-  color: #e8e8e8;
-}
-
-.sw-wilayah-luas {
-  font-size: 16px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.sw-foot {
+/* Body */
+.sw-status .sw-body {
   position: relative;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding-top: 26px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-.sw-qr {
-  flex-shrink: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: flex-start;
   gap: 6px;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 10px 10px 8px;
+  overflow: hidden;
+}
+.sw-status .sw-body--padat {
+  gap: 44px;
+}
+.sw-status .sw-hero,
+.sw-status .sw-dana,
+.sw-status .sw-rincian {
+  flex: 0 0 auto;
 }
 
-.sw-qr img {
-  display: block;
-  width: 152px;
-  height: 152px;
-}
-
-.sw-qr-merchant {
-  font-size: 14px;
+.sw-status .sw-eyebrow {
+  margin: 40px 0 0;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #0d3d45;
-}
-
-.sw-qr-caption {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #0d3d45;
+  color: #ebcb86;
+}
+.sw-status .sw-judul {
+  margin: 4px 0 0;
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #ffffff;
+}
+.sw-status .sw-luas {
+  margin: 4px 0 0;
+  font-size: 148px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.sw-status .sw-luas sup {
+  font-size: 0.46em;
+  vertical-align: top;
+  position: relative;
+  top: 0.12em;
+  margin-left: 0.02em;
+}
+.sw-status .sw-luas-label {
+  margin: 6px 0 0;
+  font-size: 28px;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.86);
 }
 
-.sw-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+/* Progress */
+.sw-status .sw-bar {
+  position: relative;
+  height: 16px;
+  margin: 22px 0 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+.sw-status .sw-bar-fill {
+  height: 100%;
+  background: #ebcb86;
+  border-radius: 8px;
   min-width: 0;
 }
 
-.sw-cta p { margin: 0; }
-
-.sw-ajakan {
-  font-size: 15px;
-  color: #e8e8e8;
+/* Dana */
+.sw-status .sw-dana-baris {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  margin-top: 16px;
+}
+.sw-status .sw-dana-baris--meta {
+  margin-top: 4px;
+}
+.sw-status .sw-dana-nilai {
+  margin: 0;
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.sw-status .sw-target,
+.sw-status .sw-update {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.86);
+  text-align: right;
+  white-space: nowrap;
+}
+.sw-status .sw-dana-label {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
+}
+.sw-status .sw-persen {
+  font-weight: 700;
+  color: #ebcb86;
 }
 
-.sw-situs {
-  font-size: 17px;
+/* Rincian */
+.sw-status .sw-rincian-judul {
+  margin: 2px 0 4px;
+  font-size: 24px;
   font-weight: 700;
-  /* Putih: area bawah gradien lebih terang, teal-400 tidak cukup kontras di sini. */
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+.sw-status .sw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 48px;
+}
+.sw-status .sw-sel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 54px;
+  padding: 10px 0 9px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 30px;
+  line-height: 1.15;
+  min-width: 0;
+}
+.sw-status .sw-sel-nama {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.86);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.sw-status .sw-sel-nilai {
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.sw-status .sw-sisa {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 0;
+  font-size: 26px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.86);
+}
+.sw-status .sw-sisa-nilai {
+  font-weight: 700;
   color: #ffffff;
 }
 
-.sw-rekening {
-  font-size: 13px;
-  color: #e8e8e8;
+/* Footer */
+.sw-status .sw-foot {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+}
+.sw-status .sw-rekening {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sw-status .sw-bank {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.12;
+  color: rgba(255, 255, 255, 0.86);
+}
+.sw-status .sw-nomor {
+  margin: 0;
+  font-size: 50px;
+  font-weight: 800;
+  line-height: 1.02;
   font-variant-numeric: tabular-nums;
+  color: #ffffff;
+}
+.sw-status .sw-atas {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.16;
+  color: rgba(255, 255, 255, 0.86);
+  text-wrap: balance;
+}
+.sw-status .sw-situs {
+  margin: 4px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #ebcb86;
+  white-space: nowrap;
 }
 
-.sw-pengurus {
-  font-size: 13px;
-  color: #f7e3ab;
-}
 </style>

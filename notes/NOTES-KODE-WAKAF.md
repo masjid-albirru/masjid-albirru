@@ -36,17 +36,21 @@ Spreadsheet dipublikasikan ke web dengan format CSV. URL polanya:
 https://docs.google.com/spreadsheets/d/e/<token>/pub?gid=<gid>&single=true&output=csv
 ```
 
-GID yang dipakai:
+GID yang dipakai (nama tab mengikuti spreadsheet):
 
-| Sheet                | GID          |
-|----------------------|--------------|
-| RT 01                | 2108613077   |
-| RT 02                | 49278673     |
-| RT 05                | 1223491287   |
-| KKS                  | 4478687      |
-| KK Cura              | 119487636    |
-| SMP M 29             | 2098343335   |
-| Rincian Transaksi    | 1423454212   |
+| Sheet                  | GID          |
+|------------------------|--------------|
+| RT 01/08               | 2108613077   |
+| RT 02/08               | 49278673     |
+| RT 05/08               | 1223491287   |
+| Kp. Kebon Selatan      | 4478687      |
+| Kp. Kebon Cura         | 119487636    |
+| SMP Muhammadiyah 29   | 2098343335   |
+| TPA Aisyiyah Cinangka  | 885998276    |
+| Rincian Transaksi      | 1423454212   |
+
+Tab "Kompilasi" (gid 0) adalah rekap manual, bukan sumber wilayah, jadi
+tidak dipakai di kode.
 
 Daftar ini didefinisikan di `wakafData.js` pada konstanta `WILAYAH_SHEET`
 dan `GID_RINCIAN`.
@@ -62,14 +66,15 @@ yang perlu diubah.
 
 ```js
 export const WILAYAH_SHEET = [
-  { nama: 'RT 01',   gid: '2108613077' },
-  { nama: 'RT 02',   gid: '49278673' },
-  { nama: 'RT 05',   gid: '1223491287' },
-  { nama: 'KKS',     gid: '4478687' },
-  { nama: 'KK Cura', gid: '119487636' },
-  { nama: 'SMP M 29',gid: '2098343335' },
+  { nama: 'RT 01/08',              gid: '2108613077' },
+  { nama: 'RT 02/08',              gid: '49278673' },
+  { nama: 'RT 05/08',              gid: '1223491287' },
+  { nama: 'Kp. Kebon Selatan',     gid: '4478687' },
+  { nama: 'Kp. Kebon Cura',        gid: '119487636' },
+  { nama: 'SMP Muhammadiyah 29',   gid: '2098343335' },
+  { nama: 'TPA Aisyiyah Cinangka', gid: '885998276' },
   // tambah di sini:
-  { nama: 'RT 07',   gid: '<gid-dari-publish-url>' },
+  { nama: 'RT 07/08', gid: '<gid-dari-publish-url>' },
 ]
 ```
 
@@ -164,14 +169,159 @@ semua tampilan ikut otomatis.
 ## Kartu share "Ajakan Wakaf"
 
 - Dihasilkan oleh `StatusWakaf.vue` (off-screen, `position: fixed;
-  left: -10000px`) lalu di-capture oleh `TombolShareWakaf.vue` dengan
-  `html-to-image` (skala 2×, jadi 1080×1920).
+  left: -12000px`) lalu diekspor oleh `TombolShareWakaf.vue` dengan
+  `html-to-image` pada `pixelRatio: 1`, sehingga PNG keluar tepat
+  **900x1600** (9:16, Story/Status).
 - Hasil di-share via Web Share API (HP) atau diunduh (desktop).
-- Konten: brand, label "Wakaf Tanah", judul "Pembebasan Tanah H. Basir",
-  angka luas (fokus utama), progress bar, total setoran & nilai, daftar
-  wilayah yang sudah ada wakifnya, QRIS + rekening + situs.
-- Style pakai token yang sama dengan `StatusDonasi.vue` agar kartu
-  masjid terbaca satu keluarga.
+- Referensi visual: `notes/wakaf-share/` (sebelum, sesudah, data
+  ekstrem, data kosong, dan perbandingan berdampingan).
+
+### Kanvas dan zona aman
+
+| Hal | Nilai |
+| --- | --- |
+| Kanvas | 900 x 1600 px |
+| Margin kiri/kanan | 80 px |
+| Konten atas | y 224 (header mulai di sini) |
+| Konten bawah | y 1280 (320 px dari dasar) |
+
+Latar gradien boleh memenuhi seluruh kanvas; hanya konten yang dibatasi
+zona di atas.
+
+Kartu memakai `display: grid` dengan `grid-template-rows: auto 1fr auto`
+(header / body / footer) dan tinggi tetap 1600 px. Grid dipilih, bukan
+flex, karena flex `1fr` bisa melampaui tinggi tetap dan membuat isi
+melimpah keluar kanvas.
+
+Padding kartu `224px 80px 320px`. Jarak tabel rincian ke footer minimal
+40 px; bila tidak cukup, kurangi jarak antar blok di body, jangan
+kecilkan hero di bawah 140 px.
+
+### Header
+
+- Kiri: mark `albirru-emblem.png` setinggi 84 px (tanpa plate putih),
+  lalu teks "Masjid / Al-Birru" 34 px bold (dua baris), dan garis
+  vertikal 1 x 60 `rgba(255,255,255,.28)` sebagai pemisah.
+- Kanan: teks "Pimpinan Ranting / Muhammadiyah Cinangka" 25 px rata
+  kanan, jarak 16 px ke logo Muhammadiyah 76 x 76 dalam lingkaran putih.
+  Logo Muhammadiyah tidak diubah proporsi maupun warnanya.
+- Logo Muhammadiyah berwarna hijau `#035f0f` hanya terbaca di atas putih,
+  jadi tetap dalam lingkaran putih. Mark Al-Birru memakai varian gelap
+  `albirru-emblem.png` tanpa plate sesuai keputusan pengelola.
+
+### Hero dan dana
+
+- Eyebrow "WAKAF TANAH" 26 px bold, letter-spacing .16em, emas `#ebcb86`,
+  margin-top 40 dari header.
+- Judul "Pembebasan Tanah" 58 px bold, margin-top 4.
+- Hero "{luas} m²" 148 px bold, line-height 1, letter-spacing -0.04em,
+  "²" sebagai `<sup>` sekitar 0.46em. Angka luas diambil dari
+  `ringkasan.totalM2` lewat `angkaLuas`.
+- Caption "Luas wakaf yang diperoleh saat ini" 28 px, margin-top 6.
+- Progress bar tinggi 16 px, radius 8, track `rgba(255,255,255,.2)` tanpa
+  outline, fill emas. Lebar fill = persen sebenarnya, minimal 1,2%.
+- Baris dana: kiri "Rp {dana}" 46 px bold, kanan "dari target Rp {target}"
+  26 px rata kanan.
+- Baris meta: kiri "Dana terkumpul · {persen}%" (persen emas bold),
+  kanan "Diperbarui {tanggal}" 26 px rata kanan. Label "Dana terkumpul"
+  `rgba(255,255,255,.72)`.
+
+### Tabel rincian per lokasi
+
+- Judul "Rincian per lokasi" 24 px bold uppercase, letter-spacing .12em,
+  `rgba(255,255,255,.72)`.
+- Grid 2 kolom `1fr 1fr`, column-gap 48 px.
+- Setiap baris = satu elemen `.sw-sel` (flex, space-between, baseline),
+  tinggi 54 px, padding-top 10, `border-bottom: 1px solid rgba(255,255,255,.28)`,
+  font 30 px. Nama lokasi bobot 500, nilai bold menempel di kanan.
+- Garis dimiliki baris, bukan sel. Tidak ada elemen kosong untuk
+  melengkapi grid; data ganjil membiarkan kolom kanan baris terakhir
+  kosong tanpa garis.
+- Urutan: mengikuti urutan `wilayahTerisi` (terbesar lebih dulu), mengalir
+  kiri-atas ke kanan lalu ke bawah.
+- Jumlah lokasi yang tampil dihitung dari **jarak nyata** isi ke footer,
+  bukan dari tebakan panjang nama, karena nama panjang membungkus ke dua
+  baris sehingga tinggi baris tidak bisa diprediksi. `hitungBatas()`
+  memindai dari jumlah terbanyak ke paling sedikit dan mengambil yang
+  **pertama muat** (jarak ke footer minimal 40 px). Urutan ini penting:
+  saat semua lokasi tampil, baris "+N lokasi lain" tidak dirender,
+  sehingga ruang melompat naik. Berhenti di kegagalan pertama justru
+  membuang baris yang masih muat.
+  Lokasi yang tidak kebagian dirangkum "+N lokasi lain {luas}".
+  Nilai diukur ulang lewat `watch` pada props dan `document.fonts.ready`,
+  sehingga data yang telat masuk atau font web tidak meninggalkan nilai
+  basi.
+
+### Footer
+
+- Kiri (blok rekening, rapat):
+  - "Bank Syariah Indonesia" 28 px, `rgba(255,255,255,.86)`.
+  - Nomor rekening 50 px bold (800), font yang sama dengan teks lain
+    (bukan monospace), `tabular-nums`, line-height 1.02.
+  - "a.n. Pimpinan Ranting / Muhammadiyah Cinangka" 26 px, dua baris
+    (`<br>`), `text-wrap: balance`.
+  - URL "masjid-albirru.id/wakaf-tanah" 28 px bold emas, margin-top 10.
+    Diturunkan dari `URL_WAKAF` lewat `urlTampil` (tanpa skema).
+- **Tidak ada QR di kartu.** Sebelumnya ada QR 176 px di kanan footer;
+  dihapus atas permintaan pengelola. Impor `qrcode` di `StatusWakaf.vue`
+  ikut dibuang. Paket `qrcode` tetap dipakai `StatusDonasi.vue` (QRIS),
+  jadi tidak dihapus dari `package.json`.
+- Tidak ada logo Al-Birru di footer. Logo hanya di header.
+
+### Data dan label
+
+Semua angka dinamis dari `wakafData.js`:
+
+| Elemen | Sumber |
+| --- | --- |
+| Luas terwakafkan | `ringkasan.totalM2` |
+| Dana terkumpul | `ringkasan.totalSetoran` |
+| Target dana | `ringkasan.totalNilai` |
+| Persentase | `totalSetoran / totalNilai`, via `formatPersen()` |
+| Diperbarui | `ringkasan.diperbarui` = tanggal transaksi terakhir di sheet Rincian |
+| Rincian per lokasi | `wilayah` (hanya `luas > 0`, urut terbesar) |
+| Nomor rekening | `REKENING[1]` di `donasiData.js` |
+
+`formatPersen()` di `wakafData.js`: di bawah 1% dua desimal ("0,28"),
+1-10% satu desimal ("4,5"), di atasnya bilangan bulat. Tidak ada angka
+persentase yang di-hardcode.
+
+`tanggalTerbaru()` membaca sheet Rincian, mencocokkan nama bulan
+(termasuk singkatan "Agsts") lalu mengambil tanggal terbesar. Bila belum
+ada transaksi, label "Diperbarui" tidak ditampilkan.
+
+### Warna dan tipografi
+
+- Font: `Lato`, `Segoe UI`, sans-serif (font yang sudah dipakai).
+- Satu aksen: emas `#ebcb86`, hanya untuk eyebrow, angka persentase,
+  dan URL.
+- Teks utama putih; teks sekunder `rgba(255,255,255,.86)`; label
+  `rgba(255,255,255,.72)`.
+- Gradien `#0d3d45` (atas) ke `#0b4f5a` (bawah).
+- Garis pemisah `rgba(255,255,255,.28)`.
+- Teks terkecil 24 px pada kanvas 900 px.
+
+### Verifikasi yang sudah dilakukan
+
+- Render 900 x 1600 dengan data spreadsheet asli (366 m², Rp 7.100.000,
+  7 wilayah / 6 aktif). Hasil di
+  `notes/wakaf-share/sesudah-data-asli-900x1600.png`: **semua 6 lokasi
+  tampil**, tanpa baris "+N lokasi lain", jarak isi ke footer 42 px.
+- Lima kasus data ekstrem, semua lolos (tidak ada overflow, tidak ada
+  teks keluar zona y 224-1280 / x 80-820, tidak ada teks terpotong,
+  teks terkecil 24 px, kartu tetap 900 x 1600):
+
+  | Kasus | Baris tampil | Jarak isi ke footer |
+  | --- | --- | --- |
+  | 0 m² | 0 (tabel tidak dirender) | - |
+  | Dana Rp 9.999.999.999 (10 digit) | 2 | 220 px |
+  | 9 lokasi | 4 + "+5 lokasi lain" | 87 px |
+  | Nama "SMP Muhammadiyah 29 Cinangka" | 4 | 97 px |
+  | 5 lokasi (ganjil) | 5 | 111 px |
+
+- Garis tabel selalu lurus antar kolom (mis. 881/881, 935/935).
+- Build `npm run docs:build` berhasil.
+- Tidak dilakukan: pemindaian QR (sudah tidak relevan, QR dihapus).
 
 ## Cache data
 

@@ -9,6 +9,7 @@ export const QRIS_STRING =
 
 export const REKENING = [
   { bank: 'Bank Syariah Indonesia (BSI)', no: '7192880558', atas: 'DKM Al Birru' },
+  { bank: 'Bank Syariah Indonesia (BSI)', no: '7376802986', atas: 'PRM Cinangka' }
 ]
 
 export const WA_NUMBER = '6281399928319'
