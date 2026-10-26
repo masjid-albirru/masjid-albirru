@@ -25,7 +25,7 @@ const props = defineProps({
 const NAMA_PENGURUS = 'Pimpinan Ranting Muhammadiyah Cinangka'
 
 /** Ajakan di footer. Harga diambil dari HARGA_PER_M2, bukan ditulis mati. */
-const ajakan = `Mari bersama-sama mewakafkan tanah untuk Masjid Al-Birru, Rp${Number(HARGA_PER_M2).toLocaleString('id-ID')} per meter persegi.`
+const ajakan = `Mari bersama-sama mewakafkan tanah bersama Pimpinan Ranting Muhammadiyah Cinangka, Rp${Number(HARGA_PER_M2).toLocaleString('id-ID')} per meter persegi.`
 
 const rekening = REKENING[1]
 const namaBank = rekening.bank.replace(/\s*\(.*\)$/, '')

@@ -71,7 +71,7 @@ async function bagikan() {
       await navigator.share({
         files: [file],
         title: 'Wakaf Tanah Masjid Al-Birru',
-        text: 'Mari bersama-sama mewakafkan tanah untuk Masjid Al-Birru, Rp2.500.000 per meter persegi.',
+        text: 'Mari bersama-sama mewakafkan tanah bersama Pimpinan Ranting Muhammadiyah Cinangka, Rp2.500.000 per meter persegi.',
       })
       return
     }
