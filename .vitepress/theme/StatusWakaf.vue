@@ -12,7 +12,7 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useData } from 'vitepress'
 import { REKENING } from './donasiData.js'
-import { rupiah, luasM2, formatPersen } from './wakafData.js'
+import { rupiah, luasM2, formatPersen, HARGA_PER_M2 } from './wakafData.js'
 
 const { site } = useData()
 
@@ -23,6 +23,9 @@ const props = defineProps({
 
 /** Nama lengkap pengurus: dipakai untuk CTA dan "a.n." rekening. */
 const NAMA_PENGURUS = 'Pimpinan Ranting Muhammadiyah Cinangka'
+
+/** Ajakan di footer. Harga diambil dari HARGA_PER_M2, bukan ditulis mati. */
+const ajakan = `Mari bersama-sama mewakafkan tanah untuk Masjid Al-Birru, Rp${Number(HARGA_PER_M2).toLocaleString('id-ID')} per meter persegi.`
 
 const rekening = REKENING[1]
 const namaBank = rekening.bank.replace(/\s*\(.*\)$/, '')
@@ -237,6 +240,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
           <p class="sw-bank">{{ namaBank }}</p>
           <p class="sw-nomor">{{ rekening.no }}</p>
           <p class="sw-atas">a.n. {{ NAMA_PENGURUS }}</p>
+          <p class="sw-ajakan">{{ ajakan }}</p>
         </div>
       </footer>
     </div>
@@ -260,7 +264,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   height: 1600px;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
   padding: 224px 80px 320px;
   background: linear-gradient(180deg, #0d3d45 0%, #0b4f5a 100%);
   color: #ffffff;
@@ -278,11 +282,14 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 }
 
 /* Header */
-/* Header: logo di atas, nama underneath, seluruh blok di tengah kanvas.
-   Teks lebih lebar dari logo, jadi blok tidak bisa menempel margin kiri
-   tanpa teksnya keluar dari kanvas. */
+/* Header: pita atas di luar flow grid. Blok dimulai y 60 (di bawah baris UI
+   aplikasi Story) dan berakhir sebelum y 224, sehingga body tidak kehilangan
+   ruang. Teks lebih lebar dari logo, jadi blok di-center kanvas. */
 .sw-status .sw-head {
-  position: relative;
+  position: absolute;
+  top: 60px;
+  left: 80px;
+  right: 80px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -527,13 +534,13 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   color: rgba(255, 255, 255, 0.86);
   text-wrap: balance;
 }
-.sw-status .sw-situs {
-  margin: 4px 0 0;
-  font-size: 28px;
+.sw-status .sw-ajakan {
+  margin: 12px 0 0;
+  font-size: 26px;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
   color: #ebcb86;
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
 </style>
