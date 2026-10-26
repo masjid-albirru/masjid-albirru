@@ -172,6 +172,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   <div class="sw-layer" aria-hidden="true">
     <div class="sw-status" ref="kartu">
       <div class="sw-grain" :style="{ backgroundImage: grainCss }"></div>
+      <img v-if="muhammadiyah" class="sw-watermark" :src="muhammadiyah" alt="">
 
       <!-- Identitas: logo Muhammadiyah di atas, nama di bawahnya -->
       <header class="sw-head">
@@ -278,6 +279,20 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   inset: 0;
   z-index: 0;
   opacity: 0.05;
+  pointer-events: none;
+}
+
+/* Watermark logo Muhammadiyah di belakang konten. Opacity rendah supaya
+   tidak menurunkan kontras teks di atasnya; lapisan teks ada di z-index 2. */
+.sw-status .sw-watermark {
+  position: absolute;
+  left: 50%;
+  top: 860px;
+  width: 720px;
+  height: auto;
+  transform: translateX(-50%);
+  opacity: 0.1;
+  z-index: 1;
   pointer-events: none;
 }
 
