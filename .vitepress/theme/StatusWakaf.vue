@@ -23,14 +23,12 @@ const props = defineProps({
 
 /** Nama lengkap pengurus: dipakai untuk CTA dan "a.n." rekening. */
 const NAMA_PENGURUS = 'Pimpinan Ranting Muhammadiyah Cinangka'
-const URL_WAKAF = 'https://masjid-albirru.id/wakaf-tanah'
 
 const rekening = REKENING[1]
 const namaBank = rekening.bank.replace(/\s*\(.*\)$/, '')
 
 // Aset dimuat sebagai data URL agar html-to-image mengekspornya utuh
 // (terutama di Safari/iOS).
-const albirru = ref('')
 const muhammadiyah = ref('')
 /** Elemen kartu, dipakai untuk mengukur ruang tabel. */
 const kartu = ref(null)
@@ -55,14 +53,6 @@ async function keDataUrl(url, tipe) {
 }
 
 onMounted(async () => {
-  // Emblem Al-Birru resmi, dipasang langsung tanpa plate putih. Proporsi
-  // dan warna aset tidak diubah.
-  try {
-    albirru.value = await keDataUrl(aset('/images/albirru-emblem.png'), 'png')
-  } catch (e) {
-    console.error('Gagal memuat emblem Al-Birru:', e)
-  }
-
   try {
     muhammadiyah.value = await keDataUrl(aset('/images/Muhammadiyah.svg'), 'svg')
   } catch (e) {
@@ -76,9 +66,6 @@ onMounted(async () => {
 
 watch(() => props.wilayah, hitungBatas)
 watch(() => props.ringkasan, hitungBatas)
-
-/** URL tanpa skema, untuk ditampilkan di footer. */
-const urlTampil = computed(() => URL_WAKAF.replace(/^https?:\/\//, ''))
 
 /** Persentase dana terkumpul terhadap target dana (bukan target luas). */
 const persenDana = computed(() => {
@@ -142,7 +129,6 @@ async function hitungBatas() {
   for (let n = total; n >= 1; n--) {
     batasTampil.value = n
     await nextTick()
-    if (window.__jejak) window.__jejak.push({ n, jarak: Math.round(jarak()), sisa: !!akar.querySelector('.sw-sisa') })
     if (jarak() >= JARAK_AKHIR) { pilihan = n; break }
   }
 
@@ -184,17 +170,13 @@ const grainCss = 'url("' + GRAIN_URL + '")'
     <div class="sw-status" ref="kartu">
       <div class="sw-grain" :style="{ backgroundImage: grainCss }"></div>
 
-      <!-- Lockup identitas: Al-Birru kiri, Muhammadiyah kanan, tinggi optik sama -->
+      <!-- Identitas: logo Muhammadiyah di atas, nama di bawahnya -->
       <header class="sw-head">
-        <div class="sw-lockup">
-          <img v-if="albirru" class="sw-mark" :src="albirru" alt="">
-          <span class="sw-brand">Masjid<br>Al-Birru</span>
-        </div>
         <div class="sw-pr">
-          <p class="sw-pr-teks">Pimpinan Ranting<br>Muhammadiyah Cinangka</p>
           <span class="sw-plate">
             <img v-if="muhammadiyah" :src="muhammadiyah" alt="">
           </span>
+          <p class="sw-pr-teks">Pimpinan Ranting<br>Muhammadiyah Cinangka</p>
         </div>
       </header>
 
@@ -254,8 +236,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
         <div class="sw-rekening">
           <p class="sw-bank">{{ namaBank }}</p>
           <p class="sw-nomor">{{ rekening.no }}</p>
-          <p class="sw-atas">a.n. Pimpinan Ranting Muhammadiyah Cinangka</p>
-          <p class="sw-situs">Mari berwakaf tanah bersama <br> Pimpinan Ranting Muhammadiyah Cinangka</p>
+          <p class="sw-atas">a.n. {{ NAMA_PENGURUS }}</p>
         </div>
       </footer>
     </div>
@@ -297,52 +278,27 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 }
 
 /* Header */
+/* Header: logo di atas, nama underneath, seluruh blok di tengah kanvas.
+   Teks lebih lebar dari logo, jadi blok tidak bisa menempel margin kiri
+   tanpa teksnya keluar dari kanvas. */
 .sw-status .sw-head {
   position: relative;
   z-index: 2;
-  height: 84px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-.sw-status .sw-lockup {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  min-width: 0;
-}
-.sw-status .sw-mark {
-  display: block;
-  height: 84px;
-  width: auto;
-  flex: 0 0 auto;
-}
-.sw-status .sw-brand {
-  margin: 0;
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1.1;
-  color: #ffffff;
-  white-space: nowrap;
-}
-.sw-status .sw-lockup::after {
-  content: '';
-  display: block;
-  width: 1px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.28);
-  margin-left: 22px;
+  justify-content: center;
 }
 .sw-status .sw-pr {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
 }
 .sw-status .sw-pr-teks {
   margin: 0;
   font-size: 25px;
-  line-height: 1.25;
-  text-align: right;
+  line-height: 1.2;
+  text-align: center;
   color: rgba(255, 255, 255, 0.86);
   white-space: nowrap;
 }
@@ -429,7 +385,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
 .sw-status .sw-bar {
   position: relative;
   height: 16px;
-  margin: 22px 0 0;
+  margin: 18px 0 0;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.2);
   overflow: hidden;

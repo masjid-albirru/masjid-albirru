@@ -199,15 +199,14 @@ kecilkan hero di bawah 140 px.
 
 ### Header
 
-- Kiri: mark `albirru-emblem.png` setinggi 84 px (tanpa plate putih),
-  lalu teks "Masjid / Al-Birru" 34 px bold (dua baris), dan garis
-  vertikal 1 x 60 `rgba(255,255,255,.28)` sebagai pemisah.
-- Kanan: teks "Pimpinan Ranting / Muhammadiyah Cinangka" 25 px rata
-  kanan, jarak 16 px ke logo Muhammadiyah 76 x 76 dalam lingkaran putih.
-  Logo Muhammadiyah tidak diubah proporsi maupun warnanya.
+- Hanya satu blok, rata kiri: teks "Pimpinan Ranting / Muhammadiyah
+  Cinangka" 25 px, jarak 16 px ke logo Muhammadiyah 76 x 76 dalam
+  lingkaran putih. Logo tidak diubah proporsi maupun warnanya.
 - Logo Muhammadiyah berwarna hijau `#035f0f` hanya terbaca di atas putih,
-  jadi tetap dalam lingkaran putih. Mark Al-Birru memakai varian gelap
-  `albirru-emblem.png` tanpa plate sesuai keputusan pengelola.
+  jadi tetap dalam lingkaran putih.
+- Mark dan teks "Masjid Al-Birru" sudah dihapus atas permintaan
+  pengelola, begitu juga garis pemisah vertikal. Aset `albirru-emblem.png`
+  tidak lagi dimuat di komponen ini (masih dipakai di halaman lain).
 
 ### Hero dan dana
 
@@ -254,19 +253,21 @@ kecilkan hero di bawah 140 px.
 
 ### Footer
 
-- Kiri (blok rekening, rapat):
+- Hanya satu blok, rata kiri (blok rekening, rapat):
   - "Bank Syariah Indonesia" 28 px, `rgba(255,255,255,.86)`.
   - Nomor rekening 50 px bold (800), font yang sama dengan teks lain
     (bukan monospace), `tabular-nums`, line-height 1.02.
-  - "a.n. Pimpinan Ranting / Muhammadiyah Cinangka" 26 px, dua baris
-    (`<br>`), `text-wrap: balance`.
-  - URL "masjid-albirru.id/wakaf-tanah" 28 px bold emas, margin-top 10.
-    Diturunkan dari `URL_WAKAF` lewat `urlTampil` (tanpa skema).
+  - "a.n. Pimpinan Ranting Muhammadiyah Cinangka" 26 px, satu baris.
+  - Kalimat ajakan "Mari berwakaf tanah bersama / Pimpinan Ranting
+    Muhammadiyah Cinangka" 28 px bold emas, dua baris (`<br>`).
 - **Tidak ada QR di kartu.** Sebelumnya ada QR 176 px di kanan footer;
   dihapus atas permintaan pengelola. Impor `qrcode` di `StatusWakaf.vue`
   ikut dibuang. Paket `qrcode` tetap dipakai `StatusDonasi.vue` (QRIS),
   jadi tidak dihapus dari `package.json`.
-- Tidak ada logo Al-Birru di footer. Logo hanya di header.
+- URL `masjid-albirru.id/wakaf-tanah` tidak lagi ditampilkan (diganti
+  kalimat ajakan), jadi konstanta `URL_WAKAF` dan computed `urlTampil`
+  di `StatusWakaf.vue` sudah dibuang.
+- Tidak ada logo Al-Birru di footer maupun header.
 
 ### Data dan label
 
