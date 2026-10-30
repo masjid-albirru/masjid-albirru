@@ -34,6 +34,7 @@ export const WILAYAH_SHEET = [
   { nama: 'Kp. Kebon Cura', gid: '119487636' },
   { nama: 'SMP Muhammadiyah 29', gid: '2098343335' },
   { nama: 'TPA Aisyiyah Cinangka', gid: '885998276' },
+  { nama: 'Umum', gid: '926459473' },
 ]
 
 const GID_RINCIAN = '1423454212'
@@ -68,9 +69,10 @@ export function parseLuas(v) {
   return isNaN(n) ? 0 : n
 }
 
-/** Kolom uang: "Rp4.500.000", "Rp0", atau angka polos. Titik = ribuan. */
+/** Kolom uang: "Rp4.500.000", "Rp0", "Rp338.889,00", atau angka polos. Titik = ribuan, koma = desimal (diabaikan). */
 export function parseRupiah(v) {
-  const n = parseInt(String(v ?? '').replace(/[^0-9-]/g, ''), 10)
+  const bulat = String(v ?? '').split(',')[0]
+  const n = parseInt(bulat.replace(/[^0-9-]/g, ''), 10)
   return isNaN(n) ? 0 : n
 }
 
@@ -229,7 +231,8 @@ async function ambilSemua() {
   })
 
   const totalM2 = wilayah.reduce((s, w) => s + w.luas, 0)
-  const totalSetoran = wilayah.reduce((s, w) => s + w.setoran, 0)
+  // Dana terkumpul dari sheet Rincian Transaksi, bukan dari kolom Jumlah per tab.
+  const totalSetoran = hasilRincian.reduce((s, t) => s + t.jumlah, 0)
   const wilayahAktif = wilayah.filter(w => w.luas > 0)
 
   return {

@@ -86,26 +86,26 @@ const wilayahTerisi = computed(() =>
 )
 
 /**
- * Jumlah lokasi yang tampil. Dihitung dari ruang yang tersisa, bukan dari
+ * Jumlah wilayah yang tampil. Dihitung dari ruang yang tersisa, bukan dari
  * panjang nama: nama wilayah panjang membungkus ke dua baris sehingga
- * tinggi baris tidak bisa ditebak. Sisanya dirangkum "+N lokasi lain".
+ * tinggi baris tidak bisa ditebak. Sisanya dirangkum "+N wilayah lain".
  */
 const batasTampil = ref(0)
 
 /**
- * Ruang tinggi untuk baris "+N lokasi lain" (12 margin + 26 x 1.25).
+ * Ruang tinggi untuk baris "+N wilayah lain" (12 margin + 26 x 1.25).
  * Hanya dipakai sebagai cadangan saat mengukur.
  */
 const JARAK_AKHIR = 40
 
 /**
- * Jumlah lokasi yang tampil ditentukan dari jarak nyata isi ke footer,
+ * Jumlah wilayah yang tampil ditentukan dari jarak nyata isi ke footer,
  * bukan dari rekonstruksi tinggi (margin yang runtuh di luar flow flex
  * membuat hasil hitungan meleset).
  *
  * Dipindai dari jumlah terbanyak ke paling sedikit, lalu diambil yang
- * pertama muat. Urutannya penting: saat semua lokasi tampil, baris
- * "+N lokasi lain" tidak dirender, sehingga ruang melompat naik. Berhenti
+ * pertama muat. Urutannya penting: saat semua wilayah tampil, baris
+ * "+N wilayah lain" tidak dirender, sehingga ruang melompat naik. Berhenti
  * pada kegagalan pertama (cara lama) justru membuang baris yang sebenarnya
  * masih muat.
  */
@@ -143,7 +143,7 @@ async function hitungBatas() {
 
 const tabelTampil = computed(() => wilayahTerisi.value.slice(0, batasTampil.value))
 
-const sisaLokasi = computed(() => {
+const sisaWilayah = computed(() => {
   const tampil = tabelTampil.value.length
   const semua = wilayahTerisi.value
   if (semua.length <= tampil) return null
@@ -216,7 +216,7 @@ const grainCss = 'url("' + GRAIN_URL + '")'
         </section>
 
         <section v-if="tabelTampil.length" class="sw-rincian">
-          <p class="sw-rincian-judul">Rincian per lokasi</p>
+          <p class="sw-rincian-judul">Rincian per wilayah</p>
           <div class="sw-grid">
             <div
               v-for="(w, i) in wilayahTerisi"
@@ -229,9 +229,9 @@ const grainCss = 'url("' + GRAIN_URL + '")'
             </div>
           </div>
 
-          <p v-if="sisaLokasi" class="sw-sisa">
-            +{{ sisaLokasi.jumlah }} lokasi lain
-            <span class="sw-sisa-nilai">{{ luasM2(sisaLokasi.luas) }}</span>
+          <p v-if="sisaWilayah" class="sw-sisa">
+            +{{ sisaWilayah.jumlah }} wilayah lain
+            <span class="sw-sisa-nilai">{{ luasM2(sisaWilayah.luas) }}</span>
           </p>
         </section>
       </div>
