@@ -480,11 +480,11 @@ const grainCss = 'url("' + GRAIN_URL + '")'
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
-  min-height: 54px;
-  padding: 10px 0 9px;
+  min-height: 44px;
+  padding: 7px 0 6px;
   box-sizing: border-box;
   border-bottom: 1px solid rgba(255, 255, 255, 0.28);
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1.15;
   min-width: 0;
 }
