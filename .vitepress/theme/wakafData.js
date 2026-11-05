@@ -2,6 +2,11 @@
  * Data wakaf tanah — Wakaf Pembebasan Tanah (Sebelah Barat Masjid Al-Birru)
  * oleh Pimpinan Ranting Muhammadiyah Cinangka.
  *
+ * Catatan penamaan: judul tab di spreadsheet memakai nama pemilik tanah
+ * ("Angsuran Wakaf Pembebasan Tanah H. Basir"), sedangkan teks publik situs
+ * sengaja memakai patokan lokasi ("Sebelah Barat Masjid Al-Birru"). Nama
+ * pemilik tidak ditampilkan di halaman; perbedaan ini disengaja.
+ *
  * Satu sumber data untuk halaman /wakaf-tanah dan ringkasan beranda,
  * supaya angka tidak pernah berbeda di dua tempat.
  *
@@ -9,6 +14,9 @@
  *   No | Wakif | Jumlah Wakaf | Tenor | Okt | Nov | ... | Des | Jumlah
  * Semua "Jumlah Wakaf" dibaca sebagai meter persegi. Ada nilai pecahan
  * (mis. "2,5"), jadi kolomnya diparse sebagai desimal, bukan ribuan.
+ *
+ * Kolom bulan tidak dipatok 12: sheet berjalan 16 bulan (Okt 2026 - Des 2027),
+ * dan labelnya dibaca apa adanya dari baris header tiap tab.
  */
 
 /** Harga wakaf per meter persegi, sesuai ketentuan Northwestern. */
@@ -25,7 +33,11 @@ export const NILAI_TARGET = LUAS_TARGET_M2 * HARGA_PER_M2
 const SHEET_BASE =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTogozxD2SadoBM8A2tl8D9cPL_sY5iGgOMVdnwDBnrj7RjyR4lZXkSfW3WjVKZhl01Oc5faFzoV2o-/pub'
 
-/** Tab wilayah sesuai urutan sheet di spreadsheet. */
+/**
+ * Tab wilayah sesuai urutan sheet di spreadsheet.
+ * Menambah wilayah = menambah satu baris di sini; total, progres, dan daftar
+ * wilayah di halaman ikut menyesuaikan tanpa perubahan kode lain.
+ */
 export const WILAYAH_SHEET = [
   { nama: 'RT 01/08', gid: '2108613077' },
   { nama: 'RT 02/08', gid: '49278673' },
@@ -34,8 +46,16 @@ export const WILAYAH_SHEET = [
   { nama: 'Kp. Kebon Cura', gid: '119487636' },
   { nama: 'SMP Muhammadiyah 29', gid: '2098343335' },
   { nama: 'TPA Aisyiyah Cinangka', gid: '885998276' },
+  { nama: 'MI Miftahul Huda', gid: '98270998' },
   { nama: 'Umum', gid: '926459473' },
 ]
+
+/**
+ * Tab "No | Wilayah | Jumlah Setoran | Tanggal" (gid=0) sudah ada di
+ * spreadsheet tapi belum diisi, dan isinya akan menyalin angka yang sudah
+ * dihitung dari tab wilayah di atas. Jadi belum dibaca. Sambungkan di sini
+ * kalau bendahara mulai memakainya sebagai sumber rekap tersendiri.
+ */
 
 const GID_RINCIAN = '1423454212'
 
