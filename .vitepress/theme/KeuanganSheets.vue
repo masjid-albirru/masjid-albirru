@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { RefreshCw, Inbox, CloudOff } from 'lucide-vue-next'
 import { muatDataKeuangan, rupiah, formatTanggal, formatKuantitas } from './keuanganData.js'
 
@@ -99,6 +99,37 @@ const jamMuat = computed(() => {
   if (!data.value) return ''
   return data.value.waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 })
+
+// Pagination hanya untuk tabel transaksi. Saldo berjalan sudah dihitung
+// di parser dari seluruh baris, jadi memotong tampilan tidak mengubah angka.
+const PER_HALAMAN = 20
+const halaman = ref(1)
+
+const jumlahHalaman = computed(() =>
+  Math.max(1, Math.ceil((program.value?.transaksi?.length ?? 0) / PER_HALAMAN))
+)
+
+const transaksiHalaman = computed(() => {
+  const awal = (halaman.value - 1) * PER_HALAMAN
+  return (program.value?.transaksi ?? []).slice(awal, awal + PER_HALAMAN)
+})
+
+const rentangTampil = computed(() => {
+  const total = program.value?.transaksi?.length ?? 0
+  if (!total) return ''
+  const awal = (halaman.value - 1) * PER_HALAMAN + 1
+  const akhir = Math.min(halaman.value * PER_HALAMAN, total)
+  return `${awal}–${akhir} dari ${total} transaksi`
+})
+
+function gantiHalaman(h) {
+  halaman.value = Math.min(Math.max(1, h), jumlahHalaman.value)
+}
+
+// Pindah program kembali ke halaman pertama; kalau data berkurang saat
+// dimuat ulang, halaman dijepit ke halaman terakhir yang masih ada.
+watch(aktif, () => { halaman.value = 1 })
+watch(jumlahHalaman, n => { if (halaman.value > n) halaman.value = n })
 </script>
 
 <template>
@@ -207,7 +238,7 @@ const jamMuat = computed(() => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(r, i) in program.transaksi" :key="i">
+                  <tr v-for="(r, i) in transaksiHalaman" :key="(halaman - 1) * PER_HALAMAN + i">
                     <td class="keu-tgl">{{ formatTanggal(r.tanggal, r.tanggalMentah) }}</td>
                     <td>{{ r.ket }}</td>
                     <td class="keu-num keu-masuk">
@@ -231,6 +262,27 @@ const jamMuat = computed(() => {
                 </tfoot>
               </table>
             </div>
+            <nav
+              v-if="jumlahHalaman > 1"
+              class="keu-halaman"
+              aria-label="Halaman rincian transaksi"
+            >
+              <button
+                type="button"
+                class="keu-halaman__btn"
+                :disabled="halaman === 1"
+                @click="gantiHalaman(halaman - 1)"
+              >Sebelumnya</button>
+              <span class="keu-halaman__info" aria-live="polite">
+                {{ rentangTampil }} · hal. {{ halaman }}/{{ jumlahHalaman }}
+              </span>
+              <button
+                type="button"
+                class="keu-halaman__btn"
+                :disabled="halaman === jumlahHalaman"
+                @click="gantiHalaman(halaman + 1)"
+              >Berikutnya</button>
+            </nav>
             <p class="keu-catatan">Saldo dihitung ulang dari kolom masuk dan keluar tiap baris.</p>
           </template>
 
@@ -701,6 +753,51 @@ const jamMuat = computed(() => {
 .keu-chip__ket { font-size: 0.72rem; color: var(--vp-c-text-2); }
 
 .dark .keu-chip__nilai { color: var(--teal-400); }
+
+/* ---- pagination rincian transaksi ---- */
+.keu-halaman {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.keu-halaman__info {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.keu-halaman__btn {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.keu-halaman__btn:hover:not(:disabled) {
+  border-color: var(--teal-600);
+  color: var(--teal-700);
+}
+
+.keu-halaman__btn:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
+}
+
+.keu-halaman__btn:disabled { opacity: 0.45; cursor: default; }
+
+.dark .keu-halaman__btn:hover:not(:disabled) { color: var(--teal-400); }
 
 /* ---- catatan & footer ---- */
 .keu-catatan {

@@ -4,7 +4,7 @@
  * Wakaf Pembebasan Tanah oleh PR Muhammadiyah Cinangka.
  * Sumber angka: spreadsheet yang sudah dipublish, satu tab per wilayah.
  */
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import {
   LandPlot, Coins, Map as PetaIcon, Receipt,
   ChevronRight, ChevronDown, CircleAlert, Loader2
@@ -55,6 +55,68 @@ function toggleBuka(nama, no) {
 function pilihWilayah(nama) {
   tabAktif.value = nama
 }
+
+// Rincian transaksi dipaginasi 20 baris per halaman. Urutan dan isi data
+// tidak diubah, hanya potongan yang tampil.
+const PER_HALAMAN_RINCIAN = 20
+const halamanRincian = ref(1)
+
+const jumlahHalamanRincian = computed(() =>
+  Math.max(1, Math.ceil(rincian.value.length / PER_HALAMAN_RINCIAN))
+)
+
+const rincianHalaman = computed(() => {
+  const awal = (halamanRincian.value - 1) * PER_HALAMAN_RINCIAN
+  return rincian.value.slice(awal, awal + PER_HALAMAN_RINCIAN)
+})
+
+const rentangRincian = computed(() => {
+  const total = rincian.value.length
+  if (!total) return ''
+  const awal = (halamanRincian.value - 1) * PER_HALAMAN_RINCIAN + 1
+  const akhir = Math.min(halamanRincian.value * PER_HALAMAN_RINCIAN, total)
+  return `${awal}–${akhir} dari ${total} transaksi`
+})
+
+function gantiHalamanRincian(h) {
+  halamanRincian.value = Math.min(Math.max(1, h), jumlahHalamanRincian.value)
+}
+
+// Jepit halaman bila data berkurang saat dimuat ulang.
+watch(jumlahHalamanRincian, n => {
+  if (halamanRincian.value > n) halamanRincian.value = n
+})
+
+// Daftar wakif per wilayah juga dipaginasi. Tiap wilayah punya halamannya
+// sendiri, jadi pindah wilayah selalu mulai dari halaman pertama.
+const PER_HALAMAN_WAKIF = 20
+const halamanWakif = ref(1)
+
+const jumlahHalamanWakif = computed(() =>
+  Math.max(1, Math.ceil((tab.value?.wakif?.length ?? 0) / PER_HALAMAN_WAKIF))
+)
+
+const wakifHalaman = computed(() => {
+  const awal = (halamanWakif.value - 1) * PER_HALAMAN_WAKIF
+  return (tab.value?.wakif ?? []).slice(awal, awal + PER_HALAMAN_WAKIF)
+})
+
+const rentangWakif = computed(() => {
+  const total = tab.value?.wakif?.length ?? 0
+  if (!total) return ''
+  const awal = (halamanWakif.value - 1) * PER_HALAMAN_WAKIF + 1
+  const akhir = Math.min(halamanWakif.value * PER_HALAMAN_WAKIF, total)
+  return `${awal}–${akhir} dari ${total} wakif`
+})
+
+function gantiHalamanWakif(h) {
+  halamanWakif.value = Math.min(Math.max(1, h), jumlahHalamanWakif.value)
+}
+
+watch(tabAktif, () => { halamanWakif.value = 1 })
+watch(jumlahHalamanWakif, n => {
+  if (halamanWakif.value > n) halamanWakif.value = n
+})
 </script>
 
 <template>
@@ -175,7 +237,7 @@ function pilihWilayah(nama) {
             </tr>
           </thead>
           <tbody>
-            <template v-for="w in tab.wakif" :key="w.no">
+            <template v-for="w in wakifHalaman" :key="w.no">
               <tr class="wt-baris">
                 <td class="wt-td-no">{{ w.no }}</td>
                 <td class="wt-td-nama">
@@ -213,6 +275,28 @@ function pilihWilayah(nama) {
             </template>
           </tbody>
         </table>
+
+        <nav
+          v-if="tab.wakif.length && jumlahHalamanWakif > 1"
+          class="wt-halaman"
+          aria-label="Halaman daftar wakif"
+        >
+          <button
+            type="button"
+            class="wt-halaman-btn"
+            :disabled="halamanWakif === 1"
+            @click="gantiHalamanWakif(halamanWakif - 1)"
+          >Sebelumnya</button>
+          <span class="wt-halaman-info" aria-live="polite">
+            {{ rentangWakif }} · hal. {{ halamanWakif }}/{{ jumlahHalamanWakif }}
+          </span>
+          <button
+            type="button"
+            class="wt-halaman-btn"
+            :disabled="halamanWakif === jumlahHalamanWakif"
+            @click="gantiHalamanWakif(halamanWakif + 1)"
+          >Berikutnya</button>
+        </nav>
       </section>
 
       <!-- Rincian transaksi -->
@@ -236,7 +320,11 @@ function pilihWilayah(nama) {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(t, i) in rincian" :key="i" class="wt-baris">
+            <tr
+              v-for="(t, i) in rincianHalaman"
+              :key="(halamanRincian - 1) * PER_HALAMAN_RINCIAN + i"
+              class="wt-baris"
+            >
               <td class="wt-td-tanggal">
                 {{ t.tanggal }} {{ t.bulan }} {{ t.tahun }}
               </td>
@@ -246,6 +334,28 @@ function pilihWilayah(nama) {
             </tr>
           </tbody>
         </table>
+
+        <nav
+          v-if="jumlahHalamanRincian > 1"
+          class="wt-halaman"
+          aria-label="Halaman rincian transaksi"
+        >
+          <button
+            type="button"
+            class="wt-halaman-btn"
+            :disabled="halamanRincian === 1"
+            @click="gantiHalamanRincian(halamanRincian - 1)"
+          >Sebelumnya</button>
+          <span class="wt-halaman-info" aria-live="polite">
+            {{ rentangRincian }} · hal. {{ halamanRincian }}/{{ jumlahHalamanRincian }}
+          </span>
+          <button
+            type="button"
+            class="wt-halaman-btn"
+            :disabled="halamanRincian === jumlahHalamanRincian"
+            @click="gantiHalamanRincian(halamanRincian + 1)"
+          >Berikutnya</button>
+        </nav>
       </section>
 
     </template>
@@ -623,6 +733,51 @@ function pilihWilayah(nama) {
 
 /* Transaksi */
 .wt-panel--transaksi .wt-panel-judul { margin-bottom: 0.85rem; }
+
+/* Pagination rincian transaksi */
+.wt-halaman {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+}
+
+.wt-halaman-info {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.wt-halaman-btn {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.wt-halaman-btn:hover:not(:disabled) {
+  border-color: var(--teal-600);
+  color: var(--teal-700);
+}
+
+.wt-halaman-btn:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
+}
+
+.wt-halaman-btn:disabled { opacity: 0.45; cursor: default; }
+
+.dark .wt-halaman-btn:hover:not(:disabled) { color: var(--teal-400); }
 
 .wt-td-tanggal {
   color: var(--vp-c-text-2);
