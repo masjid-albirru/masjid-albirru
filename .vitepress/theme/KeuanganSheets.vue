@@ -1,483 +1,754 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { BarChart3, ReceiptText, ArrowDownToLine, ArrowUpFromLine } from 'lucide-vue-next'
-import { LAPORAN_KEUANGAN_AKTIF } from './fitur'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { RefreshCw, Inbox, CloudOff } from 'lucide-vue-next'
+import { muatDataKeuangan, rupiah, formatTanggal, formatKuantitas } from './keuanganData.js'
 
-const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
+// Data baru diambil ulang tiap 5 menit supaya laporan yang diubah bendahara
+// langsung terlihat tanpa perlu deploy ulang situs.
+const SELANG_POLLING = 5 * 60 * 1000
 
-const CSV_TAHUN = {
-  '2026': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=125761613&single=true&output=csv',
-  // tambah tahun baru di sini, contoh:
-  // '2027': 'https://docs.google.com/spreadsheets/d/.../pub?gid=xxx&output=csv',
-}
+const data = ref(null)
+const memuat = ref(true)
+const galat = ref('')
+const aktif = ref('operasional')
+const tabRefs = ref([])
 
-const rekap = ref([])
-const transaksi = ref([])
-const loadingRekap = ref(true)
-const loadingTransaksi = ref(false)
-const error = ref(false)
+const program = computed(
+  () => data.value?.programs.find(p => p.id === aktif.value) ?? null
+)
 
-const activeTahun = ref('2026')
-const activeBulan = ref('Semua')
-const activeJenis = ref('Semua')
-const search = ref('')
+const adaData = computed(() => data.value != null && !galat.value)
 
-onMounted(async () => {
-  if (!LAPORAN_KEUANGAN_AKTIF) {
-    loadingRekap.value = false
-    return
-  }
-  await fetchRekap()
-  await fetchTransaksi(activeTahun.value)
-})
-
-function parseCSV(text) {
-  const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-  return lines.slice(1).map(line => {
-    const cols = []
-    let current = ''
-    let inQuote = false
-    for (const ch of line) {
-      if (ch === '"') { inQuote = !inQuote }
-      else if (ch === ',' && !inQuote) { cols.push(current.trim()); current = '' }
-      else { current += ch }
+async function muat() {
+  memuat.value = true
+  galat.value = ''
+  try {
+    const hasil = await muatDataKeuangan()
+    data.value = hasil
+    if (hasil.ringkasan.gagal === hasil.ringkasan.program) {
+      galat.value = 'Tidak ada tab spreadsheet yang bisa dibaca.'
     }
-    cols.push(current.trim())
-    const row = {}
-    headers.forEach((h, i) => { row[h] = (cols[i] ?? '').replace(/"/g, '') })
-    return row
-  }).filter(r => Object.values(r).some(v => v !== ''))
-}
-
-async function fetchRekap() {
-  try {
-    const res = await fetch(CSV_REKAP)
-    const text = await res.text()
-    rekap.value = parseCSV(text)
-  } catch {
-    error.value = true
+  } catch (e) {
+    galat.value = e?.message || 'Gagal menghubungi Google Sheets.'
   } finally {
-    loadingRekap.value = false
+    memuat.value = false
   }
 }
 
-async function fetchTransaksi(tahun) {
-  const url = CSV_TAHUN[tahun]
-  if (!url) return
-  loadingTransaksi.value = true
-  try {
-    const res = await fetch(url)
-    const text = await res.text()
-    transaksi.value = parseCSV(text)
-    activeBulan.value = 'Semua'
-  } catch {
-    error.value = true
-  } finally {
-    loadingTransaksi.value = false
-  }
+let timer = null
+
+function mulaiPolling() {
+  hentikanPolling()
+  timer = setInterval(() => {
+    if (!document.hidden) muat()
+  }, SELANG_POLLING)
 }
 
-async function gantTahun(tahun) {
-  activeTahun.value = tahun
-  await fetchTransaksi(tahun)
+function hentikanPolling() {
+  if (timer) { clearInterval(timer); timer = null }
 }
 
-// Bulan unik dari transaksi
-const bulanOptions = computed(() => {
-  const set = new Set(transaksi.value.map(r => r.bulan).filter(Boolean))
-  return ['Semua', ...Array.from(set)]
+// Tab browser yang lama ditinggal sering menahan timer, jadi saat kembali
+// ke halaman data dicek ulang bila sudah lewat satu siklus polling.
+function saatTerlihat() {
+  if (document.hidden || !data.value) return
+  if (Date.now() - data.value.waktu.getTime() > SELANG_POLLING) muat()
+}
+
+onMounted(() => {
+  muat()
+  mulaiPolling()
+  document.addEventListener('visibilitychange', saatTerlihat)
 })
 
-// Filter transaksi
-const filtered = computed(() => {
-  return transaksi.value.filter(r => {
-    const q = search.value.toLowerCase()
-    const matchSearch = !q || r.keterangan?.toLowerCase().includes(q)
-    const matchBulan  = activeBulan.value === 'Semua' || r.bulan === activeBulan.value
-    const matchJenis  = activeJenis.value === 'Semua' || r.jenis?.toLowerCase() === activeJenis.value.toLowerCase()
-    return matchSearch && matchBulan && matchJenis
-  })
+onUnmounted(() => {
+  hentikanPolling()
+  document.removeEventListener('visibilitychange', saatTerlihat)
 })
 
-// Total dari filtered
-const totalPemasukan = computed(() =>
-  filtered.value.filter(r => r.jenis?.toLowerCase() === 'pemasukan')
-    .reduce((s, r) => s + (parseFloat(r.nominal?.replace(/[^0-9.-]/g, '')) || 0), 0)
-)
+function pilihTab(e, i) {
+  const total = data.value?.programs.length ?? 0
+  if (!total) return
+  let tujuan = -1
+  if (e.key === 'ArrowRight') tujuan = (i + 1) % total
+  else if (e.key === 'ArrowLeft') tujuan = (i - 1 + total) % total
+  else if (e.key === 'Home') tujuan = 0
+  else if (e.key === 'End') tujuan = total - 1
+  if (tujuan < 0) return
+  e.preventDefault()
+  aktif.value = data.value.programs[tujuan].id
+  tabRefs.value[tujuan]?.focus()
+}
 
-const totalPengeluaran = computed(() =>
-  filtered.value.filter(r => r.jenis?.toLowerCase() === 'pengeluaran')
-    .reduce((s, r) => s + (parseFloat(r.nominal?.replace(/[^0-9.-]/g, '')) || 0), 0)
-)
+/** Nilai sel tabel zakat/kampung, sesuai tipe kolomnya. */
+function sel(nilai, tipe) {
+  if (nilai == null) return '—'
+  if (tipe === 'kuantitas') return formatKuantitas(nilai)
+  if (tipe === 'jumlah') return Number(nilai).toLocaleString('id-ID')
+  return rupiah(nilai)
+}
 
-const saldoAkhir = computed(() => {
-  if (activeBulan.value !== 'Semua') {
-    // ambil saldo terakhir di bulan itu
-    const bulanData = filtered.value.filter(r => r.saldo)
-    return bulanData.length ? parseFloat(bulanData[bulanData.length - 1].saldo?.replace(/[^0-9.-]/g, '')) || 0 : 0
-  }
-  // ambil saldo paling akhir
-  const last = transaksi.value.filter(r => r.saldo).at(-1)
-  return last ? parseFloat(last.saldo?.replace(/[^0-9.-]/g, '')) || 0 : 0
+function subtotalBulan(bulan) {
+  const p = program.value
+  if (!p) return 0
+  return p.subtotal?.[bulan]
+    ?? p.pemasukan.filter(r => r.bulan === bulan).reduce((s, r) => s + r.jumlah, 0)
+}
+
+const jamMuat = computed(() => {
+  if (!data.value) return ''
+  return data.value.waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 })
-
-function rupiah(angka) {
-  return 'Rp ' + Number(angka).toLocaleString('id-ID')
-}
-
-function formatTanggal(str) {
-  if (!str) return '—'
-  const d = new Date(str)
-  if (isNaN(d)) return str
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-}
 </script>
 
 <template>
-  <div class="keuangan-sheets">
-
-    <KeuanganSegeraHadir v-if="!LAPORAN_KEUANGAN_AKTIF" />
-
-    <div v-else-if="error" class="ks-error">
-      Gagal memuat data. Periksa koneksi internet.
+  <div class="keu">
+    <div v-if="memuat && !data" class="keu-status">
+      <span class="keu-spinner" aria-hidden="true"></span>
+      Memuat data keuangan dari Google Sheets...
     </div>
 
-    <template v-else>
-
-      <!-- ===== REKAP TAHUNAN ===== -->
-      <h3 class="ks-section-title">
-        <BarChart3 :size="17" />
-        Rekap Per Bulan
-      </h3>
-
-      <div v-if="loadingRekap" class="ks-loading">
-        <span class="spinner"></span> Memuat rekap...
+    <div v-else-if="galat" class="keu-status keu-status--galat">
+      <CloudOff :size="20" aria-hidden="true" />
+      <div>
+        <strong>Gagal memuat data keuangan</strong>
+        <p>{{ galat }} Periksa koneksi Anda, lalu coba lagi.</p>
+        <button type="button" class="keu-tombol" @click="muat">
+          <RefreshCw :size="14" aria-hidden="true" /> Muat ulang
+        </button>
       </div>
+    </div>
 
-      <div v-else class="ks-rekap-wrap">
-        <table class="ks-table">
-          <thead>
-            <tr>
-              <th>Bulan</th>
-              <th>Pemasukan</th>
-              <th>Pengeluaran</th>
-              <th>Saldo Akhir</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(r, i) in rekap" :key="i">
-              <td class="ks-td-bulan">{{ r.bulan }}</td>
-              <td class="ks-masuk">{{ rupiah(r.pemasukan) }}</td>
-              <td class="ks-keluar">{{ rupiah(r.pengeluaran) }}</td>
-              <td class="ks-saldo">{{ rupiah(r.saldo_akhir) }}</td>
-              <td class="ks-ket">{{ r.keterangan || '—' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <template v-else-if="adaData && program">
+      <nav class="keu-tabs" role="tablist" aria-label="Program laporan keuangan">
+        <button
+          v-for="(p, i) in data.programs"
+          :key="p.id"
+          ref="tabRefs"
+          type="button"
+          role="tab"
+          class="keu-tab"
+          :class="{ 'is-aktif': p.id === aktif }"
+          :aria-selected="p.id === aktif"
+          :tabindex="p.id === aktif ? 0 : -1"
+          @click="aktif = p.id"
+          @keydown="pilihTab($event, i)"
+        >
+          {{ p.nama }}
+        </button>
+      </nav>
 
-      <!-- ===== DETAIL TRANSAKSI ===== -->
-      <h3 class="ks-section-title" style="margin-top: 2rem">
-        <ReceiptText :size="17" />
-        Detail Transaksi
-      </h3>
+      <section
+        class="keu-panel"
+        role="tabpanel"
+        :aria-label="program.nama"
+        tabindex="0"
+      >
+        <header class="keu-panel__kepala">
+          <div>
+            <h3 class="keu-panel__judul">{{ program.nama }}</h3>
+            <p class="keu-panel__ket">{{ program.keterangan }}</p>
+          </div>
+          <button type="button" class="keu-tombol keu-tombol--kecil" @click="muat" :disabled="memuat">
+            <RefreshCw :size="13" aria-hidden="true" :class="{ 'keu-putar': memuat }" />
+            {{ memuat ? 'Memuat' : 'Muat ulang' }}
+          </button>
+        </header>
 
-      <!-- Pilih tahun -->
-      <div class="ks-toolbar">
-        <div class="ks-tahun-tabs">
-          <button
-            v-for="tahun in Object.keys(CSV_TAHUN)"
-            :key="tahun"
-            class="ks-tab"
-            :class="{ active: activeTahun === tahun }"
-            @click="gantTahun(tahun)"
-          >{{ tahun }}</button>
+        <!-- Program belum diisi bendahara -->
+        <div v-if="program.status === 'error'" class="keu-status keu-status--galat">
+          <CloudOff :size="18" aria-hidden="true" />
+          <div>
+            <strong>Tab ini gagal dibaca</strong>
+            <p>{{ program.pesan }}</p>
+          </div>
         </div>
 
-        <div class="ks-filters">
-          <input v-model="search" class="ks-search" placeholder="Cari keterangan..." />
-          <select v-model="activeBulan" class="ks-select">
-            <option v-for="b in bulanOptions" :key="b">{{ b }}</option>
-          </select>
-          <select v-model="activeJenis" class="ks-select">
-            <option>Semua</option>
-            <option>Pemasukan</option>
-            <option>Pengeluaran</option>
-          </select>
+        <div v-else-if="program.kosong" class="keu-kosong">
+          <Inbox :size="20" aria-hidden="true" />
+          <div>
+            <strong>Belum ada data</strong>
+            <p>
+              Data <em>{{ program.nama }}</em> masih kosong.
+              Data di halaman ini akan terisi otomatis begitu ada
+              catatan transaksi.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <!-- Ringkasan filter -->
-      <div class="ks-summary">
-        <div class="ks-sum-card ks-sum--masuk">
-          <div class="ks-sum-label">Pemasukan</div>
-          <div class="ks-sum-value">{{ rupiah(totalPemasukan) }}</div>
-        </div>
-        <div class="ks-sum-card ks-sum--keluar">
-          <div class="ks-sum-label">Pengeluaran</div>
-          <div class="ks-sum-value">{{ rupiah(totalPengeluaran) }}</div>
-        </div>
-        <div class="ks-sum-card ks-sum--saldo">
-          <div class="ks-sum-label">Saldo Akhir</div>
-          <div class="ks-sum-value">{{ rupiah(saldoAkhir) }}</div>
-        </div>
-      </div>
+        <template v-else>
+          <div class="financial-summary">
+            <div class="financial-card pemasukan">
+              <div class="label">Pemasukan</div>
+              <div class="amount">{{ rupiah(program.totals.masuk) }}</div>
+            </div>
+            <div class="financial-card pengeluaran">
+              <div class="label">Pengeluaran</div>
+              <div class="amount">{{ rupiah(program.totals.keluar) }}</div>
+            </div>
+            <div class="financial-card saldo">
+              <div class="label">Saldo</div>
+              <div class="amount">{{ rupiah(program.totals.saldo) }}</div>
+            </div>
+          </div>
 
-      <div v-if="loadingTransaksi" class="ks-loading">
-        <span class="spinner"></span> Memuat transaksi...
-      </div>
+          <!-- Transaksi berjalan: Infaq Operasional, Pemulasaran, Infaq Ramadhan -->
+          <template v-if="program.jenis === 'transaksi'">
+            <h4 class="keu-h4">Rincian transaksi</h4>
+            <div class="keu-tabel-wrap">
+              <table class="keu-tabel">
+                <thead>
+                  <tr>
+                    <th scope="col">Tanggal</th>
+                    <th scope="col">Keterangan</th>
+                    <th scope="col" class="keu-num">Masuk</th>
+                    <th scope="col" class="keu-num">Keluar</th>
+                    <th scope="col" class="keu-num">Saldo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(r, i) in program.transaksi" :key="i">
+                    <td class="keu-tgl">{{ formatTanggal(r.tanggal, r.tanggalMentah) }}</td>
+                    <td>{{ r.ket }}</td>
+                    <td class="keu-num keu-masuk">
+                      <template v-if="r.masuk">{{ rupiah(r.masuk) }}</template>
+                      <span v-else class="keu-kosongsel">—</span>
+                    </td>
+                    <td class="keu-num keu-keluar">
+                      <template v-if="r.keluar">{{ rupiah(r.keluar) }}</template>
+                      <span v-else class="keu-kosongsel">—</span>
+                    </td>
+                    <td class="keu-num keu-saldo">{{ rupiah(r.saldo) }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2">Total</td>
+                    <td class="keu-num keu-masuk">{{ rupiah(program.totals.masuk) }}</td>
+                    <td class="keu-num keu-keluar">{{ rupiah(program.totals.keluar) }}</td>
+                    <td class="keu-num keu-saldo">{{ rupiah(program.totals.saldo) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <p class="keu-catatan">Saldo dihitung ulang dari kolom masuk dan keluar tiap baris.</p>
+          </template>
 
-      <div v-else-if="filtered.length === 0" class="ks-empty">
-        Tidak ada transaksi yang cocok.
-      </div>
+          <!-- Celengan LAZIRU: pemasukan per RT dan penyaluran -->
+          <template v-else-if="program.jenis === 'celengan'">
+            <div class="keu-dua">
+              <div>
+                <h4 class="keu-h4">Pemasukan per wilayah</h4>
+                <div class="keu-tabel-wrap">
+                  <table class="keu-tabel">
+                    <thead>
+                      <tr>
+                        <th scope="col">Bulan</th>
+                        <th scope="col">Wilayah</th>
+                        <th scope="col" class="keu-num">Jumlah</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template v-for="b in program.bulan" :key="b">
+                        <tr v-for="r in program.pemasukan.filter(x => x.bulan === b)" :key="b + r.wilayah">
+                          <td class="keu-tgl">{{ b }}</td>
+                          <td>{{ r.wilayah }}</td>
+                          <td class="keu-num keu-masuk">{{ rupiah(r.jumlah) }}</td>
+                        </tr>
+                        <tr class="keu-sub">
+                          <td colspan="2">Jumlah {{ b }}</td>
+                          <td class="keu-num">{{ rupiah(subtotalBulan(b)) }}</td>
+                        </tr>
+                      </template>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="2">Total pemasukan</td>
+                        <td class="keu-num keu-masuk">{{ rupiah(program.totals.masuk) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
 
-      <div v-else class="ks-rekap-wrap">
-        <table class="ks-table">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Bulan</th>
-              <th>Keterangan</th>
-              <th>Jenis</th>
-              <th>Nominal</th>
-              <th>Saldo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(r, i) in filtered" :key="i"
-              :class="r.jenis?.toLowerCase() === 'pemasukan' ? 'ks-row--masuk' : 'ks-row--keluar'"
-            >
-              <td class="ks-td-tgl">{{ formatTanggal(r.tanggal) }}</td>
-              <td class="ks-td-bulan">{{ r.bulan }}</td>
-              <td>{{ r.keterangan }}</td>
-              <td>
-                <span class="ks-jenis-badge" :class="r.jenis?.toLowerCase() === 'pemasukan' ? 'ks-jenis--masuk' : 'ks-jenis--keluar'">
-                  <ArrowUpFromLine
-                    v-if="r.jenis?.toLowerCase() === 'pemasukan'"
-                    :size="12"
-                  />
-                  <ArrowDownToLine v-else :size="12" />
-                  {{ r.jenis }}
-                </span>
-              </td>
-              <td :class="r.jenis?.toLowerCase() === 'pemasukan' ? 'ks-masuk' : 'ks-keluar'">
-                {{ rupiah(r.nominal) }}
-              </td>
-              <td class="ks-saldo">{{ rupiah(r.saldo) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              <div>
+                <h4 class="keu-h4">Penyaluran</h4>
+                <div class="keu-tabel-wrap">
+                  <table class="keu-tabel">
+                    <thead>
+                      <tr>
+                        <th scope="col">Tanggal</th>
+                        <th scope="col">Kegiatan</th>
+                        <th scope="col" class="keu-num">Jumlah</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="r in program.pengeluaran" :key="r.no">
+                        <td class="keu-tgl">{{ formatTanggal(r.tanggal, r.tanggalMentah) }}</td>
+                        <td>{{ r.kegiatan }}</td>
+                        <td class="keu-num keu-keluar">{{ rupiah(r.jumlah) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="2">Total penyaluran</td>
+                        <td class="keu-num keu-keluar">{{ rupiah(program.totals.keluar) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </template>
 
-      <div class="ks-footer">
-        Menampilkan {{ filtered.length }} transaksi ·
-        Data diperbarui otomatis
-      </div>
+          <!-- Donatur tetap -->
+          <template v-else-if="program.jenis === 'donatur'">
+            <h4 class="keu-h4">Setoran per bulan</h4>
+            <ul class="keu-chip-lis">
+              <li v-for="b in program.perBulan" :key="b.bulan" class="keu-chip">
+                <span class="keu-chip__nama">{{ b.bulan }}</span>
+                <span class="keu-chip__nilai">{{ rupiah(b.jumlah) }}</span>
+                <span class="keu-chip__ket">{{ b.donatur }} donatur</span>
+              </li>
+            </ul>
 
+            <h4 class="keu-h4">Daftar donatur</h4>
+            <div class="keu-tabel-wrap">
+              <table class="keu-tabel">
+                <thead>
+                  <tr>
+                    <th scope="col">Bulan</th>
+                    <th scope="col">Tanggal</th>
+                    <th scope="col">Donatur</th>
+                    <th scope="col" class="keu-num">Nominal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(r, i) in program.list" :key="i">
+                    <td class="keu-tgl">{{ r.bulan }}</td>
+                    <td class="keu-tgl">{{ formatTanggal(r.tanggal, r.tanggalMentah) }}</td>
+                    <td>{{ r.nama }}</td>
+                    <td class="keu-num keu-masuk">{{ rupiah(r.jumlah) }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">Total</td>
+                    <td class="keu-num keu-masuk">{{ rupiah(program.totals.masuk) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </template>
+
+          <!-- Rekap zakat: tiga seksi dengan arti kolom berbeda -->
+          <template v-else-if="program.jenis === 'zakat'">
+            <div v-for="s in program.seksi" :key="s.kode" class="keu-blok">
+              <h4 class="keu-h4">{{ s.kode }}. {{ s.judul }}</h4>
+              <div class="keu-tabel-wrap">
+                <table class="keu-tabel">
+                  <thead>
+                    <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Item</th>
+                      <th v-for="k in s.kolom" :key="k.key" scope="col" class="keu-num">{{ k.label }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(b, i) in s.baris" :key="i">
+                      <td class="keu-tgl">{{ b.no }}</td>
+                      <td>{{ b.item }}</td>
+                      <td v-for="k in s.kolom" :key="k.key" class="keu-num keu-kosongsel">
+                        {{ sel(b[k.key], k.tipe) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="2">Total</td>
+                      <td v-for="k in s.kolom" :key="k.key" class="keu-num">
+                        {{ sel(s.total[k.key], k.tipe) }}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+            <p class="keu-catatan">
+              Saldo = penerimaan dikurangi penyaluran zakat dan biaya kelengkapan.
+            </p>
+          </template>
+
+          <!-- Kampung Ramadhan: empat seksi pengeluaran dan blok pemasukan -->
+          <template v-else-if="program.jenis === 'kampung'">
+            <div v-for="s in program.seksi" :key="s.kode" class="keu-blok">
+              <h4 class="keu-h4">{{ s.kode }}. {{ s.judul }}</h4>
+              <div class="keu-tabel-wrap">
+                <table class="keu-tabel">
+                  <thead>
+                    <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Uraian</th>
+                      <th scope="col" class="keu-num">Satuan</th>
+                      <th scope="col" class="keu-num">Qty</th>
+                      <th scope="col" class="keu-num">Biaya</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(b, i) in s.items" :key="i">
+                      <td class="keu-tgl">{{ b.no || '—' }}</td>
+                      <td>{{ b.nama }}</td>
+                      <td class="keu-num keu-kosongsel">{{ b.satuan || '—' }}</td>
+                      <td class="keu-num keu-kosongsel">
+                        {{ b.qty == null ? '—' : formatKuantitas(b.qty) }}
+                      </td>
+                      <td class="keu-num keu-keluar">{{ rupiah(b.total) }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="4">Subtotal {{ s.kode }}</td>
+                      <td class="keu-num">{{ rupiah(s.subtotal) }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <h4 class="keu-h4">Sumber pemasukan</h4>
+            <div class="keu-tabel-wrap">
+              <table class="keu-tabel">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Keterangan</th>
+                    <th scope="col" class="keu-num">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(r, i) in program.pemasukan" :key="i">
+                    <td class="keu-tgl">{{ r.no || '—' }}</td>
+                    <td>{{ r.ket }}</td>
+                    <td class="keu-num keu-masuk">{{ rupiah(r.jumlah) }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2">Total pemasukan</td>
+                    <td class="keu-num keu-masuk">{{ rupiah(program.totals.masuk) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </template>
+        </template>
+      </section>
+
+      <footer class="keu-kaki">
+        <span>
+          Sumber: Data keuangan Masjid Al-Birru, diperbarui otomatis tiap 5 menit.
+          Terakhir dimuat pukul {{ jamMuat }}.
+        </span>
+      </footer>
     </template>
   </div>
 </template>
 
 <style scoped>
-.keuangan-sheets { margin: 1.5rem 0; }
+.keu { margin: 1.5rem 0; }
 
-.ks-section-title {
+/* ---- state: memuat, galat, kosong ---- */
+.keu-status,
+.keu-kosong {
   display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 1.25rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.keu-status p,
+.keu-kosong p { margin: 0.35rem 0 0; }
+
+.keu-status strong,
+.keu-kosong strong { color: var(--vp-c-text-1); }
+
+.keu-status--galat { border-color: rgba(220, 38, 38, 0.35); }
+
+.keu-kosong { background: var(--vp-c-bg-soft); }
+.keu-kosong svg { color: var(--vp-c-text-3, var(--vp-c-text-2)); flex-shrink: 0; margin-top: 2px; }
+.keu-status svg { flex-shrink: 0; margin-top: 2px; }
+
+.keu-spinner {
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  border: 2px solid var(--vp-c-divider);
+  border-top-color: var(--vp-c-brand-1, var(--teal-700));
+  border-radius: 50%;
+  animation: keu-putar 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes keu-putar { to { transform: rotate(360deg); } }
+
+/* ---- tombol ---- */
+.keu-tombol {
+  display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
+  gap: 6px;
+  margin-top: 0.75rem;
+  padding: 0 14px;
+  min-height: 40px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.keu-tombol:hover:not(:disabled) {
+  border-color: var(--teal-600);
   color: var(--teal-700);
 }
 
-.ks-section-title svg {
-  color: var(--teal-600);
+.keu-tombol:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
 }
 
-.ks-loading, .ks-empty, .ks-error {
-  text-align: center;
-  padding: 2rem;
-  color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-}
+.keu-tombol:disabled { opacity: 0.55; cursor: default; }
 
-.spinner {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid var(--vp-c-divider);
-  border-top-color: var(--vp-c-brand);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.keu-tombol--kecil { margin-top: 0; min-height: 34px; font-size: 0.78rem; }
 
-/* Rekap table */
-.ks-rekap-wrap {
+.keu-putar { animation: keu-putar 0.8s linear infinite; }
+
+/* ---- pemindah program ---- */
+.keu-tabs {
+  display: flex;
+  gap: 2px;
   overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid var(--vp-c-divider);
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--vp-c-divider);
+  margin-bottom: 1.5rem;
+}
+
+.keu-tab {
+  flex: 0 0 auto;
+  position: relative;
+  padding: 10px 14px;
+  min-height: 44px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--vp-c-text-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.keu-tab:hover { color: var(--teal-700); }
+
+.keu-tab.is-aktif {
+  color: var(--teal-700);
+  border-bottom-color: var(--gold);
+}
+
+.keu-tab:focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: -3px;
+}
+
+.dark .keu-tab:hover,
+.dark .keu-tab.is-aktif { color: var(--teal-400); }
+
+/* ---- panel ---- */
+.keu-panel { outline: none; }
+
+.keu-panel__kepala {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.45);
   margin-bottom: 1rem;
 }
 
-.ks-table {
+.keu-panel__judul {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+}
+
+.keu-panel__ket {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--vp-c-text-2);
+}
+
+.keu-h4 {
+  margin: 1.75rem 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--vp-c-text-2);
+}
+
+.keu-blok:first-of-type .keu-h4 { margin-top: 1rem; }
+
+.keu-dua {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* ---- tabel ---- */
+.keu-tabel-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.keu-tabel {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
+  margin: 0;
 }
 
-.ks-table th {
-  background: var(--vp-c-bg-soft);
-  padding: 0.65rem 1rem;
+.keu-tabel th,
+.keu-tabel td {
+  padding: 8px 12px;
   text-align: left;
-  font-weight: 600;
-  font-size: 0.78rem;
-  color: var(--vp-c-text-2);
+  vertical-align: top;
   border-bottom: 1px solid var(--vp-c-divider);
-  white-space: nowrap;
 }
 
-.ks-table td {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid var(--vp-c-divider);
-  vertical-align: middle;
-}
-
-.ks-table tbody tr:last-child td { border-bottom: none; }
-.ks-table tbody tr:hover td { background: var(--vp-c-bg-soft); }
-
-.ks-td-bulan { font-weight: 600; white-space: nowrap; }
-.ks-td-tgl   { white-space: nowrap; color: var(--vp-c-text-2); font-size: 0.82rem; }
-.ks-ket      { color: var(--vp-c-text-2); font-size: 0.82rem; font-style: italic; }
-.ks-masuk    { color: #16a34a; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ks-keluar   { color: #dc2626; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ks-saldo    { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
-
-.ks-row--masuk td  { background: rgba(34,197,94,0.03); }
-.ks-row--keluar td { background: rgba(239,68,68,0.03); }
-
-.ks-jenis-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.keu-tabel thead th {
+  position: sticky;
+  top: 0;
+  background: var(--vp-c-bg-soft);
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 99px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.keu-tabel tbody tr:hover td { background: var(--vp-c-bg-soft); }
+.keu-tabel tbody tr:last-child td { border-bottom: 1px solid var(--vp-c-divider); }
+
+.keu-tabel tfoot td {
+  background: var(--vp-c-bg-soft);
+  font-weight: 700;
+  border-bottom: none;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.keu-num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.ks-jenis--masuk  { background: rgba(34,197,94,0.1);  color: #16a34a; }
-.ks-jenis--keluar { background: rgba(239,68,68,0.1);  color: #dc2626; }
 
-/* Toolbar */
-.ks-toolbar {
+.keu-tgl { color: var(--vp-c-text-2); white-space: nowrap; }
+.keu-masuk { color: var(--teal-700); font-weight: 600; }
+.keu-keluar { color: var(--keluar); font-weight: 600; }
+.keu-saldo { font-weight: 700; }
+.keu-kosongsel { color: var(--vp-c-text-2); font-weight: 400; }
+.keu-sub td { background: var(--vp-c-bg-soft); font-weight: 600; }
+
+.dark .keu-masuk { color: var(--teal-400); }
+
+/* ---- chip bulan ---- */
+.keu-chip-lis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.keu-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.keu-chip__nama { font-size: 0.72rem; font-weight: 700; color: var(--vp-c-text-2); text-transform: uppercase; letter-spacing: 0.3px; }
+.keu-chip__nilai { font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--teal-700); }
+.keu-chip__ket { font-size: 0.72rem; color: var(--vp-c-text-2); }
+
+.dark .keu-chip__nilai { color: var(--teal-400); }
+
+/* ---- catatan & footer ---- */
+.keu-catatan {
+  margin: 0.6rem 0 0;
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+  line-height: 1.6;
+}
+
+.keu-kaki {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 1rem;
-}
-
-.ks-tahun-tabs {
-  display: flex;
-  gap: 6px;
-}
-
-.ks-tab {
-  padding: 5px 14px;
-  border-radius: 8px;
-  border: 1.5px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
+  margin-top: 1.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--vp-c-divider);
+  font-size: 0.75rem;
   color: var(--vp-c-text-2);
-  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.keu-kaki__tautan {
+  color: var(--teal-700);
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.ks-tab:hover { border-color: var(--vp-c-brand); color: var(--vp-c-brand); }
-.ks-tab.active { background: var(--vp-c-brand); border-color: var(--vp-c-brand); color: #fff; }
+.keu-kaki__tautan:hover { text-decoration: underline; }
 
-.ks-filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.dark .keu-kaki__tautan { color: var(--teal-400); }
 
-.ks-search {
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1.5px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.82rem;
-  min-width: 180px;
-}
-
-.ks-search:focus { outline: none; border-color: var(--vp-c-brand); }
-
-.ks-select {
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1.5px solid var(--vp-c-divider);
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-/* Summary cards */
-.ks-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 1rem;
-}
-
-.ks-sum-card {
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--vp-c-divider);
-}
-
-.ks-sum-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  opacity: 0.7;
-  margin-bottom: 2px;
-}
-
-.ks-sum-value {
-  font-size: 1rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.ks-sum--masuk  { background: rgba(34,197,94,0.08);  }
-.ks-sum--masuk  .ks-sum-value { color: #16a34a; }
-.ks-sum--keluar { background: rgba(239,68,68,0.08);  }
-.ks-sum--keluar .ks-sum-value { color: #dc2626; }
-.ks-sum--saldo  { background: rgba(15,107,120,0.08); }
-.ks-sum--saldo  .ks-sum-value { color: var(--vp-c-brand); }
-
-/* Footer */
-.ks-footer {
-  text-align: center;
-  font-size: 0.72rem;
-  color: var(--vp-c-text-2);
-  margin-top: 0.75rem;
-}
-
-/* Mobile */
-@media (max-width: 640px) {
-  .ks-summary { grid-template-columns: 1fr; }
-  .ks-toolbar { flex-direction: column; align-items: flex-start; }
-  .ks-search { min-width: 100%; }
+/* ---- mobile ---- */
+@media (max-width: 768px) {
+  .keu-dua { grid-template-columns: 1fr; gap: 0; }
+  .keu-panel__kepala { flex-direction: column; }
+  .keu-tabel { min-width: 460px; }
+  .keu-tabel th:first-child,
+  .keu-tabel td:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--vp-c-bg);
+    z-index: 2;
+  }
+  .keu-tabel thead th:first-child { background: var(--vp-c-bg-soft); z-index: 3; }
+  .keu-tabel tfoot td:first-child { background: var(--vp-c-bg-soft); }
+  .keu-tabel tbody tr:hover td:first-child { background: var(--vp-c-bg-soft); }
 }
 </style>

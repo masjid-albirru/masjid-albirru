@@ -22,6 +22,10 @@
   --warm-bg: #f5fbfc;
   --warm-border: #cce8ed;
 
+  /* Merah khusus angka pengeluaran. Dua nilai karena #dc2626 gagal kontras
+     AA di atas latar gelap. */
+  --keluar: #b91c1c;
+
   --vp-font-family-base: 'Lato', 'Segoe UI', sans-serif;
   --vp-font-family-mono: 'JetBrains Mono', monospace;
 
@@ -38,6 +42,7 @@
   --gold-dark: #c9a84c;
   --warm-bg: #0f1e21;
   --warm-border: #1e3c42;
+  --keluar: #f87171;
   --mosque-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
@@ -454,7 +459,7 @@ body {
 }
 
 .financial-card.pemasukan .amount  { color: var(--teal-700); }
-.financial-card.pengeluaran .amount { color: #dc2626; }
+.financial-card.pengeluaran .amount { color: var(--keluar); }
 .financial-card.saldo .amount       { color: var(--gold-dark); }
 
 /* ===== EVENT CARDS ===== */

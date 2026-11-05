@@ -72,39 +72,6 @@ collections:
           - { label: "Khusus Muslimah", value: "Khusus Muslimah" }
       - { label: "Keterangan Tambahan", name: body, widget: markdown, required: false }
 
-  # ─── KEUANGAN ────────────────────────────────────────────────────────────
-  - name: keuangan
-    label: "💰 Laporan Keuangan"
-    label_singular: "Laporan"
-    folder: docs/keuangan
-    hide: true
-    create: true
-    slug: "{{slug}}"
-    path: "{{tahun}}/{{slug}}"
-    fields:
-      - { label: "Judul Laporan", name: title, widget: string, hint: "Contoh: Laporan Keuangan April 2025" }
-      - { label: "Deskripsi", name: description, widget: text, required: false }
-      - { label: "Tahun", name: tahun, widget: number, default: 2025 }
-      - label: "Bulan"
-        name: bulan
-        widget: select
-        options:
-          - { label: "Januari", value: januari }
-          - { label: "Februari", value: februari }
-          - { label: "Maret", value: maret }
-          - { label: "April", value: april }
-          - { label: "Mei", value: mei }
-          - { label: "Juni", value: juni }
-          - { label: "Juli", value: juli }
-          - { label: "Agustus", value: agustus }
-          - { label: "September", value: september }
-          - { label: "Oktober", value: oktober }
-          - { label: "November", value: november }
-          - { label: "Desember", value: desember }
-      - { label: "Total Pemasukan (Rp)", name: total_pemasukan, widget: number, default: 0 }
-      - { label: "Total Pengeluaran (Rp)", name: total_pengeluaran, widget: number, default: 0 }
-      - { label: "Isi Laporan", name: body, widget: markdown, hint: "Tulis rincian pemasukan dan pengeluaran di sini" }
-
 # ─── KHATIB JUM'AT ───────────────────────────────────────────────────────
   - name: khatib
     label: "🕌 Jadwal Khatib Jum'at"

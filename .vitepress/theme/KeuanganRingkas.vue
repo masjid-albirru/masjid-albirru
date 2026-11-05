@@ -1,99 +1,65 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { withBase } from 'vitepress'
-import { TrendingUp, TrendingDown, Wallet, ArrowRight } from 'lucide-vue-next'
-import { LAPORAN_KEUANGAN_AKTIF } from './fitur'
+import { Wallet, RefreshCw, Inbox } from 'lucide-vue-next'
+import { muatDataKeuangan, rupiah, rupiahRingkas } from './keuanganData.js'
 
-const CSV_REKAP = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQETicf9LMmWLV_Koo1WtGao-L5BuljaABvc9GGIoQWukZ_yXJcNy7Wz03S6yy10zGxrEznRfHSK-52/pub?gid=0&single=true&output=csv'
+const programs = ref([])
+const memuat = ref(true)
+const galat = ref(false)
 
-const pemasukan = ref(0)
-const pengeluaran = ref(0)
-const saldo = ref(0)
-const loading = ref(true)
-const error = ref(false)
+const terisi = computed(() => programs.value.filter(p => p.status === 'ok' && !p.kosong))
 
-onMounted(async () => {
-  if (!LAPORAN_KEUANGAN_AKTIF) {
-    loading.value = false
-    return
-  }
+async function muat() {
+  memuat.value = true
+  galat.value = false
   try {
-    const res = await fetch(CSV_REKAP)
-    const text = await res.text()
-    const rows = parseCSV(text)
-
-    // Jumlahkan semua baris rekap
-    rows.forEach(r => {
-      pemasukan.value   += toAngka(r.pemasukan)
-      pengeluaran.value += toAngka(r.pengeluaran)
-    })
-
-    // Saldo akhir = saldo_akhir baris terakhir
-    const last = rows.filter(r => r.saldo_akhir).at(-1)
-    saldo.value = last ? toAngka(last.saldo_akhir) : pemasukan.value - pengeluaran.value
-
+    const hasil = await muatDataKeuangan()
+    programs.value = hasil.programs
+    galat.value = hasil.ringkasan.gagal === hasil.ringkasan.program
   } catch {
-    error.value = true
+    galat.value = true
   } finally {
-    loading.value = false
+    memuat.value = false
   }
-})
-
-function parseCSV(text) {
-  const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-  return lines.slice(1).map(line => {
-    const cols = line.split(',').map(c => c.trim().replace(/"/g, ''))
-    const row = {}
-    headers.forEach((h, i) => { row[h] = cols[i] ?? '' })
-    return row
-  }).filter(r => Object.values(r).some(v => v !== ''))
 }
 
-function toAngka(str) {
-  return parseFloat((str ?? '').replace(/[^0-9.-]/g, '')) || 0
-}
-
-function rupiah(angka) {
-  return 'Rp ' + Number(angka).toLocaleString('id-ID')
-}
+onMounted(muat)
 </script>
 
 <template>
   <div class="keu-ringkas">
-    <KeuanganSegeraHadir v-if="!LAPORAN_KEUANGAN_AKTIF" compact />
-    <div v-else-if="loading" class="kr-loading">Memuat data keuangan...</div>
-    <div v-else-if="error" class="kr-error">Gagal memuat data</div>
+    <p v-if="memuat" class="kr-status">Memuat ringkasan keuangan...</p>
+
+    <p v-else-if="galat" class="kr-status">
+      Data keuangan belum bisa dimuat.
+      <button type="button" class="kr-tautan" @click="muat">
+        <RefreshCw :size="12" aria-hidden="true" /> Coba lagi
+      </button>
+    </p>
+
+    <p v-else-if="terisi.length === 0" class="kr-status kr-status--kosong">
+      <Inbox :size="16" aria-hidden="true" />
+      Belum ada pos keuangan yang terisi di spreadsheet.
+    </p>
+
     <template v-else>
-      <div class="kr-cards">
-        <div class="kr-card kr-masuk">
-          <TrendingUp :size="17" class="kr-icon" />
-          <div>
-            <div class="kr-label">Pemasukan</div>
-            <div class="kr-value">{{ rupiah(pemasukan) }}</div>
+      <ul class="kr-lis">
+        <li v-for="p in terisi" :key="p.id" class="kr-item">
+          <div class="kr-item__kepala">
+            <Wallet :size="15" aria-hidden="true" class="kr-ikon" />
+            <span class="kr-nama">{{ p.nama }}</span>
           </div>
-        </div>
-        <div class="kr-card kr-keluar">
-          <TrendingDown :size="17" class="kr-icon" />
-          <div>
-            <div class="kr-label">Pengeluaran</div>
-            <div class="kr-value">{{ rupiah(pengeluaran) }}</div>
+          <div class="kr-saldo">{{ rupiah(p.totals.saldo) }}</div>
+          <div class="kr-rinci">
+            <span>Masuk {{ rupiahRingkas(p.totals.masuk) }}</span>
+            <span>Keluar {{ rupiahRingkas(p.totals.keluar) }}</span>
           </div>
-        </div>
-        <div class="kr-card kr-saldo">
-          <Wallet :size="17" class="kr-icon" />
-          <div>
-            <div class="kr-label">Saldo Akhir</div>
-            <div class="kr-value">{{ rupiah(saldo) }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="kr-footer">
-        <a :href="withBase('/keuangan/')">
-          Lihat laporan lengkap
-          <ArrowRight :size="13" />
-        </a>
-      </div>
+        </li>
+      </ul>
+      <p class="kr-kaki">
+        <a :href="withBase('/keuangan/')">Lihat rincian tiap transaksi</a>
+      </p>
     </template>
   </div>
 </template>
@@ -101,71 +67,100 @@ function rupiah(angka) {
 <style scoped>
 .keu-ringkas { margin: 1rem 0; }
 
-.kr-loading, .kr-error {
-  text-align: center;
-  color: var(--vp-c-text-2);
-  font-size: 0.85rem;
-  padding: 1rem;
-}
-
-.kr-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.kr-card {
+.kr-status {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 1rem 1.25rem;
-  border-radius: 12px;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0.85rem 1rem;
   border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
 }
 
-.kr-icon { flex-shrink: 0; margin-top: 2px; }
-.kr-masuk .kr-icon  { color: #16a34a; }
-.kr-keluar .kr-icon { color: #dc2626; }
-.kr-saldo .kr-icon  { color: var(--vp-c-brand); }
+.kr-status--kosong { background: var(--vp-c-bg-soft); }
 
-.kr-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  opacity: 0.7;
-  margin-bottom: 4px;
-}
-
-.kr-value {
-  font-size: 1.15rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.kr-masuk  { background: rgba(34,197,94,0.08); }
-.kr-masuk  .kr-value { color: #16a34a; }
-.kr-keluar { background: rgba(239,68,68,0.08); }
-.kr-keluar .kr-value { color: #dc2626; }
-.kr-saldo  { background: rgba(15,107,120,0.08); }
-.kr-saldo  .kr-value { color: var(--vp-c-brand); }
-
-.kr-footer {
-  text-align: right;
-  margin-top: 0.5rem;
-  font-size: 0.78rem;
-}
-
-.kr-footer a {
+.kr-tautan {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--vp-c-brand);
-  text-decoration: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--teal-700);
+  font: inherit;
   font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
-.kr-footer a:hover { opacity: 0.75; }
+.kr-tautan:focus-visible { outline: 2px solid var(--teal-600); outline-offset: 2px; }
 
-@media (max-width: 640px) {
-  .kr-cards { grid-template-columns: 1fr; }
+.kr-lis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
+
+.kr-item {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+}
+
+.kr-item__kepala {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.kr-ikon { color: var(--teal-700); flex-shrink: 0; }
+
+.kr-nama {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+  line-height: 1.3;
+}
+
+.kr-saldo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--teal-700);
+  line-height: 1.3;
+}
+
+.dark .kr-saldo, .dark .kr-ikon { color: var(--teal-400); }
+
+.kr-rinci {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--vp-c-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.kr-kaki {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.kr-kaki a {
+  color: var(--teal-700);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.kr-kaki a:hover { text-decoration: underline; }
+
+.dark .kr-kaki a, .dark .kr-tautan { color: var(--teal-400); }
 </style>

@@ -7,7 +7,8 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
-    "images:compress": "node scripts/kompres-gambar.mjs"
+    "images:compress": "node scripts/kompres-gambar.mjs",
+    "keuangan:uji": "node scripts/uji-keuangan.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.4",
