@@ -88,6 +88,10 @@ function sel(nilai, tipe) {
   return rupiah(nilai)
 }
 
+// Tab Pemulasaran Jenazah menaruh Keterangan setelah Saldo di sheet-nya, jadi
+// tabelnya ikut urutan itu. Tab transaksi lain tetap Keterangan di kolom kedua.
+const ketDiAkhir = computed(() => program.value?.id === 'pemulasaran')
+
 function subtotalBulan(bulan) {
   const p = program.value
   if (!p) return 0
@@ -231,16 +235,17 @@ watch(jumlahHalaman, n => { if (halaman.value > n) halaman.value = n })
                 <thead>
                   <tr>
                     <th scope="col">Tanggal</th>
-                    <th scope="col">Keterangan</th>
+                    <th v-if="!ketDiAkhir" scope="col">Keterangan</th>
                     <th scope="col" class="keu-num">Masuk</th>
                     <th scope="col" class="keu-num">Keluar</th>
                     <th scope="col" class="keu-num">Saldo</th>
+                    <th v-if="ketDiAkhir" scope="col">Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(r, i) in transaksiHalaman" :key="(halaman - 1) * PER_HALAMAN + i">
                     <td class="keu-tgl">{{ formatTanggal(r.tanggal, r.tanggalMentah) }}</td>
-                    <td>{{ r.ket }}</td>
+                    <td v-if="!ketDiAkhir">{{ r.ket }}</td>
                     <td class="keu-num keu-masuk">
                       <template v-if="r.masuk">{{ rupiah(r.masuk) }}</template>
                       <span v-else class="keu-kosongsel">—</span>
@@ -250,14 +255,16 @@ watch(jumlahHalaman, n => { if (halaman.value > n) halaman.value = n })
                       <span v-else class="keu-kosongsel">—</span>
                     </td>
                     <td class="keu-num keu-saldo">{{ rupiah(r.saldo) }}</td>
+                    <td v-if="ketDiAkhir">{{ r.ket }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="2">Total</td>
+                    <td :colspan="ketDiAkhir ? 1 : 2">Total</td>
                     <td class="keu-num keu-masuk">{{ rupiah(program.totals.masuk) }}</td>
                     <td class="keu-num keu-keluar">{{ rupiah(program.totals.keluar) }}</td>
                     <td class="keu-num keu-saldo">{{ rupiah(program.totals.saldo) }}</td>
+                    <td v-if="ketDiAkhir"></td>
                   </tr>
                 </tfoot>
               </table>

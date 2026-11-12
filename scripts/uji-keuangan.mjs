@@ -27,6 +27,14 @@ for (const def of PROGRAM) {
     cek('donatur total', d.totals.masuk, 3450000)
     console.log('  perBulan:', d.perBulan.map(b => `${b.bulan} ${b.jumlah} (${b.donatur})`).join(' | '))
   }
+  if (def.id === 'pemulasaran') {
+    // Tab ini menaruh Saldo tepat sebelum Keterangan. Kalau kolomnya salah
+    // petakan, keterangan akan berisi nominal saldo, bukan teks kegiatan.
+    const ketAngka = d.transaksi.filter(r => /^Rp\s?[\d.,]+$/.test(r.ket))
+    cek('pemulasaran ket bukan nominal', ketAngka.length, 0)
+    if (ketAngka.length) console.log('  contoh salah:', ketAngka.slice(0, 3).map(r => r.ket))
+    console.log('  transaksi:', d.transaksi.length, 'baris')
+  }
   if (def.id === 'ramadhan') {
     cek('ramadhan masuk', d.totals.masuk, 9200000)
     cek('ramadhan keluar', d.totals.keluar, 7126000)

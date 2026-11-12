@@ -10,6 +10,8 @@
  *    Kampung Ramadhan). Nomor urut bukan syarat sebuah baris dihitung.
  *  - Sel Bulan/Tanggal kosong berarti nilainya sama dengan baris di atasnya,
  *    karena sel di-merge di spreadsheet.
+ *  - Tab Pemulasaran Jenazah menaruh kolom Saldo (4) sebelum Keterangan (5),
+ *    jadi indeks keterangannya beda dari tab transaksi lain.
  *  - Kolom beras berisi pecahan desimal ("760,5", "22.5"), jadi diparse
  *    terpisah dari uang.
  */
@@ -39,7 +41,9 @@ export const PROGRAM = [
   {
     id: 'pemulasaran', nama: 'Pemulasaran Jenazah', gid: '1658087312', jenis: 'transaksi',
     keterangan: 'Kas lembaga pemulasaran jenazah 125.',
-    kolom: { no: 0, tanggal: 1, masuk: 2, keluar: 3, ket: 4 },
+    // Tab ini menaruh Saldo sebelum Keterangan, jadi kolom keterangan ada di
+    // indeks 5 — berbeda dari Infaq Operasional yang keterangannya di indeks 4.
+    kolom: { no: 0, tanggal: 1, masuk: 2, keluar: 3, saldo: 4, ket: 5 },
   },
   {
     id: 'donatur', nama: 'Donatur Tetap', gid: '843760573', jenis: 'donatur',
